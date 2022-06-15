@@ -37,16 +37,11 @@ class MainActivity : AppCompatActivity() {
 //                }
 //            }
 
-            dao.runTaskById(1L)?.let {
-                for(item in it.listRunPoint)
-                    Log.d("MainActivity", item.toString())
-            }
-
-              //Test query
-//            for(item in dao.allTaskWithPoint()){
-//                Log.d("MainActivity", item.toString())
+            //Test get
+//            dao.runTaskById(1L)?.let {
+//                for(item in it.listRunPoint)
+//                    Log.d("MainActivity", item.toString())
 //            }
-
 
         }
 
