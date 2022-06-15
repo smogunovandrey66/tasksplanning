@@ -5,6 +5,17 @@ import android.util.Log
 import androidx.room.*
 import java.util.*
 
+
+/**
+ * Task item for persist database
+ */
+
+@Entity
+data class Task(
+    @PrimaryKey(autoGenerate = true) val idTask: Long,
+    val name: String
+)
+
 /**
  * Type trigger
  */
@@ -13,21 +24,14 @@ enum class TriggerType{
 }
 
 /**
- * Trigger for event
- */
-//@Entity
-//data class Trigger(
-//    @PrimaryKey(autoGenerate = true) val id: Long,
-//    val type: TriggerType
-//)
-
-/**
  * Point for event
  */
 @Entity
 data class Point(
     @PrimaryKey(autoGenerate = true) val idPoint: Long,
+    val idTask: Long,
     val name: String,
+    val num: Long,
     val triggerType: TriggerType
 )
 
@@ -41,50 +45,52 @@ data class PointGps(
     val longitude: Float
 )
 
-/**
- * Task item for persist database
- */
-
-@Entity
-data class Task(
-    @PrimaryKey(autoGenerate = true) val idTask: Long,
-    val name: String
-)
-
-@Entity(primaryKeys = ["idTask", "idPoint"])
-data class TaskPointCrossRef(
-    val idTask: Long,
-    val idPoint: Long
-)
-
 data class TaskWithPoint(
     @Embedded val task: Task,
 
-    @Relation(parentColumn = "idTask", entityColumn = "idPoint", associateBy = Junction(TaskPointCrossRef::class))
+    @Relation(parentColumn = "idTask", entityColumn = "idTask")
     val listTaskPoint: List<Point>
 )
 
-@Entity(primaryKeys = ["idTask", "idPoint"])
-data class RunTaskCrossRef(
-    val idTask: Long,
+@Entity
+data class RunTask(
+    @PrimaryKey(autoGenerate = true) val idRunTask: Long,
+    val idTask: Long
+)
+
+@Entity
+data class RunPoint(
+    @PrimaryKey(autoGenerate = true) val idRunPoint: Long,
+    val idRunTask: Long,
     val idPoint: Long,
-    val num: Long,
-    val dateBegin: Date = Date(),
-    val dateEnd: Date = Date()
+    var dateBegin: Date = Date(),
+    var dateEnd: Date? = null
 )
 
 data class RunTaskWithPoint(
-    @Embedded val task: Task,
+    @Embedded val runPoint: RunTask,
 
-    @Relation(parentColumn = "idTask", entityColumn = "idPoint", associateBy = Junction(RunTaskCrossRef::class))
-    val listPoints: List<Point>
+    @Relation(parentColumn = "idRunTask", entityColumn = "idRunTask")
+    val listRunPoint: List<RunPoint>
 )
+
+//data class RunPointAndNameAndTrigger(
+//    @Embedded val point: RunPointTemplate,
+//    val name: String,
+//    val triggerType: TriggerType
+//)
+
+//data class RunTask(
+//    @Embedded val task: Task,
+//    @Relation(parentColumn = "idTask", entityColumn = "idTask")
+//    val point: RunPointAndNameAndTrigger
+//)
 
 @Dao
 interface MainDao{
     //Task
     @Insert
-    suspend fun addTask(task: Task)
+    suspend fun insertTask(task: Task): Long
 
     @Delete
     suspend fun deleteTask(task: Task)
@@ -94,7 +100,7 @@ interface MainDao{
 
     //Point
     @Insert
-    suspend fun insertPoint(point: Point)
+    suspend fun insertPoint(point: Point): Long
 
     @Delete
     suspend fun deletePoint(point: Point)
@@ -102,21 +108,37 @@ interface MainDao{
     @Update
     suspend fun updatePoint(point: Point)
 
-    //TaskPoint
-    @Insert
-    suspend fun insertTaskPoint(taskPoint: TaskPointCrossRef)
-
-    @Delete
-    suspend fun deleteTaskPoint(taskPoint: TaskPointCrossRef)
-
+    //TaskWithPoint
     @Query("select * from Task where idTask = :takId")
-    suspend fun pointsByTask(takId: Long): TaskWithPoint?
+    suspend fun taskById(takId: Long): TaskWithPoint?
 
     @Query("select * FROM Task")
     suspend fun  allTaskWithPoint(): List<TaskWithPoint>
+
+    //RunTask
+    @Insert
+    suspend fun insertRunTask(runTask: RunTask): Long
+
+    @Delete
+    suspend fun deleteRunTask(runTask: RunTask)
+
+    //RunPoint
+    @Insert
+    suspend fun insertRunPoint(runPoint: RunPoint)
+
+    @Delete
+    suspend fun deleteRunPoint(runPoint: RunPoint)
+
+
+    //RunTaskWithPoint
+    @Query("select * from RunTask")
+    suspend fun allRunTask(): List<RunTaskWithPoint>
+
+    @Query("select * from RunTask where idRunTask = :idRunTask")
+    suspend fun runTaskById(idRunTask: Long): RunTaskWithPoint?
 }
 
-@Database(entities = [/*Trigger::class*,*/ Point::class, Task::class, TaskPointCrossRef::class], version = 1)
+@Database(entities = [Point::class, Task::class, RunPoint::class, RunTask::class], version = 1)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase(){
     abstract fun mainDao(): MainDao
