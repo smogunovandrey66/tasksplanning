@@ -55,7 +55,8 @@ data class TaskWithPoint(
 @Entity
 data class RunTask(
     @PrimaryKey(autoGenerate = true) val idRunTask: Long,
-    val idTask: Long
+    val idTask: Long,
+    val active: Boolean = false
 )
 
 @Entity
