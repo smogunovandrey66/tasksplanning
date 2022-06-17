@@ -3,6 +3,7 @@ package com.smogunovandrey.tasksplanning
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
 import com.smogunovandrey.tasksplanning.db.*
 import kotlinx.coroutines.CoroutineScope
@@ -12,7 +13,6 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,8 +20,7 @@ class MainActivity : AppCompatActivity() {
 
         val db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "tasks.db").build()
         val dao = db.mainDao()
-
-        scope.launch {
+        lifecycleScope.launch {
             //Insert Test
 //            for (i in 1..2) {
 //                val task = Task(0, "task $i")
