@@ -27,17 +27,22 @@ class MainActivity : AppCompatActivity() {
 
 //        val db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "tasks.db").build()
 //        val dao = db.mainDao()
-        val t = taskTemplateViewModel
+
         lifecycleScope.launch {
-            Log.d("MainActivity", "MainActivity")
+//            delay(5000)
+            Log.d("MainActivity", "begin collect")
             taskTemplateViewModel.tasksTemplate.collect{
                 for(item in it)
                     Log.d("MainActivity", item.toString())
             }
-            Log.d("MainActivity", "in MainActivity")
+        }
+
+        lifecycleScope.launch {
+            delay(1000)
+            Log.d("MainActivity", "insert")
             //Insert Test
             for (i in 1..2) {
-                delay(3000)
+//                delay(3000)
                 val task = Task(0, "task $i")
                 val dao = AppDatabase.getInstance(applicationContext).mainDao()
                 val idTask = dao.insertTask(task)
@@ -47,7 +52,7 @@ class MainActivity : AppCompatActivity() {
                     val idPoint = dao.insertPoint(point)
                     val runPoint = RunPoint(0, idTask, idPoint, dateEnd = Date())
                     dao.insertRunPoint(runPoint)
-                    delay(1000)
+//                    delay(1000)
                     Log.d("MainActivity", "create $runPoint")
                 }
             }
