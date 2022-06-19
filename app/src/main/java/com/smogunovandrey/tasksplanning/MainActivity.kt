@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
+import com.smogunovandrey.tasksplanning.databinding.ActivityMainBinding
 import com.smogunovandrey.tasksplanning.db.*
 import com.smogunovandrey.tasksplanning.viewmodel.TaskTemplateViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -17,6 +18,10 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
+
+    private val binding: ActivityMainBinding by lazy{
+        ActivityMainBinding.inflate(layoutInflater)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,16 +34,18 @@ class MainActivity : AppCompatActivity() {
 //        val dao = db.mainDao()
 
         lifecycleScope.launch {
+            return@launch
 //            delay(5000)
-            Log.d("MainActivity", "begin collect")
             taskTemplateViewModel.tasksTemplate.collect{
+                Log.d("MainActivity", "begin collect")
                 for(item in it)
                     Log.d("MainActivity", item.toString())
             }
         }
 
         lifecycleScope.launch {
-            delay(1000)
+            return@launch
+            delay(5000)
             Log.d("MainActivity", "insert")
             //Insert Test
             for (i in 1..2) {
