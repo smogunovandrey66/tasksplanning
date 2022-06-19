@@ -3,6 +3,7 @@ package com.smogunovandrey.tasksplanning.db
 import android.content.Context
 import android.util.Log
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 
@@ -114,7 +115,7 @@ interface MainDao{
     suspend fun taskById(takId: Long): TaskWithPoint?
 
     @Query("select * FROM Task")
-    suspend fun  allTaskWithPoint(): List<TaskWithPoint>
+    fun  allTaskWithPoint(): Flow<List<TaskWithPoint>>
 
     //RunTask
     @Insert
