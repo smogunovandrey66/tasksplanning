@@ -1,4 +1,4 @@
-package com.smogunovandrey.tasksplanning.repository
+package com.smogunovandrey.tasksplanning.taskstemplate
 
 import com.smogunovandrey.tasksplanning.db.MainDao
 import com.smogunovandrey.tasksplanning.result.Result

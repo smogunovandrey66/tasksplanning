@@ -6,10 +6,18 @@
 
     <fragment
         android:id="@+id/tasksTemplateFragment"
-        android:name="com.smogunovandrey.tasksplanning.ui.TasksTemplateFragment"
-        android:label="TasksTemplateFragment" />
+        android:name="com.smogunovandrey.tasksplanning.taskstemplate.TasksTemplateFragment"
+        android:label="TasksTemplateFragment" >
+        <action
+            android:id="@+id/action_tasksTemplateFragment_to_taskEditFragment"
+            app:destination="@id/taskEditFragment" />
+    </fragment>
     <fragment
         android:id="@+id/taskEditFragment"
-        android:name="com.smogunovandrey.tasksplanning.ui.TaskEditFragment"
-        android:label="TaskEditFragment" />
+        android:name="com.smogunovandrey.tasksplanning.taskedit.TaskEditFragment"
+        android:label="TaskEditFragment" >
+        <action
+            android:id="@+id/action_taskEditFragment_to_tasksTemplateFragment"
+            app:destination="@id/tasksTemplateFragment" />
+    </fragment>
 </navigation>

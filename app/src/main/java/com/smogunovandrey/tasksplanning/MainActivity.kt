@@ -23,10 +23,10 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
+    val taskTemplateViewModel: TaskTemplateViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val taskTemplateViewModel: TaskTemplateViewModel by viewModels()
 
         setContentView(R.layout.activity_main)
 
