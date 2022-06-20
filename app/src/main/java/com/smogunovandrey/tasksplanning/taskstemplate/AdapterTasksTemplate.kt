@@ -30,26 +30,23 @@ data class TaskItem(
 
 class AdapterTasksTemplate: ListAdapter<TaskItem, AdapterTasksTemplate.TaskItemHolder>(DiffUtilsTasks) {
 
-    class TaskItemHolder(val binding: ItemTasksTemplateBinding) : RecyclerView.ViewHolder(binding.root){
+    class TaskItemHolder(val binding: ItemTasksTemplateBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         init {
-            binding.name.setOnClickListener
+            binding.name.setOnClickListener {
 
                 itemView.findNavController().navigate(R.id.taskEditFragment)
             }
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskItemHolder {
-        val binding = ItemTasksTemplateBinding.inflate(LayoutInflater.from(parent.context))
-        return TaskItemHolder(binding)
-    }
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskItemHolder {
+            TODO("Not yet implemented")
+        }
 
-    override fun onBindViewHolder(holder: TaskItemHolder, position: Int) {
-        holder.binding.taskItem = getItem(position)
-
-    }
-
-
+        override fun onBindViewHolder(holder: TaskItemHolder, position: Int) {
+            TODO("Not yet implemented")
+        }
 }
 
 object DiffUtilsTasks: DiffUtil.ItemCallback<TaskItem>() {

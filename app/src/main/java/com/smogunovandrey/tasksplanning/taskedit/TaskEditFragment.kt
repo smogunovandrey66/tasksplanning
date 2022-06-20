@@ -14,7 +14,7 @@ class TaskEditFragment: Fragment() {
     }
 
     private val adapter: AdapterPoints by lazy{
-        AdapterPoints()
+        AdapterPoints(emptyList())
     }
 
     override fun onCreateView(
