@@ -6,6 +6,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.smogunovandrey.tasksplanning.databinding.ActivityMainBinding
+import com.smogunovandrey.tasksplanning.db.AppDatabase
+import com.smogunovandrey.tasksplanning.db.TaskDB
 import com.smogunovandrey.tasksplanning.taskstemplate.TaskTemplateViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -38,14 +40,14 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             return@launch
-            delay(5000)
+//            delay(2000)
             Log.d("MainActivity", "insert")
             //Insert Test
-//            for (i in 1..2) {
-////                delay(3000)
-//                val task = Task(0, "task $i")
-//                val dao = AppDatabase.getInstance(applicationContext).mainDao()
-//                val idTask = dao.insertTask(task)
+            for (i in 1..2) {
+                delay(2000)
+                val task = TaskDB(0, "task $i")
+                val dao = AppDatabase.getInstance(applicationContext).mainDao()
+                val idTask = dao.insertTask(task)
 //                dao.insertRunTask(RunTask(0, idTask))
 //                for (triggerType in TriggerType.values()) {
 //                    val point: Point = Point(0, idTask, "name ${triggerType.name}", triggerType.ordinal.toLong() + 1L, triggerType)
@@ -55,7 +57,7 @@ class MainActivity : AppCompatActivity() {
 ////                    delay(1000)
 //                    Log.d("MainActivity", "create $runPoint")
 //                }
-//            }
+            }
 
             //Test get
 //            dao.runTaskById(1L)?.let {
