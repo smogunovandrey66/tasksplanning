@@ -4,18 +4,11 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
-import androidx.room.Room
 import com.smogunovandrey.tasksplanning.databinding.ActivityMainBinding
-import com.smogunovandrey.tasksplanning.db.*
-import com.smogunovandrey.tasksplanning.viewmodel.TaskTemplateViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.smogunovandrey.tasksplanning.taskstemplate.TaskTemplateViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,13 +27,13 @@ class MainActivity : AppCompatActivity() {
 //        val dao = db.mainDao()
 
         lifecycleScope.launch {
-            return@launch
-//            delay(5000)
-            taskTemplateViewModel.tasksTemplate.collect{
-                Log.d("MainActivity", "begin collect")
-                for(item in it)
-                    Log.d("MainActivity", item.toString())
-            }
+//            return@launch
+////            delay(5000)
+//            taskTemplateViewModel.tasksTemplate.collect{
+//                Log.d("MainActivity", "begin collect")
+//                for(item in it)
+//                    Log.d("MainActivity", item.toString())
+//            }
         }
 
         lifecycleScope.launch {
@@ -48,21 +41,21 @@ class MainActivity : AppCompatActivity() {
             delay(5000)
             Log.d("MainActivity", "insert")
             //Insert Test
-            for (i in 1..2) {
-//                delay(3000)
-                val task = Task(0, "task $i")
-                val dao = AppDatabase.getInstance(applicationContext).mainDao()
-                val idTask = dao.insertTask(task)
-                dao.insertRunTask(RunTask(0, idTask))
-                for (triggerType in TriggerType.values()) {
-                    val point: Point = Point(0, idTask, "name ${triggerType.name}", triggerType.ordinal.toLong() + 1L, triggerType)
-                    val idPoint = dao.insertPoint(point)
-                    val runPoint = RunPoint(0, idTask, idPoint, dateEnd = Date())
-                    dao.insertRunPoint(runPoint)
-//                    delay(1000)
-                    Log.d("MainActivity", "create $runPoint")
-                }
-            }
+//            for (i in 1..2) {
+////                delay(3000)
+//                val task = Task(0, "task $i")
+//                val dao = AppDatabase.getInstance(applicationContext).mainDao()
+//                val idTask = dao.insertTask(task)
+//                dao.insertRunTask(RunTask(0, idTask))
+//                for (triggerType in TriggerType.values()) {
+//                    val point: Point = Point(0, idTask, "name ${triggerType.name}", triggerType.ordinal.toLong() + 1L, triggerType)
+//                    val idPoint = dao.insertPoint(point)
+//                    val runPoint = RunPoint(0, idTask, idPoint, dateEnd = Date())
+//                    dao.insertRunPoint(runPoint)
+////                    delay(1000)
+//                    Log.d("MainActivity", "create $runPoint")
+//                }
+//            }
 
             //Test get
 //            dao.runTaskById(1L)?.let {

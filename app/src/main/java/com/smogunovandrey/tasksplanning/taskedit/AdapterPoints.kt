@@ -1,14 +1,13 @@
 package com.smogunovandrey.tasksplanning.taskedit
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.smogunovandrey.tasksplanning.databinding.ItemPointsTemplateBinding
-import com.smogunovandrey.tasksplanning.taskstemplate.PointItem
+import com.smogunovandrey.tasksplanning.taskstemplate.Point
 
 
-class AdapterPoints(val points: List<PointItem>): RecyclerView.Adapter<AdapterPoints.ViewHolderPointItem>() {
+class AdapterPoints(val points: List<Point>): RecyclerView.Adapter<AdapterPoints.ViewHolderPointItem>() {
 
     class ViewHolderPointItem(val binding: ItemPointsTemplateBinding) : RecyclerView.ViewHolder(binding.root) {
 

@@ -3,7 +3,7 @@
     <data>
         <variable
             name="point"
-            type="com.smogunovandrey.tasksplanning.taskstemplate.PointItem" />
+            type="com.smogunovandrey.tasksplanning.taskstemplate.Point" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"

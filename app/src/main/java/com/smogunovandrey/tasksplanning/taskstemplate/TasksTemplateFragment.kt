@@ -10,7 +10,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.smogunovandrey.tasksplanning.databinding.FragmentTasksTemplateBinding
-import com.smogunovandrey.tasksplanning.viewmodel.TaskTemplateViewModel
 import kotlinx.coroutines.launch
 
 class TasksTemplateFragment : Fragment() {
@@ -33,22 +32,12 @@ class TasksTemplateFragment : Fragment() {
         binding.rvTasks.adapter = adapter
 
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED){
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
                 taskTemplateViewModel.tasksTemplate.collect{ listTasks ->
-                    val listAdapter = mutableListOf<TaskItem>()
-                    listTasks.map {
-                        val taskItem = TaskItem(it.task.idTask, it.task.name)
-                        it.listTaskPoint.map{ point ->
-                            taskItem.points.add(PointItem(point.idPoint, point.name, point.num, point.triggerType))
-                        }
-                        listAdapter.add(taskItem)
-                    }
-                    adapter.submitList(listAdapter)
+                    adapter.submitList(listTasks)
                 }
             }
         }
-
-
 
         return binding.root
     }

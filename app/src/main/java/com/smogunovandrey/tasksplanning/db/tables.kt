@@ -1,7 +1,6 @@
 package com.smogunovandrey.tasksplanning.db
 
 import android.content.Context
-import android.util.Log
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 import java.util.*
@@ -11,9 +10,9 @@ import java.util.*
  * Task item for persist database
  */
 
-@Entity
-data class Task(
-    @PrimaryKey(autoGenerate = true) val idTask: Long,
+@Entity(tableName = "tasks")
+data class TaskDB(
+    @PrimaryKey(autoGenerate = true) val id: Long,
     val name: String
 )
 
@@ -27,9 +26,10 @@ enum class TriggerType{
 /**
  * Point for event
  */
-@Entity
-data class Point(
-    @PrimaryKey(autoGenerate = true) val idPoint: Long,
+@Entity(tableName = "points")
+data class PointDB(
+    @PrimaryKey(autoGenerate = true) val id: Long,
+    @ColumnInfo(name = "id_task")
     val idTask: Long,
     val name: String,
     val num: Long,
@@ -39,41 +39,48 @@ data class Point(
 /**
  * Additional params for points with GPS trigger
  */
-@Entity
-data class PointGps(
-    @PrimaryKey val idPoint: Long,
+@Entity(tableName = "points_gps")
+data class PointGpsDB(
+    @PrimaryKey
+    @ColumnInfo(name = "id_point")
+    val idPoint: Long,
     val latitude: Float,
     val longitude: Float
 )
 
-data class TaskWithPoint(
-    @Embedded val task: Task,
+data class TaskWithPointDB(
+    @Embedded val task: TaskDB,
 
-    @Relation(parentColumn = "idTask", entityColumn = "idTask")
-    val listTaskPoint: List<Point>
+    @Relation(parentColumn = "id", entityColumn = "id_task")
+    val listTaskPoint: List<PointDB>
 )
 
-@Entity
-data class RunTask(
-    @PrimaryKey(autoGenerate = true) val idRunTask: Long,
+@Entity(tableName = "run_tasks")
+data class RunTaskDB(
+    @PrimaryKey(autoGenerate = true) val id: Long,
+    @ColumnInfo(name = "id_task")
     val idTask: Long,
     val active: Boolean = false
 )
 
-@Entity
-data class RunPoint(
-    @PrimaryKey(autoGenerate = true) val idRunPoint: Long,
+@Entity(tableName = "run_points")
+data class RunPointDB(
+    @PrimaryKey(autoGenerate = true) val id: Long,
+    @ColumnInfo(name = "id_run_task")
     val idRunTask: Long,
+    @ColumnInfo(name = "id_point")
     val idPoint: Long,
+    @ColumnInfo(name = "date_begin")
     var dateBegin: Date = Date(),
+    @ColumnInfo(name = "date_end")
     var dateEnd: Date? = null
 )
 
-data class RunTaskWithPoint(
-    @Embedded val runPoint: RunTask,
+data class RunTaskWithPointDB(
+    @Embedded val runPoint: RunTaskDB,
 
-    @Relation(parentColumn = "idRunTask", entityColumn = "idRunTask")
-    val listRunPoint: List<RunPoint>
+    @Relation(parentColumn = "id", entityColumn = "id_run_task")
+    val listRunPoint: List<RunPointDB>
 )
 
 //data class RunPointAndNameAndTrigger(
@@ -92,55 +99,62 @@ data class RunTaskWithPoint(
 interface MainDao{
     //Task
     @Insert
-    suspend fun insertTask(task: Task): Long
+    suspend fun insertTask(task: TaskDB): Long
 
     @Delete
-    suspend fun deleteTask(task: Task)
+    suspend fun deleteTask(task: TaskDB)
 
     @Update
-    suspend fun updateTask(task: Task)
+    suspend fun updateTask(task: TaskDB)
 
     //Point
     @Insert
-    suspend fun insertPoint(point: Point): Long
+    suspend fun insertPoint(point: PointDB): Long
 
     @Delete
-    suspend fun deletePoint(point: Point)
+    suspend fun deletePoint(point: PointDB)
 
     @Update
-    suspend fun updatePoint(point: Point)
+    suspend fun updatePoint(point: PointDB)
+
+    @Query("select * from tasks")
+    fun allTasksFlow(): Flow<List<TaskDB>>
+
+    //GPS point
+    @Query("select * from points_gps where id_point = :idPoint")
+    suspend fun gpsPoint(idPoint: Long): PointGpsDB?
 
     //TaskWithPoint
-    @Query("select * from Task where idTask = :takId")
-    suspend fun taskById(takId: Long): TaskWithPoint?
+    @Query("select * from tasks where id = :takId")
+    suspend fun taskById(takId: Long): TaskWithPointDB?
 
-    @Query("select * FROM Task")
-    fun  allTaskWithPoint(): Flow<List<TaskWithPoint>>
+    @Query("select * FROM tasks")
+    fun  allTaskWithPoint(): Flow<List<TaskWithPointDB>>
 
     //RunTask
     @Insert
-    suspend fun insertRunTask(runTask: RunTask): Long
+    suspend fun insertRunTask(runTask: RunTaskDB): Long
 
     @Delete
-    suspend fun deleteRunTask(runTask: RunTask)
+    suspend fun deleteRunTask(runTask: RunTaskDB)
 
     //RunPoint
     @Insert
-    suspend fun insertRunPoint(runPoint: RunPoint)
+    suspend fun insertRunPoint(runPoint: RunPointDB)
 
     @Delete
-    suspend fun deleteRunPoint(runPoint: RunPoint)
+    suspend fun deleteRunPoint(runPoint: RunPointDB)
 
 
     //RunTaskWithPoint
-    @Query("select * from RunTask")
-    suspend fun allRunTask(): List<RunTaskWithPoint>
+    @Query("select * from run_tasks")
+    suspend fun allRunTask(): List<RunTaskWithPointDB>
 
-    @Query("select * from RunTask where idRunTask = :idRunTask")
-    suspend fun runTaskById(idRunTask: Long): RunTaskWithPoint?
+    @Query("select * from run_tasks where id = :idRunTask")
+    suspend fun runTaskById(idRunTask: Long): RunTaskWithPointDB?
 }
 
-@Database(entities = [Point::class, Task::class, RunPoint::class, RunTask::class], version = 1)
+@Database(entities = [PointDB::class, PointGpsDB::class, TaskDB::class, RunPointDB::class, RunTaskDB::class], version = 1)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase(){
     abstract fun mainDao(): MainDao

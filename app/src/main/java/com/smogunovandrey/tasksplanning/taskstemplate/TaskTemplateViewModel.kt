@@ -1,4 +1,4 @@
-package com.smogunovandrey.tasksplanning.viewmodel
+package com.smogunovandrey.tasksplanning.taskstemplate
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
