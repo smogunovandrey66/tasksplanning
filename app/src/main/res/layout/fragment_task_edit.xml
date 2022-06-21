@@ -17,14 +17,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/name_task"/>
-        <TextView
+        <EditText
             android:id="@+id/edt_name"
             app:layout_constraintStart_toEndOf="@+id/txt_name"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{taskItem.name}"/>
+            android:text="@{taskItem.name}"
+            android:hint="@string/name_task"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_points"
@@ -34,16 +35,6 @@
             android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_points_template"/>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/btn_edit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:src="@drawable/baseline_edit_24"
-            app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

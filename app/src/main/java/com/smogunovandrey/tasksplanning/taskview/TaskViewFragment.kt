@@ -9,7 +9,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.databinding.FragmentTaskViewBinding
 import com.smogunovandrey.tasksplanning.taskstemplate.TaskTemplateViewModel
 import kotlinx.coroutines.launch
@@ -55,6 +57,10 @@ class TaskViewFragment: Fragment() {
                     }
                 }
             }
+        }
+
+        binding.btnEdit.setOnClickListener {
+            findNavController().navigate(R.id.)
         }
 
         return binding.root

@@ -13,7 +13,7 @@
             app:destination="@id/taskEditFragment" />
     </fragment>
     <fragment
-        android:id="@+id/taskEditFragment"
+        android:id="@+id/taskViewFragment"
         android:name="com.smogunovandrey.tasksplanning.taskview.TaskViewFragment"
         android:label="TaskEditFragment" >
         <action
@@ -22,5 +22,16 @@
         <argument
             android:name="idTask"
             app:argType="long" />
+        <action
+            android:id="@+id/action_taskEditFragment_to_taskEditFragment2"
+            app:destination="@id/taskEditFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/taskEditFragment"
+        android:name="com.smogunovandrey.tasksplanning.taskedit.TaskEditFragment"
+        android:label="TaskEditFragment" >
+        <action
+            android:id="@+id/action_taskEditFragment2_to_taskEditFragment"
+            app:destination="@id/taskEditFragment" />
     </fragment>
 </navigation>
