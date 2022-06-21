@@ -22,8 +22,8 @@ class TaskViewFragment: Fragment() {
         FragmentTaskViewBinding.inflate(layoutInflater)
     }
 
-    private val adapter: AdapterPoints by lazy{
-        AdapterPoints(emptyList())
+    private val adapter: AdapterViewPoints by lazy{
+        AdapterViewPoints(emptyList())
     }
 
     private val args by navArgs<TaskViewFragmentArgs>()

@@ -30,11 +30,11 @@
         android:id="@+id/taskEditFragment"
         android:name="com.smogunovandrey.tasksplanning.taskedit.TaskEditFragment"
         android:label="TaskEditFragment" >
-        <action
-            android:id="@+id/action_taskEditFragment_to_taskViewFragment"
-            app:destination="@id/taskViewFragment" />
         <argument
             android:name="idTask"
             app:argType="long" />
+        <action
+            android:id="@+id/action_taskEditFragment_to_tasksTemplateFragment2"
+            app:destination="@id/tasksTemplateFragment" />
     </fragment>
 </navigation>

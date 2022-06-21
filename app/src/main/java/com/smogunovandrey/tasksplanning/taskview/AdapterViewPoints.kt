@@ -7,7 +7,7 @@ import com.smogunovandrey.tasksplanning.databinding.ItemPointsTemplateBinding
 import com.smogunovandrey.tasksplanning.taskstemplate.Point
 
 
-class AdapterPoints(var points: List<Point>): RecyclerView.Adapter<AdapterPoints.ViewHolderPointItem>() {
+class AdapterViewPoints(var points: List<Point>): RecyclerView.Adapter<AdapterViewPoints.ViewHolderPointItem>() {
 
     class ViewHolderPointItem(val binding: ItemPointsTemplateBinding) : RecyclerView.ViewHolder(binding.root) {
 
