@@ -60,7 +60,7 @@ class TaskViewFragment: Fragment() {
         }
 
         binding.btnEdit.setOnClickListener {
-            findNavController().navigate(R.id.)
+            findNavController().navigate(R.id.taskEditFragment)
         }
 
         return binding.root

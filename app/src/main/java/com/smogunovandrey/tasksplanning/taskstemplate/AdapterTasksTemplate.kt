@@ -30,7 +30,7 @@ class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolde
         init {
             binding.name.setOnClickListener {
                 binding.taskItem?.let {
-                    val action = TasksTemplateFragmentDirections.actionTasksTemplateFragmentToTaskEditFragment(it.id)
+                    val action = TasksTemplateFragmentDirections.actionTasksTemplateFragmentToTaskViewFragment(it.id)
                     itemView.findNavController().navigate(action)
                 }
 
