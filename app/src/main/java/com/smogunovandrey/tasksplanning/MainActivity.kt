@@ -7,7 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.smogunovandrey.tasksplanning.databinding.ActivityMainBinding
 import com.smogunovandrey.tasksplanning.db.AppDatabase
+import com.smogunovandrey.tasksplanning.db.PointDB
 import com.smogunovandrey.tasksplanning.db.TaskDB
+import com.smogunovandrey.tasksplanning.db.TriggerType
+import com.smogunovandrey.tasksplanning.taskstemplate.Point
 import com.smogunovandrey.tasksplanning.taskstemplate.TaskTemplateViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -45,18 +48,15 @@ class MainActivity : AppCompatActivity() {
             //Insert Test
             for (i in 1..2) {
                 delay(2000)
-                val task = TaskDB(0, "task $i")
+                val taskDB = TaskDB(0, "task $i")
                 val dao = AppDatabase.getInstance(applicationContext).mainDao()
-                val idTask = dao.insertTask(task)
+                val idTask = dao.insertTask(taskDB)
+
 //                dao.insertRunTask(RunTask(0, idTask))
-//                for (triggerType in TriggerType.values()) {
-//                    val point: Point = Point(0, idTask, "name ${triggerType.name}", triggerType.ordinal.toLong() + 1L, triggerType)
-//                    val idPoint = dao.insertPoint(point)
-//                    val runPoint = RunPoint(0, idTask, idPoint, dateEnd = Date())
-//                    dao.insertRunPoint(runPoint)
-////                    delay(1000)
-//                    Log.d("MainActivity", "create $runPoint")
-//                }
+                for (triggerType in TriggerType.values()) {
+                    val pointDb = PointDB(0, idTask, "name ${triggerType.name}", triggerType.ordinal + 1L, triggerType)
+                    val idPoint = dao.insertPoint(pointDb)
+                }
             }
 
             //Test get

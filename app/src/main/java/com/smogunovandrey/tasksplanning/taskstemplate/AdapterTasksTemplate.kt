@@ -6,10 +6,8 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.databinding.ItemTasksTemplateBinding
 import com.smogunovandrey.tasksplanning.db.TriggerType
-import com.smogunovandrey.tasksplanning.taskedit.TaskEditFragmentDirections
 
 data class Point(
     val id: Long,
@@ -31,8 +29,14 @@ class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolde
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.name.setOnClickListener {
-                TaskEditFragmentDirections.actionTaskEditFragmentToTasksTemplateFragment()
-                itemView.findNavController().navigate(R.id.taskEditFragment)
+                binding.taskItem?.let {
+                    val action = TasksTemplateFragmentDirections.actionTasksTemplateFragmentToTaskEditFragment(it.id)
+                    itemView.findNavController().navigate(action)
+                }
+
+
+                //Other way navigate to taskFragment
+//                itemView.findNavController().navigate(R.id.taskEditFragment)
             }
         }
     }

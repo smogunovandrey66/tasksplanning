@@ -107,6 +107,12 @@ interface MainDao{
     @Update
     suspend fun updateTask(task: TaskDB)
 
+    @Query("select * from tasks")
+    fun allTasksFlow(): Flow<List<TaskDB>>
+
+    @Query("select * from tasks where id = :idTask")
+    fun taskById(idTask: Long): Flow<TaskDB?>
+
     //Point
     @Insert
     suspend fun insertPoint(point: PointDB): Long
@@ -117,16 +123,18 @@ interface MainDao{
     @Update
     suspend fun updatePoint(point: PointDB)
 
-    @Query("select * from tasks")
-    fun allTasksFlow(): Flow<List<TaskDB>>
+    @Query("select * from points where id_task = :idTask")
+    fun pointsByTaskId(idTask: Long): Flow<List<PointDB>>
+
 
     //GPS point
     @Query("select * from points_gps where id_point = :idPoint")
     suspend fun gpsPoint(idPoint: Long): PointGpsDB?
 
+    //Example complex data(with embedded)
     //TaskWithPoint
-    @Query("select * from tasks where id = :takId")
-    suspend fun taskById(takId: Long): TaskWithPointDB?
+//    @Query("select * from tasks where id = :takId")
+//    suspend fun taskById(takId: Long): TaskWithPointDB?
 
     @Query("select * FROM tasks")
     fun  allTaskWithPoint(): Flow<List<TaskWithPointDB>>

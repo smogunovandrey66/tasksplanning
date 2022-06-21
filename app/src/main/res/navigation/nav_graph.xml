@@ -14,10 +14,13 @@
     </fragment>
     <fragment
         android:id="@+id/taskEditFragment"
-        android:name="com.smogunovandrey.tasksplanning.taskedit.TaskEditFragment"
+        android:name="com.smogunovandrey.tasksplanning.taskview.TaskViewFragment"
         android:label="TaskEditFragment" >
         <action
             android:id="@+id/action_taskEditFragment_to_tasksTemplateFragment"
             app:destination="@id/tasksTemplateFragment" />
+        <argument
+            android:name="idTask"
+            app:argType="long" />
     </fragment>
 </navigation>

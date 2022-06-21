@@ -1,4 +1,4 @@
-package com.smogunovandrey.tasksplanning.taskedit
+package com.smogunovandrey.tasksplanning.taskview
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,7 +7,7 @@ import com.smogunovandrey.tasksplanning.databinding.ItemPointsTemplateBinding
 import com.smogunovandrey.tasksplanning.taskstemplate.Point
 
 
-class AdapterPoints(val points: List<Point>): RecyclerView.Adapter<AdapterPoints.ViewHolderPointItem>() {
+class AdapterPoints(var points: List<Point>): RecyclerView.Adapter<AdapterPoints.ViewHolderPointItem>() {
 
     class ViewHolderPointItem(val binding: ItemPointsTemplateBinding) : RecyclerView.ViewHolder(binding.root) {
 

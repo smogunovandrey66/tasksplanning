@@ -15,6 +15,6 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:hint="@string/name_point"/>
+            android:text="@{point.name}"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
