@@ -9,19 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.smogunovandrey.tasksplanning.databinding.ItemTasksTemplateBinding
 import com.smogunovandrey.tasksplanning.db.TriggerType
 
-data class Point(
-    val id: Long,
-    val name: String,
-    val num: Long,
-    val triggerType: TriggerType
-)
-
-
-data class Task(
-    val id: Long,
-    val name: String
-)
-
 
 class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolder>(DiffUtilsTasks) {
 
@@ -42,7 +29,7 @@ class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolde
     }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskItemHolder {
-            val binding = ItemTasksTemplateBinding.inflate(LayoutInflater.from(parent.context))
+            val binding = ItemTasksTemplateBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             return  TaskItemHolder(binding)
         }
 

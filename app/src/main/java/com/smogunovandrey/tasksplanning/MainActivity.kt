@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("MainActivity", "insert")
             //Insert Test
             for (i in 1..2) {
-                delay(2000)
+//                delay(2000)
                 val taskDB = TaskDB(0, "task $i")
                 val dao = AppDatabase.getInstance(applicationContext).mainDao()
                 val idTask = dao.insertTask(taskDB)

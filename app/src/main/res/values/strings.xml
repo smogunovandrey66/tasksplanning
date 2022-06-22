@@ -4,4 +4,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="name_task">Name Task</string>
     <string name="name_point">Name point</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
 </resources>
