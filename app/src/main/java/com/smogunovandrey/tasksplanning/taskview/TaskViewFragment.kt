@@ -14,6 +14,8 @@ import androidx.navigation.fragment.navArgs
 import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.databinding.FragmentTaskViewBinding
 import com.smogunovandrey.tasksplanning.taskstemplate.TaskTemplateViewModel
+import com.smogunovandrey.tasksplanning.taskstemplate.TaskWithPoints
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class TaskViewFragment: Fragment() {
@@ -28,6 +30,7 @@ class TaskViewFragment: Fragment() {
 
     private val args by navArgs<TaskViewFragmentArgs>()
     private val model: TaskTemplateViewModel by activityViewModels()
+    private var taskWithPoints = TaskWithPoints()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,26 +44,18 @@ class TaskViewFragment: Fragment() {
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
-                model.pointsTemplate(args.idTask).collect{
-                    adapter.points = it
+                model.taskWithPoints(args.idTask).collect{
+                    taskWithPoints = it
+                    binding.taskItem = it.task
+                    adapter.points = it.points
                     adapter.notifyDataSetChanged()
-                }
-            }
-        }
-
-        lifecycleScope.launch{
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
-                model.taskById(args.idTask).collect{
-
-                    it?.let {
-                        binding.taskItem = it
-                    }
                 }
             }
         }
 
         binding.btnEdit.setOnClickListener {
             val action = TaskViewFragmentDirections.actionTaskViewFragmentToTaskEditFragment(args.idTask)
+            model.editedTaskWithPoints = taskWithPoints.deepCopy()
             findNavController().navigate(action)
         }
 

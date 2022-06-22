@@ -26,4 +26,10 @@ class TaskTemplateRepository(private val mainDao: MainDao) {
             Task(taskDB.id, taskDB.name)
         }
     }
+
+    fun taskWithPoints(idTask: Long): Flow<TaskWithPoints> = mainDao.taskWithPoints(idTask).map { it ->
+        TaskWithPoints(Task(it.task.id, it.task.name), it.listTaskPoint.map { pointDB ->
+            Point(pointDB.id, pointDB.name, pointDB.num, pointDB.triggerType)
+        }.toMutableList())
+    }
 }

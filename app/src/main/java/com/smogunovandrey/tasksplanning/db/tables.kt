@@ -131,10 +131,9 @@ interface MainDao{
     @Query("select * from points_gps where id_point = :idPoint")
     suspend fun gpsPoint(idPoint: Long): PointGpsDB?
 
-    //Example complex data(with embedded)
-    //TaskWithPoint
-//    @Query("select * from tasks where id = :takId")
-//    suspend fun taskById(takId: Long): TaskWithPointDB?
+    //TaskWithPointDB
+    @Query("select * from tasks where id = :takId")
+    fun taskWithPoints(takId: Long): Flow<TaskWithPointDB>
 
     @Query("select * FROM tasks")
     fun  allTaskWithPoint(): Flow<List<TaskWithPointDB>>

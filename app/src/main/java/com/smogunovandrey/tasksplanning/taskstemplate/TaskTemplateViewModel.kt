@@ -16,4 +16,9 @@ class TaskTemplateViewModel(application: Application) : AndroidViewModel(applica
 
     fun pointsTemplate(idTask: Long) = taskTemplateRepository.pointsByTaskId(idTask)
 
+    fun taskWithPoints(idTask: Long) = taskTemplateRepository. taskWithPoints(idTask)
+
+    //Edited TaskWithPoints
+    var editedTaskWithPoints = TaskWithPoints()
+
 }

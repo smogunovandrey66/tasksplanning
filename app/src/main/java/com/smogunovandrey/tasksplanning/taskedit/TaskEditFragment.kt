@@ -5,7 +5,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -15,6 +17,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.smogunovandrey.tasksplanning.databinding.FragmentTaskEditBinding
 import com.smogunovandrey.tasksplanning.taskstemplate.Point
+import com.smogunovandrey.tasksplanning.taskstemplate.Task
 import com.smogunovandrey.tasksplanning.taskstemplate.TaskTemplateViewModel
 import com.smogunovandrey.tasksplanning.utils.swap
 import kotlinx.coroutines.launch
@@ -26,13 +29,22 @@ class TaskEditFragment: Fragment() {
     }
 
     private val args by navArgs<TaskEditFragmentArgs>()
-    private val model: TaskTemplateViewModel by viewModels()
-    private val adapter: AdapterEditPoints = AdapterEditPoints()
+    private val model: TaskTemplateViewModel by activityViewModels()
+    private val adapter: AdapterEditPoints by lazy{
+        AdapterEditPoints(model.editedTaskWithPoints.points)
+    }
     private var pointsBefore: List<Point> = emptyList()
+    private var taskBefor: Task = Task()
 
     private fun checkSave(){
-        val ena = !(adapter.points.containsAll(pointsBefore) && pointsBefore.containsAll(adapter.points))
-        Log.d("TaskEditFragment", "ena = $ena")
+        var ena = taskBefor == binding.taskItem && pointsBefore.size != adapter.points.size
+        if(!ena){
+            for(i in pointsBefore.indices){
+                ena = pointsBefore[i] != adapter.points[i]
+                if(ena)
+                    break
+            }
+        }
         binding.btnSave.isEnabled = ena
     }
 
@@ -41,33 +53,38 @@ class TaskEditFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d("TaskEditFragment", "onCreateView")
         //viewLifecycleOwner vs this - see documentation(documentation in detached)
         binding.lifecycleOwner = viewLifecycleOwner
 
         //Set adapter
         binding.rvPoints.adapter = adapter
 
+        binding.taskItem = model.editedTaskWithPoints.task
+//        adapter.points = model.editedTaskWithPoints.points
+
         //Collect data about task by way of Flow
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
-                model.taskById(args.idTask).collect{
-                    it?.let {
-                        binding.taskItem = it
-                    }
-                }
-            }
-        }
+//        lifecycleScope.launch {
+//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+//                model.taskById(args.idTask).collect{
+//                    it?.let {
+//                        binding.taskItem = it
+//                        taskBefor = it.copy()
+//                    }
+//                }
+//            }
+//        }
 
         //Collect data about points by way of Flow
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
-                model.pointsTemplate(args.idTask).collect{
-                    adapter.points = it.toMutableList()
-                    pointsBefore = it.toMutableList()
-                    adapter.notifyDataSetChanged()
-                }
-            }
-        }
+//        lifecycleScope.launch {
+//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+//                model.pointsTemplate(args.idTask).collect{
+//                    adapter.points = it.toMutableList()
+//                    pointsBefore = it.toMutableList()
+//                    adapter.notifyDataSetChanged()
+//                }
+//            }
+//        }
 
         val simpleCallback = object :ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN,
@@ -99,6 +116,10 @@ class TaskEditFragment: Fragment() {
 
         val itemTouchHelper = ItemTouchHelper(simpleCallback)
         itemTouchHelper.attachToRecyclerView(binding.rvPoints)
+
+        binding.edtName.addTextChangedListener {
+            checkSave()
+        }
 
         return binding.root
     }
