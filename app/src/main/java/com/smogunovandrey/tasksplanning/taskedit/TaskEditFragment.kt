@@ -18,6 +18,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.databinding.FragmentTaskEditBinding
 import com.smogunovandrey.tasksplanning.taskstemplate.Point
 import com.smogunovandrey.tasksplanning.taskstemplate.Task
@@ -162,8 +163,7 @@ class TaskEditFragment: Fragment() {
 
         binding.btnCancel.setOnClickListener {
             val navController = findNavController()
-            val action = TaskEditFragmentDirections.actionTaskEditFragmentToTaskViewFragment(editedTask.id)
-            navController.navigate(action, NavOptions.Builder().setRestoreState(false).set.build())
+            navController.popBackStack()
 
         }
 
