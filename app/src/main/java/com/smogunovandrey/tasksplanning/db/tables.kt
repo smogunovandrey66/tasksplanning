@@ -2,6 +2,7 @@ package com.smogunovandrey.tasksplanning.db
 
 import android.content.Context
 import androidx.room.*
+import com.smogunovandrey.tasksplanning.taskstemplate.TaskWithPoints
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 
@@ -134,6 +135,9 @@ interface MainDao{
     //TaskWithPointDB
     @Query("select * from tasks where id = :takId")
     fun taskWithPoints(takId: Long): Flow<TaskWithPointDB>
+
+    @Query("select * from tasks where id = :idTask")
+    suspend fun taskWithPointsSuspend(idTask: Long): TaskWithPointDB
 
     @Query("select * FROM tasks")
     fun  allTaskWithPoint(): Flow<List<TaskWithPointDB>>
