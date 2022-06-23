@@ -7,7 +7,7 @@
     <fragment
         android:id="@+id/tasksTemplateFragment"
         android:name="com.smogunovandrey.tasksplanning.taskstemplate.TasksTemplateFragment"
-        android:label="TasksTemplateFragment" >
+        android:label="@string/list_tasks" >
         <action
             android:id="@+id/action_tasksTemplateFragment_to_taskViewFragment"
             app:destination="@id/taskViewFragment" />
@@ -15,7 +15,7 @@
     <fragment
         android:id="@+id/taskViewFragment"
         android:name="com.smogunovandrey.tasksplanning.taskview.TaskViewFragment"
-        android:label="TaskEditFragment" >
+        android:label="@string/view_task" >
         <action
             android:id="@+id/action_taskEditFragment_to_tasksTemplateFragment"
             app:destination="@id/tasksTemplateFragment" />
@@ -29,7 +29,7 @@
     <fragment
         android:id="@+id/taskEditFragment"
         android:name="com.smogunovandrey.tasksplanning.taskedit.TaskEditFragment"
-        android:label="TaskEditFragment" >
+        android:label="@string/edit_task" >
         <argument
             android:name="idTask"
             app:argType="long" />
