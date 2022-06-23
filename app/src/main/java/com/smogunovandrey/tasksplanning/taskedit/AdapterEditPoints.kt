@@ -14,7 +14,8 @@ class AdapterEditPoints(var points: MutableList<Point> = mutableListOf()): Recyc
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderPointItem {
-        val binding: ItemPointsTemplateBinding = ItemPointsTemplateBinding.inflate(LayoutInflater.from(parent.context))
+        //Need parent for android:layout_width="match_parent"
+        val binding: ItemPointsTemplateBinding = ItemPointsTemplateBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolderPointItem(binding)
     }
 

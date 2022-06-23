@@ -14,7 +14,7 @@ class AdapterViewPoints(var points: List<Point>): RecyclerView.Adapter<AdapterVi
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderPointItem {
-        val binding: ItemPointsTemplateBinding = ItemPointsTemplateBinding.inflate(LayoutInflater.from(parent.context))
+        val binding: ItemPointsTemplateBinding = ItemPointsTemplateBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolderPointItem(binding)
     }
 
