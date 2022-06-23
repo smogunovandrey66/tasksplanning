@@ -16,15 +16,15 @@
         android:id="@+id/taskViewFragment"
         android:name="com.smogunovandrey.tasksplanning.taskview.TaskViewFragment"
         android:label="@string/view_task" >
-        <action
-            android:id="@+id/action_taskEditFragment_to_tasksTemplateFragment"
-            app:destination="@id/tasksTemplateFragment" />
         <argument
             android:name="idTask"
             app:argType="long" />
         <action
             android:id="@+id/action_taskViewFragment_to_taskEditFragment"
             app:destination="@id/taskEditFragment" />
+        <action
+            android:id="@+id/action_taskViewFragment_to_tasksTemplateFragment"
+            app:destination="@id/tasksTemplateFragment" />
     </fragment>
     <fragment
         android:id="@+id/taskEditFragment"
@@ -34,7 +34,10 @@
             android:name="idTask"
             app:argType="long" />
         <action
-            android:id="@+id/action_taskEditFragment_to_tasksTemplateFragment2"
+            android:id="@+id/action_taskEditFragment_to_taskViewFragment"
+            app:destination="@id/taskViewFragment" />
+        <action
+            android:id="@+id/action_taskEditFragment_to_tasksTemplateFragment"
             app:destination="@id/tasksTemplateFragment" />
     </fragment>
 </navigation>

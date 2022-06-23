@@ -12,6 +12,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavOptions
+import androidx.navigation.NavOptionsBuilder
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -19,7 +22,9 @@ import com.smogunovandrey.tasksplanning.databinding.FragmentTaskEditBinding
 import com.smogunovandrey.tasksplanning.taskstemplate.Point
 import com.smogunovandrey.tasksplanning.taskstemplate.Task
 import com.smogunovandrey.tasksplanning.taskstemplate.TaskTemplateViewModel
+import com.smogunovandrey.tasksplanning.taskstemplate.TaskWithPoints
 import com.smogunovandrey.tasksplanning.utils.swap
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class TaskEditFragment: Fragment() {
@@ -31,16 +36,40 @@ class TaskEditFragment: Fragment() {
     private val args by navArgs<TaskEditFragmentArgs>()
     private val model: TaskTemplateViewModel by activityViewModels()
     private val adapter: AdapterEditPoints by lazy{
-        AdapterEditPoints(model.editedTaskWithPoints.points)
+        AdapterEditPoints(editedPoints)
     }
-    private var pointsBefore: List<Point> = emptyList()
-    private var taskBefor: Task = Task()
+
+    //Edited Data
+    private val editedTaskWithPoints: TaskWithPoints by lazy {
+        model.editedTaskWithPoints
+    }
+    private val editedTask by lazy {
+        editedTaskWithPoints.task
+    }
+    private val editedPoints by lazy{
+        editedTaskWithPoints.points
+    }
+
+    //DB Data(saved)
+    private lateinit var dbTaskWithPoints: TaskWithPoints
+    private val dbTask: Task
+        get() {
+            return dbTaskWithPoints.task
+        }
+    private val dbPoints: List<Point>
+        get(){
+            return dbTaskWithPoints.points
+        }
+
 
     private fun checkSave(){
-        var ena = taskBefor == binding.taskItem && pointsBefore.size != adapter.points.size
+        if(!this::dbTaskWithPoints.isInitialized)
+            return
+
+        var ena = editedTask != dbTask || editedPoints.size != dbPoints.size
         if(!ena){
-            for(i in pointsBefore.indices){
-                ena = pointsBefore[i] != adapter.points[i]
+            for(i in editedPoints.indices){
+                ena = editedPoints[i] != dbPoints[i]
                 if(ena)
                     break
             }
@@ -53,15 +82,22 @@ class TaskEditFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Log.d("TaskEditFragment", "onCreateView")
         //viewLifecycleOwner vs this - see documentation(documentation in detached)
         binding.lifecycleOwner = viewLifecycleOwner
 
         //Set adapter
         binding.rvPoints.adapter = adapter
 
-        binding.taskItem = model.editedTaskWithPoints.task
-//        adapter.points = model.editedTaskWithPoints.points
+        binding.taskItem = editedTaskWithPoints.task
+
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+                model.taskWithPoints(editedTaskWithPoints.task.id).collect{
+                    dbTaskWithPoints = it
+                    checkSave()
+                }
+            }
+        }
 
         //Collect data about task by way of Flow
 //        lifecycleScope.launch {
@@ -97,7 +133,7 @@ class TaskEditFragment: Fragment() {
                 val fromPos = viewHolder.adapterPosition
                 val toPos = target.adapterPosition
 
-                adapter.points.swap(fromPos, toPos)
+                editedPoints.swap(fromPos, toPos)
                 adapter.notifyItemMoved(fromPos, toPos)
 
                 checkSave()
@@ -107,7 +143,7 @@ class TaskEditFragment: Fragment() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val delPos = viewHolder.adapterPosition
-                adapter.points.removeAt(delPos)
+                editedPoints.removeAt(delPos)
                 adapter.notifyItemRemoved(delPos)
                 checkSave()
             }
@@ -118,7 +154,17 @@ class TaskEditFragment: Fragment() {
         itemTouchHelper.attachToRecyclerView(binding.rvPoints)
 
         binding.edtName.addTextChangedListener {
+            it?.let {
+                editedTask.name = it.toString()
+            }
             checkSave()
+        }
+
+        binding.btnCancel.setOnClickListener {
+            val navController = findNavController()
+            val action = TaskEditFragmentDirections.actionTaskEditFragmentToTaskViewFragment(editedTask.id)
+            navController.navigate(action, NavOptions.Builder().setRestoreState(false).set.build())
+
         }
 
         return binding.root
