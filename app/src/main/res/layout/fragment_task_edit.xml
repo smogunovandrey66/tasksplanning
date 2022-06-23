@@ -30,11 +30,13 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_points"
             app:layout_constraintTop_toBottomOf="@+id/edt_name"
+            app:layout_constraintBottom_toTopOf="@+id/btn_save"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_points_template"/>
+            tools:listitem="@layout/item_points_template"
+            android:background="@drawable/border_blue"/>
 
         <Button
             android:id="@+id/btn_save"
