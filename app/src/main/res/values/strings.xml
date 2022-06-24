@@ -6,6 +6,7 @@
     <string name="name_point">Name point</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
+    <string name="add">Add</string>
     <string name="edit_task">Edit task</string>
     <string name="view_task">View task</string>
     <string name="list_tasks">List tasks</string>
