@@ -1,12 +1,10 @@
 package com.smogunovandrey.tasksplanning.taskstemplate
 
 import com.smogunovandrey.tasksplanning.db.MainDao
-import com.smogunovandrey.tasksplanning.db.TaskDB
-import com.smogunovandrey.tasksplanning.result.Result
-import com.smogunovandrey.tasksplanning.utils.toDB
+import com.smogunovandrey.tasksplanning.utils.toPointDB
+import com.smogunovandrey.tasksplanning.utils.toTaskDB
+import com.smogunovandrey.tasksplanning.utils.toTaskWithPoint
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 class TaskTemplateRepository(private val mainDao: MainDao) {
@@ -18,7 +16,7 @@ class TaskTemplateRepository(private val mainDao: MainDao) {
 
     fun pointsByTaskId(idTask: Long): Flow<List<Point>> = mainDao.pointsByTaskId(idTask).map { listPointsDB ->
         listPointsDB.map{
-            Point(it.id, it.name, it.num, it.triggerType)
+            Point(it.id, idTask, it.name, it.num, it.triggerType)
         }
     }
 
@@ -31,19 +29,50 @@ class TaskTemplateRepository(private val mainDao: MainDao) {
     /**
      * Task with Points sorted by num
      */
-    fun taskWithPoints(idTask: Long): Flow<TaskWithPoints> = mainDao.taskWithPoints(idTask).map { it ->
+    fun taskWithPoints(idTask: Long): Flow<TaskWithPoints> = mainDao.taskWithPoints(idTask).map {
         TaskWithPoints(Task(it.task.id, it.task.name), it.listTaskPoint.map { pointDB ->
-            Point(pointDB.id, pointDB.name, pointDB.num, pointDB.triggerType)
+            Point(pointDB.id, idTask, pointDB.name, pointDB.num, pointDB.triggerType)
         }.sortedWith { point1, point2 -> (point1.num - point2.num).toInt() }.toMutableList())
     }
 
     suspend fun updateTaskWithPoints(taskWithPoints: TaskWithPoints){
         val task = taskWithPoints.task
+        val points: List<Point> = taskWithPoints.points
 
-        mainDao.updateTask(task.toDB())
-        val taskWithPointsDB = mainDao.taskWithPointsSuspend(task.id)
+        //1. Update Task
+        if(task.id == 0L){
+            val idTask = mainDao.insertTask(task.toTaskDB())
+            for(point in points)
+                point.idTask = idTask
+        } else {
+            mainDao.updateTask(task.toTaskDB())
+        }
 
-        val points = taskWithPoints.points
+        val taskWithPointsInDB = mainDao.taskWithPointsSuspend(task.id).toTaskWithPoint()
+        val pointsInDB = taskWithPointsInDB.points.toList()
+
+        //2. Add, update, remove points
+        for(point in points){
+            //Insert
+            if(point.id == 0L){
+                mainDao.insertPoint(point.toPointDB())
+            } else{
+                var find = false
+                for(pointInDB in pointsInDB){
+                    if(pointInDB.id == point.id){
+                        find = true
+                        break
+                    }
+                }
+
+                if(find)
+                    //Update
+                    mainDao.updatePoint(point.toPointDB())
+                else
+                    //Delete
+                    mainDao.deletePoint(point.toPointDB())
+            }
+        }
     }
 
 

@@ -26,10 +26,23 @@
             android:layout_height="wrap_content"
             android:text="@{taskItem.name}"
             android:hint="@string/name_task"/>
+        <TextView
+            android:id="@+id/txt_switch_edit_click_point"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBaseline_toBaselineOf="@+id/btn_switch_edit_click_point"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/edit_click_point"/>
+        <ToggleButton
+            android:id="@+id/btn_switch_edit_click_point"
+            app:layout_constraintStart_toEndOf="@+id/txt_switch_edit_click_point"
+            app:layout_constraintTop_toBottomOf="@id/edt_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_points"
-            app:layout_constraintTop_toBottomOf="@+id/edt_name"
+            app:layout_constraintTop_toBottomOf="@+id/btn_switch_edit_click_point"
             app:layout_constraintBottom_toTopOf="@+id/btn_save"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -53,6 +66,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/cancel"/>
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/btn_add_point"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:icon="@drawable/baseline_add_24"
+            android:text="@string/add_point"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

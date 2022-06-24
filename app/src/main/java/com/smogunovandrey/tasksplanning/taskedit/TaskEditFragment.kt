@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -126,6 +127,14 @@ class TaskEditFragment: Fragment() {
         val simpleCallback = object :ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN,
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT){
+            override fun isItemViewSwipeEnabled(): Boolean {
+                return super.isItemViewSwipeEnabled()
+            }
+
+            override fun isLongPressDragEnabled(): Boolean {
+                return super.isLongPressDragEnabled()
+            }
+
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
@@ -137,6 +146,9 @@ class TaskEditFragment: Fragment() {
                 editedPoints.swap(fromPos, toPos)
                 adapter.notifyItemMoved(fromPos, toPos)
 
+                editedPoints[fromPos].num = fromPos + 1L
+                editedPoints[toPos].num = toPos + 1L
+
                 checkSave()
 
                 return true
@@ -146,6 +158,9 @@ class TaskEditFragment: Fragment() {
                 val delPos = viewHolder.adapterPosition
                 editedPoints.removeAt(delPos)
                 adapter.notifyItemRemoved(delPos)
+                for(i in delPos + 1 until editedPoints.size){
+                    editedPoints[i].num = i.toLong() - 1L
+                }
                 checkSave()
             }
 
@@ -164,7 +179,16 @@ class TaskEditFragment: Fragment() {
         binding.btnCancel.setOnClickListener {
             val navController = findNavController()
             navController.popBackStack()
+        }
 
+        binding.btnSave.setOnClickListener {
+            lifecycleScope.launch {
+                model.updateTaskWithPoints(editedTaskWithPoints)
+            }
+        }
+
+        binding.btnAddPoint.setOnClickListener{
+            DialogEditPointFragment().show(childFragmentManager, DialogEditPointFragment.TAG)
         }
 
         return binding.root

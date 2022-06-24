@@ -21,4 +21,10 @@ class TaskTemplateViewModel(application: Application) : AndroidViewModel(applica
     //Edited TaskWithPoints
     var editedTaskWithPoints = TaskWithPoints()
 
+    //Save TaskWithPoints
+    suspend fun updateTaskWithPoints(taskWithPoints: TaskWithPoints) = taskTemplateRepository.updateTaskWithPoints(taskWithPoints)
+
+    //Edited point
+    var editedPoint = Point()
+
 }

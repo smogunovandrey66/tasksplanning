@@ -4,10 +4,11 @@ import com.google.gson.Gson
 import com.smogunovandrey.tasksplanning.db.TriggerType
 
 data class Point(
-    var id: Long,
-    var name: String,
-    var num: Long,
-    var triggerType: TriggerType
+    var id: Long = 0L,
+    var idTask: Long = 0L,
+    var name: String = "",
+    var num: Long = 0L,
+    var triggerType: TriggerType = TriggerType.HAND
 )
 
 

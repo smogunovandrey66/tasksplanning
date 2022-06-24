@@ -6,11 +6,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.smogunovandrey.tasksplanning.databinding.ItemPointsTemplateBinding
 import com.smogunovandrey.tasksplanning.taskstemplate.Point
 
+class AdapterEditPoints(private var points: MutableList<Point> = mutableListOf(), private var onClickPoint: OnClickPoint? = null): RecyclerView.Adapter<AdapterEditPoints.ViewHolderPointItem>() {
 
-class AdapterEditPoints(var points: MutableList<Point> = mutableListOf()): RecyclerView.Adapter<AdapterEditPoints.ViewHolderPointItem>() {
+    interface OnClickPoint{
+        fun onClick(point: Point)
+    }
 
     class ViewHolderPointItem(val binding: ItemPointsTemplateBinding) : RecyclerView.ViewHolder(binding.root) {
+        init{
+            binding.root.setOnClickListener {
 
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderPointItem {
@@ -21,10 +28,7 @@ class AdapterEditPoints(var points: MutableList<Point> = mutableListOf()): Recyc
 
     override fun onBindViewHolder(holder: ViewHolderPointItem, position: Int) {
         holder.binding.point = points[position]
-
     }
 
-    override fun getItemCount(): Int {
-        return points.count()
-    }
+    override fun getItemCount() = points.count()
 }

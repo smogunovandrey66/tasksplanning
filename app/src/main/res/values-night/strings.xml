@@ -2,4 +2,7 @@
 <resources>
     <string name="edit_task">Edit task</string>
     <string name="view_task">View task</string>
+    <string name="number_point">Number point</string>
+    <string name="type_trigger">Type trigger</string>
+    <string name="edit_click_point">Edit click point</string>
 </resources>
