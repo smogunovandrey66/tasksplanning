@@ -56,6 +56,7 @@ class TaskViewFragment: Fragment() {
         binding.btnEdit.setOnClickListener {
             val action = TaskViewFragmentDirections.actionTaskViewFragmentToTaskEditFragment(args.idTask)
             model.editedTaskWithPoints = taskWithPoints.deepCopy()
+            model.editClickPoint = false
             findNavController().navigate(action)
         }
 

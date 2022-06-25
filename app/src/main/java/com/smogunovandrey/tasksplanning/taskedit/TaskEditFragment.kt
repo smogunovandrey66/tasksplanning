@@ -1,36 +1,31 @@
 package com.smogunovandrey.tasksplanning.taskedit
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavOptions
-import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.databinding.FragmentTaskEditBinding
 import com.smogunovandrey.tasksplanning.taskstemplate.Point
 import com.smogunovandrey.tasksplanning.taskstemplate.Task
 import com.smogunovandrey.tasksplanning.taskstemplate.TaskTemplateViewModel
 import com.smogunovandrey.tasksplanning.taskstemplate.TaskWithPoints
 import com.smogunovandrey.tasksplanning.utils.swap
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class TaskEditFragment: Fragment() {
+class TaskEditFragment: Fragment(), AdapterEditPoints.OnClickPoint {
 
+    private lateinit var itemTouchHelper: ItemTouchHelper
+    private lateinit var simpleCallback: ItemTouchHelper.SimpleCallback
     private val binding by lazy {
         FragmentTaskEditBinding.inflate(layoutInflater)
     }
@@ -38,7 +33,7 @@ class TaskEditFragment: Fragment() {
     private val args by navArgs<TaskEditFragmentArgs>()
     private val model: TaskTemplateViewModel by activityViewModels()
     private val adapter: AdapterEditPoints by lazy{
-        AdapterEditPoints(editedPoints)
+        AdapterEditPoints(editedPoints, this)
     }
 
     //Edited Data
@@ -124,7 +119,7 @@ class TaskEditFragment: Fragment() {
 //            }
 //        }
 
-        val simpleCallback = object :ItemTouchHelper.SimpleCallback(
+        simpleCallback = object :ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN,
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT){
             override fun isItemViewSwipeEnabled(): Boolean {
@@ -166,8 +161,7 @@ class TaskEditFragment: Fragment() {
 
         }
 
-        val itemTouchHelper = ItemTouchHelper(simpleCallback)
-        itemTouchHelper.attachToRecyclerView(binding.rvPoints)
+        itemTouchHelper = ItemTouchHelper(simpleCallback)
 
         binding.edtName.addTextChangedListener {
             it?.let {
@@ -188,9 +182,35 @@ class TaskEditFragment: Fragment() {
         }
 
         binding.btnAddPoint.setOnClickListener{
+            model.flagEditPoint = false
             DialogEditPointFragment().show(childFragmentManager, DialogEditPointFragment.TAG)
         }
 
+        updateTouchHelper()
+        binding.btnSwitchEditClickPoint.isChecked = model.editClickPoint
+
+        binding.btnSwitchEditClickPoint.setOnCheckedChangeListener { _, isChecked ->
+            model.editClickPoint = isChecked
+            updateTouchHelper()
+        }
+
+
         return binding.root
+    }
+
+    /**
+     * Update behavior touch event recycler view
+     */
+    fun updateTouchHelper(){
+        if(model.editClickPoint)
+            itemTouchHelper.attachToRecyclerView(null)
+        else
+            itemTouchHelper.attachToRecyclerView(binding.rvPoints)
+    }
+
+    override fun onClick(point: Point) {
+        model.editedPoint = point
+        model.flagEditPoint = true
+        DialogEditPointFragment().show(childFragmentManager, DialogEditPointFragment.TAG)
     }
 }

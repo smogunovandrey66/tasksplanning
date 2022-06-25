@@ -29,6 +29,10 @@ class DialogEditPointFragment: DialogFragment() {
                     }
                     spnTriggerType.adapter = ArrayAdapter(requireActivity(), android.R.layout.simple_spinner_item, listTrigger)
 
+                    if(model.flagEditPoint){
+                        edtName.setText(model.editedPoint.name)
+
+                    }
                 }
                 .root)
             .create()

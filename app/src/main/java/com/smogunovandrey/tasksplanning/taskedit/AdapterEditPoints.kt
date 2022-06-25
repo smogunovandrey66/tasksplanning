@@ -13,16 +13,17 @@ class AdapterEditPoints(private var points: MutableList<Point> = mutableListOf()
     }
 
     class ViewHolderPointItem(val binding: ItemPointsTemplateBinding) : RecyclerView.ViewHolder(binding.root) {
-        init{
-            binding.root.setOnClickListener {
 
-            }
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderPointItem {
         //Need parent for android:layout_width="match_parent"
         val binding: ItemPointsTemplateBinding = ItemPointsTemplateBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        binding.root.setOnClickListener {
+            val point = binding.point
+            if(point != null)
+                onClickPoint?.onClick(point)
+        }
         return ViewHolderPointItem(binding)
     }
 
