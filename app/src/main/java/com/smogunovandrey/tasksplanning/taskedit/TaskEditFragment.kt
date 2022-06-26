@@ -183,6 +183,8 @@ class TaskEditFragment: Fragment(), AdapterEditPoints.OnClickPoint {
 
         binding.btnAddPoint.setOnClickListener{
             model.flagEditPoint = false
+            model.editedPoint.clear()
+            model.editedPoint.idTask = editedTask.id
             DialogEditPointFragment().show(childFragmentManager, DialogEditPointFragment.TAG)
         }
 
@@ -203,12 +205,18 @@ class TaskEditFragment: Fragment(), AdapterEditPoints.OnClickPoint {
      */
     fun updateTouchHelper(){
         if(model.editClickPoint)
+            //Mode click item
             itemTouchHelper.attachToRecyclerView(null)
         else
+            //Mode move/swipe item
             itemTouchHelper.attachToRecyclerView(binding.rvPoints)
     }
 
     override fun onClick(point: Point) {
+        //Only mode click
+        if(!model.editClickPoint)
+            return
+
         model.editedPoint = point
         model.flagEditPoint = true
         DialogEditPointFragment().show(childFragmentManager, DialogEditPointFragment.TAG)

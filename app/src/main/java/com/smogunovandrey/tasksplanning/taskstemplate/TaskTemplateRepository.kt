@@ -75,6 +75,8 @@ class TaskTemplateRepository(private val mainDao: MainDao) {
         }
     }
 
+    suspend fun updatePoint(point: Point) = mainDao.updatePoint(point.toPointDB())
 
+    suspend fun addPoint(point: Point) = mainDao.insertPoint(point.toPointDB())
 
 }

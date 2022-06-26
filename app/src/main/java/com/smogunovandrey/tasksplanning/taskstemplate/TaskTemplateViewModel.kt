@@ -36,4 +36,7 @@ class TaskTemplateViewModel(application: Application) : AndroidViewModel(applica
      * true - user click item point in list points(edit point)
      */
     var flagEditPoint = false
+
+    suspend fun updatePoint(point: Point) = taskTemplateRepository.updatePoint(point)
+    suspend fun addPoint(point: Point) = taskTemplateRepository.addPoint(point)
 }

@@ -9,7 +9,15 @@ data class Point(
     var name: String = "",
     var num: Long = 0L,
     var triggerType: TriggerType = TriggerType.HAND
-)
+){
+    fun clear(){
+        id = 0L
+        idTask = 0L
+        name = ""
+        num = 0L
+        triggerType = TriggerType.HAND
+    }
+}
 
 
 data class Task(
