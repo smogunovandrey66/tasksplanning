@@ -184,8 +184,10 @@ class TaskEditFragment: Fragment(), AdapterEditPoints.OnClickPoint {
         binding.btnAddPoint.setOnClickListener{
             model.flagEditPoint = false
             model.editedPoint.clear()
+            model.editedPoint.num = model.editedTaskWithPoints.points.size + 1L
             model.editedPoint.idTask = editedTask.id
-            DialogEditPointFragment().show(childFragmentManager, DialogEditPointFragment.TAG)
+
+            findNavController().navigate(TaskEditFragmentDirections.actionTaskEditFragmentToPointEditFragment())
         }
 
         updateTouchHelper()
@@ -217,8 +219,9 @@ class TaskEditFragment: Fragment(), AdapterEditPoints.OnClickPoint {
         if(!model.editClickPoint)
             return
 
-        model.editedPoint = point
+        model.editedPoint.copy(point)
         model.flagEditPoint = true
-        DialogEditPointFragment().show(childFragmentManager, DialogEditPointFragment.TAG)
+        model.selectedPoint = point
+        findNavController().navigate(TaskEditFragmentDirections.actionTaskEditFragmentToPointEditFragment())
     }
 }

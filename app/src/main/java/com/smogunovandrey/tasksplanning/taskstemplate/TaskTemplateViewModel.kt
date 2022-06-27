@@ -39,4 +39,6 @@ class TaskTemplateViewModel(application: Application) : AndroidViewModel(applica
 
     suspend fun updatePoint(point: Point) = taskTemplateRepository.updatePoint(point)
     suspend fun addPoint(point: Point) = taskTemplateRepository.addPoint(point)
+
+    var selectedPoint: Point = Point()
 }

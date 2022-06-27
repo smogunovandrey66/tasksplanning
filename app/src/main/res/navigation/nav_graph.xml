@@ -36,5 +36,12 @@
         <action
             android:id="@+id/action_taskEditFragment_to_tasksTemplateFragment"
             app:destination="@id/tasksTemplateFragment" />
+        <action
+            android:id="@+id/action_taskEditFragment_to_pointEditFragment"
+            app:destination="@id/pointEditFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/pointEditFragment"
+        android:name="com.smogunovandrey.tasksplanning.taskedit.PointEditFragment"
+        android:label="PointEditFragment" />
 </navigation>
