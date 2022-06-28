@@ -11,6 +11,9 @@
         <action
             android:id="@+id/action_tasksTemplateFragment_to_taskViewFragment"
             app:destination="@id/taskViewFragment" />
+        <action
+            android:id="@+id/action_tasksTemplateFragment_to_taskEditFragment"
+            app:destination="@id/taskEditFragment" />
     </fragment>
     <fragment
         android:id="@+id/taskViewFragment"

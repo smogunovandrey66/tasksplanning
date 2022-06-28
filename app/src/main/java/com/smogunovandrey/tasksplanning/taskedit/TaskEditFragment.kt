@@ -88,13 +88,11 @@ class TaskEditFragment: Fragment(), AdapterEditPoints.OnClickPoint {
 
         binding.taskItem = editedTaskWithPoints.task
 
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
-                model.taskWithPoints(editedTaskWithPoints.task.id).collect{
-                    dbTaskWithPoints = it
-                    checkSave()
-                }
-            }
+        if(editedTask.id != 0L) {
+            subscribeDB()
+        } else {
+            dbTaskWithPoints = TaskWithPoints()
+            checkSave()
         }
 
         //Collect data about task by way of Flow
@@ -182,7 +180,10 @@ class TaskEditFragment: Fragment(), AdapterEditPoints.OnClickPoint {
 
         binding.btnSave.setOnClickListener {
             lifecycleScope.launch {
+                val needSubscribe = editedTask.id == 0L
                 model.updateTaskWithPoints(editedTaskWithPoints)
+                if(needSubscribe)
+                    subscribeDB()
             }
         }
 
@@ -205,6 +206,17 @@ class TaskEditFragment: Fragment(), AdapterEditPoints.OnClickPoint {
 
 
         return binding.root
+    }
+
+    fun subscribeDB(){
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                model.taskWithPoints(editedTaskWithPoints.task.id).collect {
+                    dbTaskWithPoints = it
+                    checkSave()
+                }
+            }
+        }
     }
 
     /**

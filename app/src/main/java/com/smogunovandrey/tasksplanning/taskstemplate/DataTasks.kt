@@ -31,7 +31,12 @@ data class Point(
 data class Task(
     var id: Long = 0,
     var name: String = ""
-)
+){
+    fun clear(){
+        id = 0
+        name = ""
+    }
+}
 
 data class TaskWithPoints(
     var task: Task = Task(),
@@ -41,6 +46,11 @@ data class TaskWithPoints(
     fun deepCopy():TaskWithPoints {
         val JSON = Gson().toJson(this)
         return Gson().fromJson(JSON, TaskWithPoints::class.java)
+    }
+
+    fun clear(){
+        task.clear()
+        points.clear()
     }
 }
 

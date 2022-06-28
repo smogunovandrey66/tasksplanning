@@ -9,6 +9,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.smogunovandrey.tasksplanning.databinding.FragmentTasksTemplateBinding
 import kotlinx.coroutines.launch
 
@@ -22,7 +23,7 @@ class TasksTemplateFragment : Fragment() {
         AdapterTasksTemplate()
     }
 
-    private val taskTemplateViewModel: TaskTemplateViewModel by activityViewModels()
+    private val model: TaskTemplateViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,10 +34,16 @@ class TasksTemplateFragment : Fragment() {
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
-                taskTemplateViewModel.tasksTemplate.collect{ listTasks ->
+                model.tasksTemplate.collect{ listTasks ->
                     adapter.submitList(listTasks)
                 }
             }
+        }
+
+        binding.btnAdd.setOnClickListener {
+            model.editedTaskWithPoints.clear()
+            val action = TasksTemplateFragmentDirections.actionTasksTemplateFragmentToTaskEditFragment(0)
+            findNavController().navigate(action)
         }
 
         return binding.root
