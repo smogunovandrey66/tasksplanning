@@ -52,8 +52,6 @@ class TaskTemplateRepository(private val mainDao: MainDao) {
 
         val taskWithPointsInDB = mainDao.taskWithPointsSuspend(task.id).toTaskWithPoint()
         val pointsInDB = taskWithPointsInDB.points.toList()
-        Log.d("TaskTemplateRepository", "points in DB: ${pointsInDB.toString()}")
-        Log.d("TaskTemplateRepository", "edited: ${points.toString()}")
 
         //2. Add, update, remove points
         for(point in points){
