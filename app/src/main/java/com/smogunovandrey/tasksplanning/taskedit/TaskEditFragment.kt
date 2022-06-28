@@ -1,6 +1,7 @@
 package com.smogunovandrey.tasksplanning.taskedit
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -139,10 +140,14 @@ class TaskEditFragment: Fragment(), AdapterEditPoints.OnClickPoint {
                 val toPos = target.adapterPosition
 
                 editedPoints.swap(fromPos, toPos)
-                adapter.notifyItemMoved(fromPos, toPos)
 
                 editedPoints[fromPos].num = fromPos + 1L
                 editedPoints[toPos].num = toPos + 1L
+
+                (viewHolder as AdapterEditPoints.ViewHolderPointItem).binding.point = editedPoints[toPos]
+                (target as AdapterEditPoints.ViewHolderPointItem).binding.point = editedPoints[fromPos]
+
+                adapter.notifyItemMoved(fromPos, toPos)
 
                 checkSave()
 
@@ -152,10 +157,10 @@ class TaskEditFragment: Fragment(), AdapterEditPoints.OnClickPoint {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val delPos = viewHolder.adapterPosition
                 editedPoints.removeAt(delPos)
-                adapter.notifyItemRemoved(delPos)
-                for(i in delPos + 1 until editedPoints.size){
+                for(i in delPos  until editedPoints.size){
                     editedPoints[i].num = i.toLong() - 1L
                 }
+                adapter.notifyItemRemoved(delPos)
                 checkSave()
             }
 
@@ -223,5 +228,18 @@ class TaskEditFragment: Fragment(), AdapterEditPoints.OnClickPoint {
         model.flagEditPoint = true
         model.selectedPoint = point
         findNavController().navigate(TaskEditFragmentDirections.actionTaskEditFragmentToPointEditFragment())
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+
+        model.posPointInserted?.let{
+            adapter.notifyItemInserted(it)
+        }
+
+        model.posPointUpdate?.let {
+            adapter.notifyItemChanged(it)
+        }
     }
 }

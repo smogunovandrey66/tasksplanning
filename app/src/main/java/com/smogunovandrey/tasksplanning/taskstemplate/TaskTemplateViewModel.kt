@@ -19,7 +19,9 @@ class TaskTemplateViewModel(application: Application) : AndroidViewModel(applica
     var editedTaskWithPoints = TaskWithPoints()
 
     //Save TaskWithPoints
-    suspend fun updateTaskWithPoints(taskWithPoints: TaskWithPoints) = taskTemplateRepository.updateTaskWithPoints(taskWithPoints)
+    suspend fun updateTaskWithPoints(taskWithPoints: TaskWithPoints) {
+        taskTemplateRepository.updateTaskWithPoints(taskWithPoints)
+    }
 
     //Edited point
     var editedPoint = Point()
@@ -41,4 +43,16 @@ class TaskTemplateViewModel(application: Application) : AndroidViewModel(applica
     suspend fun addPoint(point: Point) = taskTemplateRepository.addPoint(point)
 
     var selectedPoint: Point = Point()
+
+    /**
+     * Position for notify inserted in AdapterEditPoints.
+     * -1 not need notify
+     */
+    var posPointInserted: Int? = null
+
+    /**
+     * Position for notify update in AdapterEditPoints.
+     * -1 not need notify
+     */
+    var posPointUpdate: Int? = null
 }

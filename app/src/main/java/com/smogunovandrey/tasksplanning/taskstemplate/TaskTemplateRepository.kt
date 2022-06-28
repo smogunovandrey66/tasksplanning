@@ -1,5 +1,6 @@
 package com.smogunovandrey.tasksplanning.taskstemplate
 
+import android.util.Log
 import com.smogunovandrey.tasksplanning.db.MainDao
 import com.smogunovandrey.tasksplanning.utils.toPointDB
 import com.smogunovandrey.tasksplanning.utils.toTaskDB
@@ -37,11 +38,12 @@ class TaskTemplateRepository(private val mainDao: MainDao) {
 
     suspend fun updateTaskWithPoints(taskWithPoints: TaskWithPoints){
         val task = taskWithPoints.task
-        val points: List<Point> = taskWithPoints.points
+        val points: MutableList<Point> = taskWithPoints.points
 
         //1. Update Task
         if(task.id == 0L){
             val idTask = mainDao.insertTask(task.toTaskDB())
+            task.id = idTask
             for(point in points)
                 point.idTask = idTask
         } else {
@@ -50,27 +52,33 @@ class TaskTemplateRepository(private val mainDao: MainDao) {
 
         val taskWithPointsInDB = mainDao.taskWithPointsSuspend(task.id).toTaskWithPoint()
         val pointsInDB = taskWithPointsInDB.points.toList()
+        Log.d("TaskTemplateRepository", "points in DB: ${pointsInDB.toString()}")
+        Log.d("TaskTemplateRepository", "edited: ${points.toString()}")
 
         //2. Add, update, remove points
         for(point in points){
             //Insert
             if(point.id == 0L){
-                mainDao.insertPoint(point.toPointDB())
+                point.id = mainDao.insertPoint(point.toPointDB())
             } else{
-                var find = false
-                for(pointInDB in pointsInDB){
-                    if(pointInDB.id == point.id){
-                        find = true
-                        break
-                    }
-                }
+                mainDao.updatePoint(point.toPointDB())
+            }
+        }
 
-                if(find)
-                    //Update
-                    mainDao.updatePoint(point.toPointDB())
-                else
-                    //Delete
-                    mainDao.deletePoint(point.toPointDB())
+        val iterator = pointsInDB.iterator()
+        while (iterator.hasNext()){
+            val pointDB = iterator.next()
+
+            var find = false
+            for(point in points){
+                if(pointDB.id == point.id){
+                    find = true
+                    break
+                }
+            }
+
+            if(!find){
+                mainDao.deletePoint(pointDB.toPointDB())
             }
         }
     }

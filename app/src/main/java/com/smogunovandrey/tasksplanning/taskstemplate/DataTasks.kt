@@ -17,12 +17,13 @@ data class Point(
         num = 0L
         triggerType = TriggerType.HAND
     }
-    fun copy(other: Point){
+    fun copy(other: Point): Point{
         id = other.id
         idTask = other.idTask
         name = other.name
         num = other.num
         triggerType = other.triggerType
+        return this
     }
 }
 

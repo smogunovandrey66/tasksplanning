@@ -1,6 +1,7 @@
 package com.smogunovandrey.tasksplanning.taskedit
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,16 +16,18 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
-import com.smogunovandrey.tasksplanning.databinding.FragmentDialogEditPointBinding
+import com.smogunovandrey.tasksplanning.databinding.FragmentPointEditBinding
 import com.smogunovandrey.tasksplanning.db.TriggerType
 import com.smogunovandrey.tasksplanning.taskstemplate.TaskTemplateViewModel
 import com.smogunovandrey.tasksplanning.utils.swap
 import kotlinx.coroutines.launch
+import com.smogunovandrey.tasksplanning.taskstemplate.Point
+import com.smogunovandrey.tasksplanning.taskstemplate.Task
 
 class PointEditFragment: Fragment() {
     private val model: TaskTemplateViewModel by activityViewModels()
     private val binding by lazy{
-        FragmentDialogEditPointBinding.inflate(layoutInflater)
+        FragmentPointEditBinding.inflate(layoutInflater)
     }
 
     override fun onCreateView(
@@ -32,6 +35,8 @@ class PointEditFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        model.posPointInserted = null
+        model.posPointUpdate = null
 
         val listTrigger = TriggerType.values().map {
             it.name
@@ -42,7 +47,7 @@ class PointEditFragment: Fragment() {
 
         binding.edtName.setText(point.name)
         binding.spnTriggerType.setSelection(listTrigger.indexOf(point.triggerType.name))
-        binding.edtNumber.setText(point.num.toString())
+        binding.txtNumber.text = point.num.toString()
 
 
         binding.edtName.addTextChangedListener {
@@ -63,12 +68,6 @@ class PointEditFragment: Fragment() {
             }
 
         }
-        binding.edtNumber.addTextChangedListener {
-            val str = it.toString()
-            if(str.isDigitsOnly()){
-                point.num = str.toLong()
-            }
-        }
 
         if(model.flagEditPoint)
             binding.btnAddPoint.setText(com.smogunovandrey.tasksplanning.R.string.edit)
@@ -76,26 +75,13 @@ class PointEditFragment: Fragment() {
         binding.btnAddPoint.setOnClickListener {
             if(canSave()){
                 if(model.flagEditPoint){
-                    var fromPos = 0
-                    var toPos = 0
-                    var num = 0L
-
-
-                    for(item in model.editedTaskWithPoints.points){
-                        num++
-                        if(item.id == point.id){
-                            fromPos = num.toInt() - 1
-                        }
-                       if(item.num == point.num){
-                           toPos = num.toInt() - 1
-                       }
-                    }
-                    if(fromPos != toPos){
-                        model.editedTaskWithPoints.points.swap(fromPos, toPos)
-                        model.editedTaskWithPoints.points[fromPos].num = fromPos + 1L
-                        model.editedTaskWithPoints.points[toPos].num = toPos + 1L
-                    }
+                    model.selectedPoint.copy(point)
+                    model.posPointUpdate = point.num.toInt() - 1
+                } else {
+                    model.editedTaskWithPoints.points.add(Point().copy(point))
+                    model.posPointInserted = point.num.toInt() - 1
                 }
+                findNavController().popBackStack()
             }
         }
 
@@ -108,7 +94,7 @@ class PointEditFragment: Fragment() {
 
     fun canSave(): Boolean{
         if(model.editedPoint.name == ""){
-            Snackbar.make(binding.btnAddPoint, "Name point empty", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.btnAddPoint, com.smogunovandrey.tasksplanning.R.string.empty_name_point, Snackbar.LENGTH_SHORT).show()
             return false
         }
         return true
