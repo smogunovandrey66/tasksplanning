@@ -55,4 +55,6 @@ class TaskTemplateViewModel(application: Application) : AndroidViewModel(applica
      * -1 not need notify
      */
     var posPointUpdate: Int? = null
+
+    suspend fun deleteTask(idTask: Long) = taskTemplateRepository.deleteTask(idTask)
 }

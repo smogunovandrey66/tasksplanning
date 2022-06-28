@@ -87,4 +87,11 @@ class TaskTemplateRepository(private val mainDao: MainDao) {
 
     suspend fun addPoint(point: Point) = mainDao.insertPoint(point.toPointDB())
 
+    suspend fun deleteTask(idTask: Long){
+        val taskWithPointDB = mainDao.taskWithPointsSuspend(idTask)
+        for(point in taskWithPointDB.listTaskPoint)
+            mainDao.deletePoint(point)
+        mainDao.deleteTask(taskWithPointDB.task)
+    }
+
 }

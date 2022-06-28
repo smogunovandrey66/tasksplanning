@@ -15,6 +15,7 @@
         <entry key="app/src/main/res/layout/fragment_tasks_template.xml" value="0.1" />
         <entry key="app/src/main/res/layout/item_points_template.xml" value="0.18" />
         <entry key="app/src/main/res/layout/item_tasks_template.xml" value="0.15" />
+        <entry key="app/src/main/res/menu/tasks.xml" value="0.24114583333333334" />
       </map>
     </option>
   </component>

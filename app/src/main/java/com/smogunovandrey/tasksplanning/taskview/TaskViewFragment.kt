@@ -1,9 +1,8 @@
 package com.smogunovandrey.tasksplanning.taskview
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -60,7 +59,28 @@ class TaskViewFragment: Fragment() {
             findNavController().navigate(action)
         }
 
+        setHasOptionsMenu(true)
+
         return binding.root
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.tasks, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.item_delete -> {
+                Log.d("TaskViewFragment", taskWithPoints.toString())
+                lifecycleScope.launch {
+                    model.deleteTask(taskWithPoints.task.id)
+                    findNavController().popBackStack()
+                }
+                return true
+            }
+        }
+
+        return false
     }
 }
 
