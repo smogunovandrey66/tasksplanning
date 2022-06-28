@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -15,6 +16,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
+import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.databinding.FragmentTaskEditBinding
 import com.smogunovandrey.tasksplanning.taskstemplate.Point
 import com.smogunovandrey.tasksplanning.taskstemplate.Task
@@ -179,6 +182,8 @@ class TaskEditFragment: Fragment(), AdapterEditPoints.OnClickPoint {
         }
 
         binding.btnSave.setOnClickListener {
+            if(!canCheck())
+                return@setOnClickListener
             lifecycleScope.launch {
                 val needSubscribe = editedTask.id == 0L
                 model.updateTaskWithPoints(editedTaskWithPoints)
@@ -253,5 +258,14 @@ class TaskEditFragment: Fragment(), AdapterEditPoints.OnClickPoint {
         model.posPointUpdate?.let {
             adapter.notifyItemChanged(it)
         }
+    }
+
+    fun canCheck(): Boolean{
+        if(editedTask.name == ""){
+            Snackbar.make(binding.btnAddPoint, com.smogunovandrey.tasksplanning.R.string.empty_name_task, Snackbar.LENGTH_SHORT).show()
+            return false
+        }
+
+        return true
     }
 }
