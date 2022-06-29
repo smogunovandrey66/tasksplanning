@@ -9,4 +9,5 @@
     <string name="empty_name_point">Name point empty</string>
     <string name="delete">Delete</string>
     <string name="empty_name_task">Empty name task</string>
+    <string name="start">Start</string>
 </resources>
