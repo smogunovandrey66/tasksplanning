@@ -12,6 +12,10 @@
         <entry key="app/src/main/res/drawable/border.xml" value="0.19" />
         <entry key="app/src/main/res/drawable/border_blue.xml" value="0.19" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.18072916666666666" />
+        <entry key="app/src/main/res/layout/fragment_run_points.xml" value="0.2375" />
+        <entry key="app/src/main/res/layout/fragment_run_task_view.xml" value="0.21041666666666667" />
+        <entry key="app/src/main/res/layout/fragment_run_tasks_with_date.xml" value="0.21041666666666667" />
+        <entry key="app/src/main/res/layout/fragment_statistics.xml" value="0.21458333333333332" />
         <entry key="app/src/main/res/layout/fragment_task_edit.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_task_view.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_tasks_template.xml" value="0.19739583333333333" />

@@ -21,6 +21,16 @@ class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolde
                     itemView.findNavController().navigate(action)
                 }
 
+                binding.btnStart.setOnClickListener {
+                    val action = TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskViewFragment()
+                    itemView.findNavController().navigate(action)
+                }
+
+                binding.btnStatistics.setOnClickListener {
+                    val action = TasksTemplateFragmentDirections.actionTasksTemplateFragmentToStatisticsFragment()
+                    itemView.findNavController().navigate(action)
+                }
+
 
                 //Other way navigate to taskFragment
 //                itemView.findNavController().navigate(R.id.taskEditFragment)

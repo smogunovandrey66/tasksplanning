@@ -2,7 +2,6 @@ package com.smogunovandrey.tasksplanning.db
 
 import android.content.Context
 import androidx.room.*
-import com.smogunovandrey.tasksplanning.taskstemplate.TaskWithPoints
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 
@@ -21,7 +20,7 @@ data class TaskDB(
  * Type trigger
  */
 enum class TriggerType{
-    HAND, GPS_IN, GPS_OUT, NFC, VOICE, BTN_HEADPHONE
+    HAND, GPS_IN, GPS_OUT, NFC, VOICE, BTN_HEADPHONE, TIMER
 }
 
 /**
@@ -61,7 +60,8 @@ data class RunTaskDB(
     @PrimaryKey(autoGenerate = true) val id: Long,
     @ColumnInfo(name = "id_task")
     val idTask: Long,
-    val active: Boolean = false
+    val dateCreate: Date = Date(),
+    val active: Boolean = true
 )
 
 @Entity(tableName = "run_points")
@@ -71,10 +71,8 @@ data class RunPointDB(
     val idRunTask: Long,
     @ColumnInfo(name = "id_point")
     val idPoint: Long,
-    @ColumnInfo(name = "date_begin")
-    var dateBegin: Date = Date(),
-    @ColumnInfo(name = "date_end")
-    var dateEnd: Date? = null
+    @ColumnInfo(name = "date_mark")
+    var dateMark: Date? = null
 )
 
 data class RunTaskWithPointDB(

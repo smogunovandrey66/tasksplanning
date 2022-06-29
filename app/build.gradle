@@ -6,7 +6,6 @@ plugins {
     id 'kotlin-parcelize'
 
 }
-
 android {
     compileSdk 32
 
