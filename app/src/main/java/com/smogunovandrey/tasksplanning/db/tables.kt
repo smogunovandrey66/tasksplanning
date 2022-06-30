@@ -112,6 +112,9 @@ interface MainDao{
     @Query("select * from tasks where id = :idTask")
     fun taskById(idTask: Long): Flow<TaskDB?>
 
+    @Query("select * from tasks where id = :idTask")
+    suspend fun taskByIdSuspend(idTask: Long): TaskDB
+
     //Point
     @Insert
     suspend fun insertPoint(point: PointDB): Long

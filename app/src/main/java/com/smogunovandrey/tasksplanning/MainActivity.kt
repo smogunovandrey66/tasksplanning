@@ -2,11 +2,9 @@ package com.smogunovandrey.tasksplanning
 
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -15,9 +13,6 @@ import com.smogunovandrey.tasksplanning.db.AppDatabase
 import com.smogunovandrey.tasksplanning.db.PointDB
 import com.smogunovandrey.tasksplanning.db.TaskDB
 import com.smogunovandrey.tasksplanning.db.TriggerType
-import com.smogunovandrey.tasksplanning.taskstemplate.Point
-import com.smogunovandrey.tasksplanning.taskstemplate.TaskTemplateViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -27,8 +22,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var navController: NavController
-
-    val taskTemplateViewModel: TaskTemplateViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
