@@ -66,7 +66,9 @@ data class RunTaskDB(
 
 @Entity(tableName = "run_points")
 data class RunPointDB(
-    @PrimaryKey(autoGenerate = true) val id: Long,
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    val idRunPoint: Long,
     @ColumnInfo(name = "id_run_task")
     val idRunTask: Long,
     @ColumnInfo(name = "id_point")
@@ -76,7 +78,7 @@ data class RunPointDB(
 )
 
 data class RunTaskWithPointDB(
-    @Embedded val runPoint: RunTaskDB,
+    @Embedded val runTask: RunTaskDB,
 
     @Relation(parentColumn = "id", entityColumn = "id_run_task")
     val listRunPoint: List<RunPointDB>
@@ -163,7 +165,7 @@ interface MainDao{
     suspend fun allRunTask(): List<RunTaskWithPointDB>
 
     @Query("select * from run_tasks where id = :idRunTask")
-    suspend fun runTaskById(idRunTask: Long): RunTaskWithPointDB?
+    suspend fun runTaskWithPointsByIdSuspend(idRunTask: Long): RunTaskWithPointDB
 }
 
 @Database(entities = [PointDB::class, PointGpsDB::class, TaskDB::class, RunPointDB::class, RunTaskDB::class], version = 1)

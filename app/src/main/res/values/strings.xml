@@ -20,4 +20,7 @@
     <string name="empty_name_task">Empty name task</string>
     <string name="start">Start</string>
     <string name="statistic">Statistic</string>
+    <string name="date_create">Date create</string>
+    <string name="active">Active</string>
+    <string name="next">Next</string>
 </resources>

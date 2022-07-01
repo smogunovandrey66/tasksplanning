@@ -56,12 +56,13 @@ data class TaskWithPoints(
 }
 
 data class RunPoint(
-    var id: Long = 0,
+    var idRunPoint: Long = 0,
+    var idTask: Long = 0,
     var idPoint: Long = 0,
     var num: Long = 0,
     var name: String = "",
-    var duration: Long = 0,
     var triggerType: TriggerType = TriggerType.HAND,
+    var duration: Long = 0,
     var dateMark: Date? = null
 )
 

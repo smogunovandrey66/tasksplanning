@@ -3,8 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/dev/tasksplanning/app/src/main/res/layout/fragment_run_task_view.xml" value="0.22" />
         <entry key="..\:/dev/tasksplanning/app/src/main/res/layout/fragment_task_edit.xml" value="0.23645833333333333" />
         <entry key="..\:/dev/tasksplanning/app/src/main/res/layout/fragment_tasks_template.xml" value="0.2375" />
+        <entry key="..\:/dev/tasksplanning/app/src/main/res/layout/item_run_point.xml" value="0.25" />
         <entry key="app/src/main/res/drawable/bordeer.xml" value="0.2065" />
         <entry key="app/src/main/res/drawable/border.xml" value="0.19" />
         <entry key="app/src/main/res/drawable/border_blue.xml" value="0.19" />
