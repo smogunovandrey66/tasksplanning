@@ -73,6 +73,7 @@ data class RunPointDB(
     val idRunTask: Long,
     @ColumnInfo(name = "id_point")
     val idPoint: Long,
+    val num: Long,
     @ColumnInfo(name = "date_mark")
     var dateMark: Date? = null
 )
@@ -81,7 +82,7 @@ data class RunTaskWithPointDB(
     @Embedded val runTask: RunTaskDB,
 
     @Relation(parentColumn = "id", entityColumn = "id_run_task")
-    val listRunPoint: List<RunPointDB>
+    val listRunPoint: MutableList<RunPointDB>
 )
 
 //data class RunPointAndNameAndTrigger(
@@ -110,6 +111,9 @@ interface MainDao{
 
     @Query("select * from tasks")
     fun allTasksFlow(): Flow<List<TaskDB>>
+
+    @Query("select * from tasks")
+    suspend fun allTasksSuspend(): List<TaskDB>
 
     @Query("select * from tasks where id = :idTask")
     fun taskById(idTask: Long): Flow<TaskDB?>

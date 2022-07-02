@@ -46,6 +46,18 @@ class MainActivity : AppCompatActivity() {
 //                    Log.d("MainActivity", item.toString())
 //            }
         }
+        //For test first time if database is empty
+        lifecycleScope.launch {
+            val dao = AppDatabase.getInstance(applicationContext).mainDao()
+            val tasks = dao.allTasksSuspend()
+            if(tasks.isEmpty()){
+                val taskDB = TaskDB(0, "Morning")
+                val idTask = dao.insertTask(taskDB)
+                dao.insertPoint(PointDB(0, idTask, "Lift", 1, TriggerType.HAND))
+                dao.insertPoint(PointDB(0, idTask, "5-ka", 2, TriggerType.HAND))
+                dao.insertPoint(PointDB(0, idTask, "Bus", 3, TriggerType.HAND))
+            }
+        }
 
         lifecycleScope.launch {
             return@launch

@@ -26,8 +26,12 @@ class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolde
             }
 
             binding.btnStart.setOnClickListener {
-                val action = TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskViewFragment(0, binding.taskItem.id)
-                itemView.findNavController().navigate(action)
+                val task = binding.taskItem
+                task?.let {
+                    val action = TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskViewFragment(0, it.id)
+                    itemView.findNavController().navigate(action)
+                }
+
             }
 
             binding.btnStatistics.setOnClickListener {

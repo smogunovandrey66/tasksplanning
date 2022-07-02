@@ -23,4 +23,5 @@
     <string name="date_create">Date create</string>
     <string name="active">Active</string>
     <string name="next">Next</string>
+    <string name="duration">Duration</string>
 </resources>

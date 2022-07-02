@@ -37,7 +37,8 @@ fun Point.toRunPoint(idRunPoint: Long = 0, duration: Long = 0, dateMark: Date? =
 fun List<PointDB>.toListPoint() = map{
     it.toPoint()
 }
-fun RunPointDB.toRunPoint() = RunPoint(idRunPoint, idTask, idPoint, num, name)
+fun RunPointDB.toRunPoint(idTask: Long = 0, num: Long = 0, name: String = "") =
+    RunPoint(idRunPoint, idTask, idPoint, num, name)
 
 fun List<Point>.toListPointDB() = map{
     it.toPointDB()
