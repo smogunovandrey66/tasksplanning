@@ -1,11 +1,14 @@
 package com.smogunovandrey.tasksplanning.utils
 
 import com.smogunovandrey.tasksplanning.db.PointDB
+import com.smogunovandrey.tasksplanning.db.RunPointDB
 import com.smogunovandrey.tasksplanning.db.TaskDB
 import com.smogunovandrey.tasksplanning.db.TaskWithPointDB
 import com.smogunovandrey.tasksplanning.taskstemplate.Point
+import com.smogunovandrey.tasksplanning.taskstemplate.RunPoint
 import com.smogunovandrey.tasksplanning.taskstemplate.Task
 import com.smogunovandrey.tasksplanning.taskstemplate.TaskWithPoints
+import java.util.*
 
 /**
  * Swap for MutableList
@@ -25,10 +28,17 @@ fun Point.toPointDB() = PointDB(id, idTask, name, num, triggerType)
 
 fun PointDB.toPoint() = Point(id, idTask, name, num, triggerType)
 
+fun PointDB.toRunPoint(idRunPoint: Long = 0, duration: Long = 0, dateMark: Date? = null) =
+    RunPoint(idRunPoint, idTask, id, num, name, triggerType, duration, dateMark)
+
+fun Point.toRunPoint(idRunPoint: Long = 0, duration: Long = 0, dateMark: Date? = null) =
+    RunPoint(idRunPoint, idTask, id, num, name, triggerType, duration, dateMark)
 
 fun List<PointDB>.toListPoint() = map{
     it.toPoint()
 }
+fun RunPointDB.toRunPoint(idTask: Long = 0, num: Long = 0, name: String = "") =
+    RunPoint(idRunPoint, idTask, idPoint, num, name)
 
 fun List<Point>.toListPointDB() = map{
     it.toPointDB()

@@ -56,12 +56,13 @@ data class TaskWithPoints(
 }
 
 data class RunPoint(
-    var id: Long = 0,
+    var idRunPoint: Long = 0,
+    var idTask: Long = 0,
     var idPoint: Long = 0,
     var num: Long = 0,
     var name: String = "",
-    var duration: Long = 0,
     var triggerType: TriggerType = TriggerType.HAND,
+    var duration: Long = 0,
     var dateMark: Date? = null
 )
 
@@ -69,12 +70,12 @@ data class RunTask(
     var id: Long = 0L,
     var idTask: Long = 0,
     var name: String = "",
-    var dateCreate: Date = Date(),
+    var dateCreate: Date? = null,
     var active: Boolean = false
 )
 
 data class RunTaskWithPoints(
-    var task: RunTask = RunTask(),
+    var runTask: RunTask = RunTask(),
     val points: MutableList<RunPoint> = mutableListOf()
 )
 

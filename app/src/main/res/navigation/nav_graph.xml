@@ -57,9 +57,12 @@
         android:id="@+id/runTaskViewFragment"
         android:name="com.smogunovandrey.tasksplanning.runtask.RunTaskViewFragment"
         android:label="RunTaskViewFragment" >
-        <action
-            android:id="@+id/action_runTaskViewFragment_to_runPointsFragment"
-            app:destination="@id/runPointsFragment" />
+        <argument
+            android:name="idRunTask"
+            app:argType="long" />
+        <argument
+            android:name="idTask"
+            app:argType="long" />
     </fragment>
     <fragment
         android:id="@+id/statisticsFragment"
@@ -77,8 +80,4 @@
             android:id="@+id/action_runTasksWithDateFragment_to_runTaskViewFragment"
             app:destination="@id/runTaskViewFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/runPointsFragment"
-        android:name="com.smogunovandrey.tasksplanning.runtask.RunPointsFragment"
-        android:label="RunPointsFragment" />
 </navigation>

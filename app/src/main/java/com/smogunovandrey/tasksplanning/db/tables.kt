@@ -66,20 +66,23 @@ data class RunTaskDB(
 
 @Entity(tableName = "run_points")
 data class RunPointDB(
-    @PrimaryKey(autoGenerate = true) val id: Long,
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    val idRunPoint: Long,
     @ColumnInfo(name = "id_run_task")
     val idRunTask: Long,
     @ColumnInfo(name = "id_point")
     val idPoint: Long,
+    val num: Long,
     @ColumnInfo(name = "date_mark")
     var dateMark: Date? = null
 )
 
 data class RunTaskWithPointDB(
-    @Embedded val runPoint: RunTaskDB,
+    @Embedded val runTask: RunTaskDB,
 
     @Relation(parentColumn = "id", entityColumn = "id_run_task")
-    val listRunPoint: List<RunPointDB>
+    val listRunPoint: MutableList<RunPointDB>
 )
 
 //data class RunPointAndNameAndTrigger(
@@ -109,8 +112,14 @@ interface MainDao{
     @Query("select * from tasks")
     fun allTasksFlow(): Flow<List<TaskDB>>
 
+    @Query("select * from tasks")
+    suspend fun allTasksSuspend(): List<TaskDB>
+
     @Query("select * from tasks where id = :idTask")
     fun taskById(idTask: Long): Flow<TaskDB?>
+
+    @Query("select * from tasks where id = :idTask")
+    suspend fun taskByIdSuspend(idTask: Long): TaskDB
 
     //Point
     @Insert
@@ -160,7 +169,7 @@ interface MainDao{
     suspend fun allRunTask(): List<RunTaskWithPointDB>
 
     @Query("select * from run_tasks where id = :idRunTask")
-    suspend fun runTaskById(idRunTask: Long): RunTaskWithPointDB?
+    suspend fun runTaskWithPointsByIdSuspend(idRunTask: Long): RunTaskWithPointDB
 }
 
 @Database(entities = [PointDB::class, PointGpsDB::class, TaskDB::class, RunPointDB::class, RunTaskDB::class], version = 1)

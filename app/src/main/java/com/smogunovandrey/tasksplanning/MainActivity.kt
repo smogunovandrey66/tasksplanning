@@ -2,11 +2,9 @@ package com.smogunovandrey.tasksplanning
 
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -15,9 +13,6 @@ import com.smogunovandrey.tasksplanning.db.AppDatabase
 import com.smogunovandrey.tasksplanning.db.PointDB
 import com.smogunovandrey.tasksplanning.db.TaskDB
 import com.smogunovandrey.tasksplanning.db.TriggerType
-import com.smogunovandrey.tasksplanning.taskstemplate.Point
-import com.smogunovandrey.tasksplanning.taskstemplate.TaskTemplateViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -27,8 +22,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var navController: NavController
-
-    val taskTemplateViewModel: TaskTemplateViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +45,18 @@ class MainActivity : AppCompatActivity() {
 //                for(item in it)
 //                    Log.d("MainActivity", item.toString())
 //            }
+        }
+        //For test first time if database is empty
+        lifecycleScope.launch {
+            val dao = AppDatabase.getInstance(applicationContext).mainDao()
+            val tasks = dao.allTasksSuspend()
+            if(tasks.isEmpty()){
+                val taskDB = TaskDB(0, "Morning")
+                val idTask = dao.insertTask(taskDB)
+                dao.insertPoint(PointDB(0, idTask, "Lift", 1, TriggerType.HAND))
+                dao.insertPoint(PointDB(0, idTask, "5-ka", 2, TriggerType.HAND))
+                dao.insertPoint(PointDB(0, idTask, "Bus", 3, TriggerType.HAND))
+            }
         }
 
         lifecycleScope.launch {
