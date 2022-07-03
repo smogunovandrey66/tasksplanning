@@ -1,13 +1,16 @@
 package com.smogunovandrey.tasksplanning.taskstemplate
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.smogunovandrey.tasksplanning.databinding.ItemTasksTemplateBinding
 import com.smogunovandrey.tasksplanning.db.TriggerType
+import com.smogunovandrey.tasksplanning.runtask.RunService
 
 
 class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolder>(DiffUtilsTasks) {
@@ -26,6 +29,9 @@ class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolde
             }
 
             binding.btnStart.setOnClickListener {
+                val intent = Intent(itemView.context, RunService::class.java)
+                ContextCompat.startForegroundService(itemView.context, intent)
+
                 val task = binding.taskItem
                 task?.let {
                     val action = TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskViewFragment(0, it.id)
@@ -35,6 +41,9 @@ class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolde
             }
 
             binding.btnStatistics.setOnClickListener {
+                val intent = Intent(itemView.context, RunService::class.java)
+                itemView.context.stopService(intent)
+
                 val action = TasksTemplateFragmentDirections.actionTasksTemplateFragmentToStatisticsFragment()
                 itemView.findNavController().navigate(action)
             }

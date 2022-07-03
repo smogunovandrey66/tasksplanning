@@ -1,5 +1,7 @@
 package com.smogunovandrey.tasksplanning.runtask
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -47,7 +49,9 @@ class RunTaskViewFragment: Fragment() {
         }
 
         binding.btnStart.setOnClickListener {
-
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                requireActivity().startForegroundService(Intent())
+            }
         }
 
         return binding.root
