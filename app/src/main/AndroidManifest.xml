@@ -24,6 +24,7 @@
             </intent-filter>
         </activity>
         <service android:name=".runtask.RunService"/>
+        <receiver android:name=".runtask.RunBroadcastReceiver"/>
     </application>
 
 </manifest>

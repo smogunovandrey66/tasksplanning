@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.databinding.ItemTasksTemplateBinding
+import com.smogunovandrey.tasksplanning.runtask.RunBroadcastReceiver
 import com.smogunovandrey.tasksplanning.runtask.RunService
 
 
@@ -22,6 +23,7 @@ class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolde
 
     class TaskItemHolder(val binding: ItemTasksTemplateBinding) :
         RecyclerView.ViewHolder(binding.root) {
+        var task: Task = Task()
         init {
             binding.name.setOnClickListener {
                 binding.taskItem?.let {
@@ -34,8 +36,12 @@ class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolde
             }
 
             binding.btnStart.setOnClickListener {
-                val intent = Intent(itemView.context, RunService::class.java)
-                ContextCompat.startForegroundService(itemView.context.applicationContext, intent)
+//                val intent = Intent(itemView.context, RunService::class.java)
+//                ContextCompat.startForegroundService(itemView.context.applicationContext, intent)
+                val intent = Intent(itemView.context.applicationContext, RunBroadcastReceiver::class.java).apply {
+                    putExtra("idTask", task.id)
+                }
+                itemView.context.applicationContext.sendBroadcast(intent)
 
                 val task = binding.taskItem
                 task?.let {
@@ -58,7 +64,8 @@ class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolde
         }
 
         override fun onBindViewHolder(holder: TaskItemHolder, position: Int) {
-            holder.binding.taskItem = getItem(position)
+            holder.task = getItem(position)
+            holder.binding.taskItem = holder.task
         }
 }
 

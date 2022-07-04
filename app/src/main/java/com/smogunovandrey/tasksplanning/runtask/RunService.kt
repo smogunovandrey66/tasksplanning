@@ -10,6 +10,10 @@ import android.media.MediaSession2Service.MediaNotification
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import android.widget.RelativeLayout
+import android.widget.RemoteViews
+import android.widget.RemoteViews.RemoteView
+import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.db.AppDatabase
@@ -41,11 +45,12 @@ class RunService: Service() {
         var nameTask = ""
 
         createNotificationChannel()
+
+        val layoutNotification = RemoteViews(packageName, R.layout.notification_run_task)
+        layoutNotification.setImageViewResource(R.id.btn_next, R.drawable.baseline_add_24)
         val notificationBuilder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-            .setContentTitle(getString(R.string.content_title_run_task))
-            .setContentText(nameTask)
-            .setStyle(androidx.media.app.NotificationCompat.MediaStyle().setShowActionsInCompactView(0))
-            .addAction(R.drawable.baseline_play_arrow_24, "t", null)
+            .setCustomContentView(layoutNotification)
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setSmallIcon(R.drawable.baseline_run_circle_24)
 
 
@@ -60,7 +65,7 @@ class RunService: Service() {
             (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).notify(NOTIFICATION_ID,
             notificationBuilder.setSmallIcon(R.drawable.baseline_add_24).build())
             delay(2000)
-            stopSelf()
+//            stopSelf()
         }
 
         return START_STICKY
