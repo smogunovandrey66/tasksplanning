@@ -14,4 +14,5 @@
     <string name="active">Active</string>
     <string name="next">Next</string>
     <string name="duration">Duration</string>
+    <string name="content_title_run_task">Running task</string>
 </resources>

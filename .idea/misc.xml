@@ -3,12 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/dev/tasksplanning/app/src/main/res/drawable/baseline_run_circle_24.xml" value="0.1" />
-        <entry key="..\:/dev/tasksplanning/app/src/main/res/layout/fragment_run_task_view.xml" value="0.1" />
         <entry key="..\:/dev/tasksplanning/app/src/main/res/layout/fragment_task_edit.xml" value="0.23645833333333333" />
         <entry key="..\:/dev/tasksplanning/app/src/main/res/layout/fragment_tasks_template.xml" value="0.2375" />
-        <entry key="..\:/dev/tasksplanning/app/src/main/res/layout/item_run_point.xml" value="0.1" />
-        <entry key="..\:/dev/tasksplanning/app/src/main/res/layout/item_tasks_template.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/baseline_play_arrow_24.xml" value="0.244" />
         <entry key="app/src/main/res/drawable/bordeer.xml" value="0.2065" />
         <entry key="app/src/main/res/drawable/border.xml" value="0.19" />
         <entry key="app/src/main/res/drawable/border_blue.xml" value="0.19" />
@@ -25,7 +22,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_15" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

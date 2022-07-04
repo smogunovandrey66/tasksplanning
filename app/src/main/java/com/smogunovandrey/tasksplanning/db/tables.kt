@@ -85,6 +85,12 @@ data class RunTaskWithPointDB(
     val listRunPoint: MutableList<RunPointDB>
 )
 
+data class AcitveTask(
+    @Embedded val runTask: RunTaskDB,
+    @Relation(parentColumn = "id_task", entityColumn = "id")
+    val task: TaskDB
+)
+
 //data class RunPointAndNameAndTrigger(
 //    @Embedded val point: RunPointTemplate,
 //    val name: String,
@@ -120,6 +126,9 @@ interface MainDao{
 
     @Query("select * from tasks where id = :idTask")
     suspend fun taskByIdSuspend(idTask: Long): TaskDB
+
+    @Query("select * from run_tasks where active='true'")
+    suspend fun activeTask(): AcitveTask?
 
     //Point
     @Insert

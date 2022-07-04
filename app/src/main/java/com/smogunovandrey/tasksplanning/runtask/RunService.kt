@@ -3,47 +3,72 @@ package com.smogunovandrey.tasksplanning.runtask
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.media.MediaSession2Service.MediaNotification
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.smogunovandrey.tasksplanning.R
-import kotlinx.coroutines.coroutineScope
+import com.smogunovandrey.tasksplanning.db.AppDatabase
+import com.smogunovandrey.tasksplanning.db.MainDao
+import com.smogunovandrey.tasksplanning.taskstemplate.RunTask
+import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
 
 class RunService: Service() {
+    private val dao: MainDao by lazy {
+        AppDatabase.getInstance(this).mainDao()
+    }
+    private val coroutine: CoroutineScope = CoroutineScope(Dispatchers.Main)
+
     private fun createNotificationChannel(){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             val notificationManager = getSystemService(NotificationManager::class.java)
-            val channel = NotificationChannel(CHANNEL_ID[NOTIFICATION_ID],
-                CHANNEL_NAME[NOTIFICATION_ID], NotificationManager.IMPORTANCE_DEFAULT)
+            val channel = NotificationChannel(CHANNEL_ID,
+                CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
             notificationManager.createNotificationChannel(channel)
         }
     }
 
     override fun onCreate() {
         super.onCreate()
-        Log.d("RunService", "On create")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        var nameTask = ""
+
         createNotificationChannel()
-        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID[NOTIFICATION_ID])
-            .setContentTitle(CHANNEL_NAME[NOTIFICATION_ID])
-            .setContentText(CHANNEL_ID[NOTIFICATION_ID])
-            .setSmallIcon(if(NOTIFICATION_ID == 1) R.drawable.baseline_run_circle_24
-            else R.drawable.baseline_edit_24)
-            .build()
-        startForeground(NOTIFICATION_ID, notification)
-        Log.d("RunService", "onStartCommand startId=$startId, NOTIFICATION_ID=$NOTIFICATION_ID")
-        NOTIFICATION_ID++
+        val notificationBuilder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+            .setContentTitle(getString(R.string.content_title_run_task))
+            .setContentText(nameTask)
+            .setStyle(androidx.media.app.NotificationCompat.MediaStyle().setShowActionsInCompactView(0))
+            .addAction(R.drawable.baseline_play_arrow_24, "t", null)
+            .setSmallIcon(R.drawable.baseline_run_circle_24)
+
+
+
+        startForeground(NOTIFICATION_ID, notificationBuilder.build())
+
+        coroutine.launch {
+            dao.activeTask()?.let {
+                val runTask = RunTask(it.runTask.id, it.task.id, it.task.name, it.runTask.dateCreate, it.runTask.active)
+            }
+            delay(3000)
+            (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).notify(NOTIFICATION_ID,
+            notificationBuilder.setSmallIcon(R.drawable.baseline_add_24).build())
+            delay(2000)
+            stopSelf()
+        }
+
         return START_STICKY
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("RunService", "Destroy")
+        coroutine.cancel()
     }
 
 
@@ -53,8 +78,8 @@ class RunService: Service() {
     }
 
     companion object{
-        val CHANNEL_ID = arrayOf("id channel1", "id channdel 2", "id channel 3", "id channdel 4")
-        val CHANNEL_NAME = arrayOf("name channel1", "name channel 2", "name channel 3", "name channel4")
-        var NOTIFICATION_ID = 1
+        val CHANNEL_ID = "id channel1"
+        val CHANNEL_NAME = "name channel1"
+        val NOTIFICATION_ID = 1
     }
 }

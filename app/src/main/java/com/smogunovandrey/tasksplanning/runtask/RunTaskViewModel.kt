@@ -7,6 +7,7 @@ import com.smogunovandrey.tasksplanning.db.RunPointDB
 import com.smogunovandrey.tasksplanning.taskstemplate.RunPoint
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTask
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTaskWithPoints
+import com.smogunovandrey.tasksplanning.taskstemplate.Task
 import com.smogunovandrey.tasksplanning.utils.toRunPoint
 import com.smogunovandrey.tasksplanning.utils.toTaskWithPoint
 import kotlinx.coroutines.flow.Flow
@@ -75,5 +76,12 @@ class RunTaskViewModel(application: Application) : AndroidViewModel(application)
         }
 
         _loadedRunTaskWithPoints.emit(data)
+    }
+
+    suspend fun activeTask(): RunTask?{
+        dao.activeTask()?.let {
+            return RunTask(it.runTask.id, it.task.id, it.task.name, it.runTask.dateCreate, it.runTask.active)
+        }
+        return null
     }
 }
