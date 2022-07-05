@@ -37,39 +37,38 @@ class RunBroadcastReceiver: BroadcastReceiver() {
         Log.d("RunBroadcastReceiver", "init")
     }
 
-    private fun createNotification(context: Context){
+    private fun createNotification(context: Context) {
         createNotificationChannel(context)
 
         val layoutNotification = RemoteViews(context.packageName, R.layout.notification_run_task)
         layoutNotification.setImageViewResource(R.id.btn_next, R.drawable.baseline_add_24)
-        val notificationBuilder = NotificationCompat.Builder(context.applicationContext,
-            CHANNEL_ID
+        val notificationBuilder = NotificationCompat.Builder(
+            context.applicationContext, CHANNEL_ID
         )
             .setCustomContentView(layoutNotification)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setSmallIcon(R.drawable.baseline_run_circle_24)
             .setOngoing(true)
 
-        (context.getSystemService(Service.NOTIFICATION_SERVICE) as NotificationManager).notify(
+        val notifyManager =
+            context.getSystemService(Service.NOTIFICATION_SERVICE) as NotificationManager
+        notifyManager.notify(
             NOTIFICATION_ID,
-            notificationBuilder.setSmallIcon(R.drawable.baseline_add_24).build())
+            notificationBuilder.setSmallIcon(R.drawable.baseline_add_24).build()
+        )
     }
 
 
-    override fun onReceive(context: Context?, intent: Intent?) {
-        Log.d("RunBroadcastReceiver", "onReceive,context=${context?.toString()}")
-        if(context != null) {
-            if(intent != null) {
-                val idTask = intent.getLongExtra("idTask", 0L)
-                if(idTask > 0L) {
-                    coroutineScope.launch {
-                        val task = dao(context).taskByIdSuspend(idTask).toTask()
+    override fun onReceive(context: Context, intent: Intent) {
+        Log.d("RunBroadcastReceiver", "onReceive,context=${context.toString()}")
+        val idTask = intent.getLongExtra("idTask", 0L)
+        if (idTask > 0L) {
+            coroutineScope.launch {
+                val task = dao(context).taskByIdSuspend(idTask).toTask()
 
-                        createNotification(context)
+                createNotification(context)
 
-                        cancel()
-                    }
-                }
+                cancel()
             }
         }
     }

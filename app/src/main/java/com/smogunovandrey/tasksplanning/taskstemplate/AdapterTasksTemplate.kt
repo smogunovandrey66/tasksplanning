@@ -36,19 +36,18 @@ class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolde
             }
 
             binding.btnStart.setOnClickListener {
-//                val intent = Intent(itemView.context, RunService::class.java)
-//                ContextCompat.startForegroundService(itemView.context.applicationContext, intent)
-                val intent = Intent(itemView.context.applicationContext, RunBroadcastReceiver::class.java).apply {
-                    putExtra("idTask", task.id)
-                }
-                itemView.context.applicationContext.sendBroadcast(intent)
+                val intent = Intent(itemView.context, RunService::class.java)
+                ContextCompat.startForegroundService(itemView.context.applicationContext, intent)
+//                val intent = Intent(itemView.context.applicationContext, RunBroadcastReceiver::class.java).apply {
+//                    putExtra("idTask", task.id)
+//                }
+//                itemView.context.applicationContext.sendBroadcast(intent)
 
                 val task = binding.taskItem
                 task?.let {
                     val action = TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskViewFragment(0, it.id)
                     itemView.findNavController().navigate(action)
                 }
-
             }
 
             binding.btnStatistics.setOnClickListener {
