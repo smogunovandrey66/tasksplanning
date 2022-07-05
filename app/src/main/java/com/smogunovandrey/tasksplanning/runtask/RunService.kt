@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.media.MediaSession2Service.MediaNotification
 import android.os.Build
@@ -15,9 +16,11 @@ import android.widget.RemoteViews
 import android.widget.RemoteViews.RemoteView
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.db.AppDatabase
 import com.smogunovandrey.tasksplanning.db.MainDao
+import com.smogunovandrey.tasksplanning.db.RunTaskDB
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTask
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
@@ -27,6 +30,7 @@ data class RunTaskNotification(
     var idTask: Long = 0L,
     var maxPoints: Int = 0,
     var curNumPoint: Long = 1L,
+    var idNotification: Int
 )
 
 class RunService : Service() {
@@ -49,7 +53,7 @@ class RunService : Service() {
 
     private fun notificationBuilder(channelId: String): NotificationCompat.Builder {
         val layoutNotification = RemoteViews(packageName, R.layout.notification_run_task)
-        layoutNotification.setImageViewResource(R.id.btn_next, R.drawable.baseline_skip_next_24)
+//        layoutNotification.setImageViewResource(R.id.btn_next, R.drawable.baseline_skip_next_24)
 
         val intent = Intent(this.applicationContext, RunService::class.java)
         val pendingIntent =
@@ -82,7 +86,7 @@ class RunService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         var nameTask = ""
 
-        /*coroutine.launch {
+        coroutine.launch {
             dao.activeTask()?.let {
                 val runTask = RunTask(
                     it.runTask.id,
@@ -92,12 +96,12 @@ class RunService : Service() {
                     it.runTask.active
                 )
             }
-            delay(5000)
-            createNotificationChannel(CHANNEL_ID + "yet", CHANNEL_NAME + "yet")
+            delay(3000)
+            createNotificationChannel(CHANNEL_ID, CHANNEL_NAME)
             val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.notify(
                 NOTIFICATION_ID + 1,
-                notificationBuilder(CHANNEL_ID + "yet")
+                notificationBuilder(CHANNEL_ID)
                     .setOngoing(true)
                     .build()
             )
@@ -107,13 +111,12 @@ class RunService : Service() {
 //            notificationManager.cancel(NOTIFICATION_ID + 1)
 //            delay(2000)
 //            stopSelf()
-        }*/
+        }
 
         val command = intent.getIntExtra(COMMAND, 0)
         when(command){
-            COMMAND_NEXT -> {
-                val idTask = intent.getLongExtra(TASK_ID, 0L)
-
+            COMMAND_START -> {
+                val idRunTask = intent.getLongExtra(ID_RUN_TASK, 0)
             }
         }
 
@@ -138,7 +141,16 @@ class RunService : Service() {
         const val NOTIFICATION_ID = 1
 
         const val COMMAND = "command"
-        const val COMMAND_NEXT = 1
+        const val COMMAND_START = 1
+        const val COMMAND_NEXT = COMMAND_START + 1
         const val TASK_ID = "id task"
+        const val ID_RUN_TASK = "id_run_task"
+
+        fun runTask(context: Context, runTaskNotification: RunTaskNotification){
+            val intent = Intent(context, RunService::class.java)
+            intent.putExtra(COMMAND, COMMAND_START)
+            intent.putExtra(ID_RUN_TASK, runTaskNotification.idRunTask)
+            ContextCompat.startForegroundService(context, intent)
+        }
     }
 }
