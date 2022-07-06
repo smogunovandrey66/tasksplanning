@@ -39,7 +39,7 @@ class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolde
             binding.btnStart.setOnClickListener {
                 RunService.runTask(
                     itemView.context.applicationContext, RunTaskNotification(
-                        1, 1, "Lift", 3, 1, 1, false
+                        1, 1, "Lift", 4, 1, 1, false
                     )
                 )
 //                val intent = Intent(itemView.context, RunService::class.java)

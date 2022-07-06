@@ -19,7 +19,7 @@
         <entry key="app/src/main/res/layout/fragment_tasks_template.xml" value="0.1" />
         <entry key="app/src/main/res/layout/item_points_template.xml" value="0.18" />
         <entry key="app/src/main/res/layout/item_tasks_template.xml" value="0.15" />
-        <entry key="app/src/main/res/layout/notification_run_task.xml" value="0.75" />
+        <entry key="app/src/main/res/layout/notification_run_task.xml" value="0.11578947368421053" />
         <entry key="app/src/main/res/menu/tasks.xml" value="0.24114583333333334" />
       </map>
     </option>

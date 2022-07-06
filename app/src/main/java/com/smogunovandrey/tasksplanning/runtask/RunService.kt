@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -56,12 +55,12 @@ class RunService : Service() {
                 applicationContext,
                 1,
                 intent,
-                PendingIntent.FLAG_ONE_SHOT
+                PendingIntent.FLAG_MUTABLE
             ) else PendingIntent.getService(
                 applicationContext,
                 1,
                 intent,
-                PendingIntent.FLAG_ONE_SHOT
+                PendingIntent.FLAG_MUTABLE
             )
         layoutNotification.setOnClickPendingIntent(R.id.btn_next, pendingIntent)
 
@@ -108,10 +107,8 @@ class RunService : Service() {
         }
 
         val command = intent.getIntExtra(COMMAND, 0)
-        Log.d("RunService", "before check command, commnad = $command")
         when(command){
             COMMAND_START -> {
-                Log.d("RunService", "start command")
                 val idRunTask = intent.getLongExtra(ID_RUN_TASK, 0)
                 val nameTask = intent.getStringExtra(NAME_TASK)
                 val curNumPoint = intent.getLongExtra(CUR_NUM_POINT, 0L)
@@ -121,26 +118,46 @@ class RunService : Service() {
                 layoutRemoteViews.setTextViewText(R.id.txt_name, nameTask.toString())
                 layoutRemoteViews.setTextViewText(R.id.txt_number, curNumPoint.toString())
 
-                val intentSend = Intent(this.applicationContext, RunService::class.java)
-                intentSend.putExtra(ID_RUN_TASK, idRunTask)
-                intentSend.putExtra(NAME_TASK, nameTask)
-                intentSend.putExtra(CUR_NUM_POINT, curNumPoint)
-                intentSend.putExtra(COUNT_POINTS, countPoints)
-                intentSend.putExtra(COMMAND, COMMAND_NEXT)
+                val intentNext = Intent(this.applicationContext, RunService::class.java)
+                intentNext.putExtra(ID_RUN_TASK, idRunTask)
+                intentNext.putExtra(NAME_TASK, nameTask)
+                intentNext.putExtra(CUR_NUM_POINT, curNumPoint)
+                intentNext.putExtra(COUNT_POINTS, countPoints)
+                intentNext.putExtra(COMMAND, COMMAND_NEXT)
 
-                val pendingIntent =
+                val pendingIntentNext =
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) PendingIntent.getForegroundService(
                         applicationContext,
                         1,
-                        intentSend,
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                        intentNext,
+                        PendingIntent.FLAG_MUTABLE
                     ) else PendingIntent.getService(
                         applicationContext,
                         1,
-                        intentSend,
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                        intentNext,
+                        PendingIntent.FLAG_MUTABLE
                     )
-                layoutRemoteViews.setOnClickPendingIntent(R.id.btn_next, pendingIntent)
+                layoutRemoteViews.setOnClickPendingIntent(R.id.btn_next, pendingIntentNext)
+
+                val intentStop = Intent(this.applicationContext, RunService::class.java)
+                intentStop.putExtra(ID_RUN_TASK, idRunTask)
+                intentStop.putExtra(NAME_TASK, nameTask)
+                intentStop.putExtra(CUR_NUM_POINT, curNumPoint)
+                intentStop.putExtra(COUNT_POINTS, countPoints)
+                intentStop.putExtra(COMMAND, COMMAND_STOP)
+
+                val pendingIntentStop =
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) PendingIntent.getForegroundService(
+                        applicationContext,
+                        1, intentStop, PendingIntent.FLAG_MUTABLE
+                    ) else PendingIntent.getService(
+                        applicationContext,
+                        1,
+                        intentStop,
+                        PendingIntent.FLAG_MUTABLE
+                    )
+                layoutRemoteViews.setOnClickPendingIntent(R.id.btn_stop, pendingIntentStop)
+
                 val notificationBuilder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
                     .setCustomContentView(layoutRemoteViews)
                     .setStyle(NotificationCompat.DecoratedCustomViewStyle())
@@ -151,7 +168,6 @@ class RunService : Service() {
             }
 
             COMMAND_NEXT -> {
-                Log.d("RunService", "next command")
                 val idRunTask = intent.getLongExtra(ID_RUN_TASK, 0)
                 val nameTask = intent.getStringExtra(NAME_TASK)
                 val curNumPoint = intent.getLongExtra(CUR_NUM_POINT, 0L) + 1
@@ -178,12 +194,12 @@ class RunService : Service() {
                         applicationContext,
                         1,
                         intentSend,
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                        PendingIntent.FLAG_MUTABLE
                     ) else PendingIntent.getService(
                         applicationContext,
                         1,
                         intentSend,
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                        PendingIntent.FLAG_MUTABLE
                     )
                 layoutRemoteViews.setOnClickPendingIntent(R.id.btn_next, pendingIntent)
                 val notificationBuilder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
@@ -194,6 +210,14 @@ class RunService : Service() {
                 val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
             }
+
+            COMMAND_STOP -> {
+                val idRunTask = intent.getLongExtra(ID_RUN_TASK, 0)
+                val nameTask = intent.getStringExtra(NAME_TASK)
+                val curNumPoint = intent.getLongExtra(CUR_NUM_POINT, 0L) + 1
+                val countPoints = intent.getIntExtra(COUNT_POINTS, 0)
+                stopSelf()
+            }
         }
 
         return START_STICKY
@@ -202,7 +226,6 @@ class RunService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         coroutine.cancel()
-        Log.d("RunService", "onDestroy")
     }
 
 
@@ -218,6 +241,8 @@ class RunService : Service() {
         const val COMMAND = "command"
         const val COMMAND_START = 1
         const val COMMAND_NEXT = COMMAND_START + 1
+        const val COMMAND_STOP = COMMAND_START + 2
+
         const val TASK_ID = "id task"
         const val ID_RUN_TASK = "id_run_task"
         const val NAME_TASK = "name task"
