@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -55,12 +56,12 @@ class RunService : Service() {
                 applicationContext,
                 1,
                 intent,
-                PendingIntent.FLAG_MUTABLE
+                PendingIntent.FLAG_IMMUTABLE
             ) else PendingIntent.getService(
                 applicationContext,
                 1,
                 intent,
-                PendingIntent.FLAG_MUTABLE
+                PendingIntent.FLAG_IMMUTABLE
             )
         layoutNotification.setOnClickPendingIntent(R.id.btn_next, pendingIntent)
 
@@ -73,40 +74,41 @@ class RunService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        createNotificationChannel(CHANNEL_ID, CHANNEL_NAME)
-        startForeground(NOTIFICATION_ID, notificationBuilder(CHANNEL_ID).build())
+//        createNotificationChannel(CHANNEL_ID, CHANNEL_NAME)
+//        startForeground(NOTIFICATION_ID, notificationBuilder(CHANNEL_ID).build())
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
 
-        coroutine.launch {
-            dao.activeTask()?.let {
-                val runTask = RunTask(
-                    it.runTask.id,
-                    it.task.id,
-                    it.task.name,
-                    it.runTask.dateCreate,
-                    it.runTask.active
-                )
-            }
-            delay(3000)
-            createNotificationChannel(CHANNEL_ID, CHANNEL_NAME)
-            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-//            notificationManager.notify(
-//                NOTIFICATION_ID + 1,
-//                notificationBuilder(CHANNEL_ID)
-//                    .setOngoing(true)
-//                    .build()
-//            )
-//            startForeground(NOTIFICATION_ID + 1, notificationBuilder(CHANNEL_ID + "yet").build())
-//            stopSelf()
-            delay(4000)
-//            notificationManager.cancel(NOTIFICATION_ID + 1)
-//            delay(2000)
-//            stopSelf()
-        }
+//        coroutine.launch {
+//            dao.activeTask()?.let {
+//                val runTask = RunTask(
+//                    it.runTask.id,
+//                    it.task.id,
+//                    it.task.name,
+//                    it.runTask.dateCreate,
+//                    it.runTask.active
+//                )
+//            }
+//            delay(3000)
+//            createNotificationChannel(CHANNEL_ID, CHANNEL_NAME)
+//            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+////            notificationManager.notify(
+////                NOTIFICATION_ID + 1,
+////                notificationBuilder(CHANNEL_ID)
+////                    .setOngoing(true)
+////                    .build()
+////            )
+////            startForeground(NOTIFICATION_ID + 1, notificationBuilder(CHANNEL_ID + "yet").build())
+////            stopSelf()
+//            delay(4000)
+////            notificationManager.cancel(NOTIFICATION_ID + 1)
+////            delay(2000)
+////            stopSelf()
+//        }
 
         val command = intent.getIntExtra(COMMAND, 0)
+        Log.d("RunService", "command=$command")
         when(command){
             COMMAND_START -> {
                 val idRunTask = intent.getLongExtra(ID_RUN_TASK, 0)
@@ -130,12 +132,12 @@ class RunService : Service() {
                         applicationContext,
                         1,
                         intentNext,
-                        PendingIntent.FLAG_MUTABLE
+                        PendingIntent.FLAG_IMMUTABLE + PendingIntent.FLAG_UPDATE_CURRENT
                     ) else PendingIntent.getService(
                         applicationContext,
                         1,
                         intentNext,
-                        PendingIntent.FLAG_MUTABLE
+                        PendingIntent.FLAG_IMMUTABLE + PendingIntent.FLAG_UPDATE_CURRENT
                     )
                 layoutRemoteViews.setOnClickPendingIntent(R.id.btn_next, pendingIntentNext)
 
@@ -149,12 +151,12 @@ class RunService : Service() {
                 val pendingIntentStop =
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) PendingIntent.getForegroundService(
                         applicationContext,
-                        1, intentStop, PendingIntent.FLAG_MUTABLE
+                        1, intentStop, PendingIntent.FLAG_IMMUTABLE + PendingIntent.FLAG_UPDATE_CURRENT
                     ) else PendingIntent.getService(
                         applicationContext,
                         1,
                         intentStop,
-                        PendingIntent.FLAG_MUTABLE
+                        PendingIntent.FLAG_IMMUTABLE + PendingIntent.FLAG_UPDATE_CURRENT
                     )
                 layoutRemoteViews.setOnClickPendingIntent(R.id.btn_stop, pendingIntentStop)
 
@@ -163,14 +165,19 @@ class RunService : Service() {
                     .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                     .setSmallIcon(R.drawable.baseline_run_circle_24)
 
-                val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
+                createNotificationChannel(CHANNEL_ID, CHANNEL_NAME)
+                startForeground(NOTIFICATION_ID, notificationBuilder.build())
+
+//                val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+//                notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
             }
 
             COMMAND_NEXT -> {
                 val idRunTask = intent.getLongExtra(ID_RUN_TASK, 0)
                 val nameTask = intent.getStringExtra(NAME_TASK)
-                val curNumPoint = intent.getLongExtra(CUR_NUM_POINT, 0L) + 1
+                var curNumPoint = intent.getLongExtra(CUR_NUM_POINT, 0L)
+                Log.d("RunService", "curNumPoint=$curNumPoint")
+                curNumPoint++
                 val countPoints = intent.getIntExtra(COUNT_POINTS, 0)
 
                 if(curNumPoint >= countPoints){
@@ -194,14 +201,35 @@ class RunService : Service() {
                         applicationContext,
                         1,
                         intentSend,
-                        PendingIntent.FLAG_MUTABLE
+                        PendingIntent.FLAG_IMMUTABLE + PendingIntent.FLAG_UPDATE_CURRENT
                     ) else PendingIntent.getService(
                         applicationContext,
                         1,
                         intentSend,
-                        PendingIntent.FLAG_MUTABLE
+                        PendingIntent.FLAG_IMMUTABLE + PendingIntent.FLAG_UPDATE_CURRENT
                     )
                 layoutRemoteViews.setOnClickPendingIntent(R.id.btn_next, pendingIntent)
+
+//                val intentStop = Intent(this.applicationContext, RunService::class.java)
+//                intentStop.putExtra(ID_RUN_TASK, idRunTask)
+//                intentStop.putExtra(NAME_TASK, nameTask)
+//                intentStop.putExtra(CUR_NUM_POINT, curNumPoint)
+//                intentStop.putExtra(COUNT_POINTS, countPoints)
+//                intentStop.putExtra(COMMAND, COMMAND_STOP)
+//
+//                val pendingIntentStop =
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) PendingIntent.getForegroundService(
+//                        applicationContext,
+//                        1, intentStop, PendingIntent.FLAG_IMMUTABLE + PendingIntent.FLAG_UPDATE_CURRENT
+//                    ) else PendingIntent.getService(
+//                        applicationContext,
+//                        1,
+//                        intentStop,
+//                        PendingIntent.FLAG_IMMUTABLE + PendingIntent.FLAG_UPDATE_CURRENT
+//                    )
+//                layoutRemoteViews.setOnClickPendingIntent(R.id.btn_stop, pendingIntentStop)
+
+
                 val notificationBuilder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
                     .setCustomContentView(layoutRemoteViews)
                     .setStyle(NotificationCompat.DecoratedCustomViewStyle())
@@ -226,6 +254,7 @@ class RunService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         coroutine.cancel()
+        Log.d("RunService", "Destroy")
     }
 
 
