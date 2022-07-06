@@ -9,11 +9,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/baseline_double_arrow_24" />
+    <TextView
+        android:id="@+id/txt_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/btn_next"
+        android:text="Name"/>
+    <TextView
+        android:id="@+id/txt_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="number"
+        android:layout_toEndOf="@+id/btn_next"
+        android:layout_below="@+id/txt_name"/>
 
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_next"
+
         android:layout_alignParentEnd="true"
         android:src="@drawable/baseline_stop_circle_24" />
 

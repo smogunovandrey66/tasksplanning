@@ -17,6 +17,7 @@ import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.databinding.ItemTasksTemplateBinding
 import com.smogunovandrey.tasksplanning.runtask.RunBroadcastReceiver
 import com.smogunovandrey.tasksplanning.runtask.RunService
+import com.smogunovandrey.tasksplanning.runtask.RunTaskNotification
 
 
 class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolder>(DiffUtilsTasks) {
@@ -36,8 +37,13 @@ class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolde
             }
 
             binding.btnStart.setOnClickListener {
-                val intent = Intent(itemView.context, RunService::class.java)
-                ContextCompat.startForegroundService(itemView.context.applicationContext, intent)
+                RunService.runTask(
+                    itemView.context.applicationContext, RunTaskNotification(
+                        1, 1, "Lift", 3, 1, 1, false
+                    )
+                )
+//                val intent = Intent(itemView.context, RunService::class.java)
+//                ContextCompat.startForegroundService(itemView.context.applicationContext, intent)
 //                val intent = Intent(itemView.context.applicationContext, RunBroadcastReceiver::class.java).apply {
 //                    putExtra("idTask", task.id)
 //                }
