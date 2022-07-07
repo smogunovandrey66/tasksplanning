@@ -2,8 +2,10 @@ package com.smogunovandrey.tasksplanning.taskstemplate
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.app.NotificationCompat
@@ -20,15 +22,20 @@ import com.smogunovandrey.tasksplanning.runtask.RunService
 import com.smogunovandrey.tasksplanning.runtask.RunTaskNotification
 
 
-class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolder>(DiffUtilsTasks) {
+class AdapterTasksTemplate :
+    ListAdapter<Task, AdapterTasksTemplate.TaskItemHolder>(DiffUtilsTasks) {
 
     class TaskItemHolder(val binding: ItemTasksTemplateBinding) :
         RecyclerView.ViewHolder(binding.root) {
         var task: Task = Task()
+
         init {
             binding.name.setOnClickListener {
                 binding.taskItem?.let {
-                    val action = TasksTemplateFragmentDirections.actionTasksTemplateFragmentToTaskViewFragment(it.id)
+                    val action =
+                        TasksTemplateFragmentDirections.actionTasksTemplateFragmentToTaskViewFragment(
+                            it.id
+                        )
                     itemView.findNavController().navigate(action)
                 }
 
@@ -37,8 +44,17 @@ class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolde
             }
 
             binding.btnStart.setOnClickListener {
+                val appContext = itemView.context.applicationContext
+//                val intent = Intent(appContext, RunService::class.java).apply { action = "intent" }
+//                val pendingIntent = PendingIntent.getForegroundService(appContext, 1, intent, PendingIntent.FLAG_MUTABLE)
+//                pendingIntent.send()
+//                Log.d("RunService", "pendingIntent=$pendingIntent")
+//
+//                val intent2 = Intent(appContext, RunService::class.java).apply { action = "intent2" }
+//                val pendingIntent2 = PendingIntent.getForegroundService(appContext, 1, intent2, PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_MUTABLE)
+//                Log.d("RunService", "pendingIntent2=$pendingIntent2")
                 RunService.runTask(
-                    itemView.context.applicationContext, RunTaskNotification(
+                    appContext, RunTaskNotification(
                         1, 1, "Lift", 4, 1, 1, false
                     )
                 )
@@ -50,31 +66,38 @@ class AdapterTasksTemplate: ListAdapter<Task, AdapterTasksTemplate.TaskItemHolde
 //                itemView.context.applicationContext.sendBroadcast(intent)
 
                 val task = binding.taskItem
+                return@setOnClickListener
                 task?.let {
-                    val action = TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskViewFragment(0, it.id)
+                    val action =
+                        TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskViewFragment(
+                            0,
+                            it.id
+                        )
                     itemView.findNavController().navigate(action)
                 }
             }
 
             binding.btnStatistics.setOnClickListener {
-                val action = TasksTemplateFragmentDirections.actionTasksTemplateFragmentToStatisticsFragment()
+                val action =
+                    TasksTemplateFragmentDirections.actionTasksTemplateFragmentToStatisticsFragment()
                 itemView.findNavController().navigate(action)
             }
         }
     }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskItemHolder {
-            val binding = ItemTasksTemplateBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            return  TaskItemHolder(binding)
-        }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskItemHolder {
+        val binding =
+            ItemTasksTemplateBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return TaskItemHolder(binding)
+    }
 
-        override fun onBindViewHolder(holder: TaskItemHolder, position: Int) {
-            holder.task = getItem(position)
-            holder.binding.taskItem = holder.task
-        }
+    override fun onBindViewHolder(holder: TaskItemHolder, position: Int) {
+        holder.task = getItem(position)
+        holder.binding.taskItem = holder.task
+    }
 }
 
-object DiffUtilsTasks: DiffUtil.ItemCallback<Task>() {
+object DiffUtilsTasks : DiffUtil.ItemCallback<Task>() {
     override fun areItemsTheSame(oldItem: Task, newItem: Task): Boolean {
         return oldItem.id == newItem.id
     }
