@@ -1,5 +1,6 @@
 package com.smogunovandrey.tasksplanning.utils
 
+import android.os.Bundle
 import com.smogunovandrey.tasksplanning.db.PointDB
 import com.smogunovandrey.tasksplanning.db.RunPointDB
 import com.smogunovandrey.tasksplanning.db.TaskDB
@@ -48,7 +49,17 @@ fun TaskWithPointDB.toTaskWithPoint() = TaskWithPoints(this.task.toTask(), this.
 
 fun TaskWithPoints.toTaskWithPointDB() = TaskWithPointDB(this.task.toTaskDB(), this.points.toListPointDB())
 
+
 //***********Convert function DB<->not DB************************
+
+fun Bundle?.toList(): kotlin.collections.List<String>? =
+    if(this != null){
+        keySet().map { key ->
+            "$key=${get(key)}"
+        }
+    } else {
+        null
+    }
 
 //fun Any.deepCopy():Any {
 //    val JSON = Gson().toJson(this)

@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.db.AppDatabase
 import com.smogunovandrey.tasksplanning.db.MainDao
+import com.smogunovandrey.tasksplanning.utils.toList
 import kotlinx.coroutines.*
 
 data class RunTaskNotification(
@@ -150,13 +151,7 @@ class RunService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        val data = intent.extras?.let { extras ->
-            extras.keySet().map { key ->
-                "$key=${extras[key]}"
-            }
-        }
-
-        Log.d("RunService", "onStartCommand intent=$data")
+        Log.d("RunService", "onStartCommand intent=${intent.extras.toList()}")
         updateNotification(intent)
         return START_STICKY
     }
