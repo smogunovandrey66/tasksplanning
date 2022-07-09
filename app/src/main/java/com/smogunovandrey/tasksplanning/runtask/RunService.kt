@@ -150,7 +150,13 @@ class RunService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        Log.d("RunService", "onStartCommand intent=${intent.extras.toString()}")
+        val data = intent.extras?.let { extras ->
+            extras.keySet().map { key ->
+                "$key=${extras[key]}"
+            }
+        }
+
+        Log.d("RunService", "onStartCommand intent=$data")
         updateNotification(intent)
         return START_STICKY
     }
