@@ -55,9 +55,10 @@ class AdapterTasksTemplate :
 //                Log.d("RunService", "pendingIntent2=$pendingIntent2")
                 RunService.runTask(
                     appContext, RunTaskNotification(
-                        1, 1, "Lift", 4, 1, 1, false
+                        1, 1, "Lift", 6, 1, 1, false
                     )
                 )
+                return@setOnClickListener
 //                val intent = Intent(itemView.context, RunService::class.java)
 //                ContextCompat.startForegroundService(itemView.context.applicationContext, intent)
 //                val intent = Intent(itemView.context.applicationContext, RunBroadcastReceiver::class.java).apply {
