@@ -51,11 +51,17 @@ class MainActivity : AppCompatActivity() {
             val dao = AppDatabase.getInstance(applicationContext).mainDao()
             val tasks = dao.allTasksSuspend()
             if(tasks.isEmpty()){
-                val taskDB = TaskDB(0, "Morning")
-                val idTask = dao.insertTask(taskDB)
+                var taskDB = TaskDB(0, "Morning")
+                var idTask = dao.insertTask(taskDB)
                 dao.insertPoint(PointDB(0, idTask, "Lift", 1, TriggerType.HAND))
                 dao.insertPoint(PointDB(0, idTask, "5-ka", 2, TriggerType.HAND))
                 dao.insertPoint(PointDB(0, idTask, "Bus", 3, TriggerType.HAND))
+
+                taskDB = TaskDB(0, "Work")
+                idTask = dao.insertTask(taskDB)
+                dao.insertPoint(PointDB(0, idTask, "Parkoviy", 1, TriggerType.HAND))
+                dao.insertPoint(PointDB(0, idTask, "Goznak", 2, TriggerType.HAND))
+                dao.insertPoint(PointDB(0, idTask, "Work", 3, TriggerType.HAND))
             }
         }
 

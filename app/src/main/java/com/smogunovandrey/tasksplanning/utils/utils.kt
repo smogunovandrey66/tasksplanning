@@ -1,14 +1,8 @@
 package com.smogunovandrey.tasksplanning.utils
 
 import android.os.Bundle
-import com.smogunovandrey.tasksplanning.db.PointDB
-import com.smogunovandrey.tasksplanning.db.RunPointDB
-import com.smogunovandrey.tasksplanning.db.TaskDB
-import com.smogunovandrey.tasksplanning.db.TaskWithPointDB
-import com.smogunovandrey.tasksplanning.taskstemplate.Point
-import com.smogunovandrey.tasksplanning.taskstemplate.RunPoint
-import com.smogunovandrey.tasksplanning.taskstemplate.Task
-import com.smogunovandrey.tasksplanning.taskstemplate.TaskWithPoints
+import com.smogunovandrey.tasksplanning.db.*
+import com.smogunovandrey.tasksplanning.taskstemplate.*
 import java.util.*
 
 /**
@@ -41,17 +35,26 @@ fun List<PointDB>.toListPoint() = map{
 fun RunPointDB.toRunPoint(idTask: Long = 0, num: Long = 0, name: String = "") =
     RunPoint(idRunPoint, idTask, idPoint, num, name)
 
+fun RunTask.toRunTaskDB() =
+    RunTaskDB(id, idTask, dateCreate ?: Date(), active)
+
 fun List<Point>.toListPointDB() = map{
     it.toPointDB()
 }
+fun RunPoint.toRunPointDB(idRunTask: Long) =
+    RunPointDB(idRunPoint, idRunTask, idPoint, num, dateMark)
 
 fun TaskWithPointDB.toTaskWithPoint() = TaskWithPoints(this.task.toTask(), this.listTaskPoint.toListPoint().toMutableList())
 
 fun TaskWithPoints.toTaskWithPointDB() = TaskWithPointDB(this.task.toTaskDB(), this.points.toListPointDB())
 
 
+
 //***********Convert function DB<->not DB************************
 
+/**
+ * List-view presentation bundle
+ */
 fun Bundle?.toList(): kotlin.collections.List<String>? =
     if(this != null){
         keySet().map { key ->

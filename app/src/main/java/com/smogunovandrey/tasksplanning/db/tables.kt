@@ -127,9 +127,6 @@ interface MainDao{
     @Query("select * from tasks where id = :idTask")
     suspend fun taskByIdSuspend(idTask: Long): TaskDB
 
-    @Query("select * from run_tasks where active='true'")
-    suspend fun activeTask(): AcitveTask?
-
     //Point
     @Insert
     suspend fun insertPoint(point: PointDB): Long
@@ -171,6 +168,9 @@ interface MainDao{
 
     @Delete
     suspend fun deleteRunPoint(runPoint: RunPointDB)
+
+    @Query("select * from run_tasks where active='true'")
+    fun activeTask(): Flow<RunTaskDB?>
 
 
     //RunTaskWithPoint

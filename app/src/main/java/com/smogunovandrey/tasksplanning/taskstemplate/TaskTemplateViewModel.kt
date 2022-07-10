@@ -57,4 +57,6 @@ class TaskTemplateViewModel(application: Application) : AndroidViewModel(applica
     var posPointUpdate: Int? = null
 
     suspend fun deleteTask(idTask: Long) = taskTemplateRepository.deleteTask(idTask)
+
+    val activeTask = taskTemplateRepository.activeTask()
 }

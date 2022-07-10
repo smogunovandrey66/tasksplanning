@@ -11,19 +11,23 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.smogunovandrey.tasksplanning.databinding.FragmentTasksTemplateBinding
+import com.smogunovandrey.tasksplanning.runtask.RunTaskViewModel
 import kotlinx.coroutines.launch
 
-class TasksTemplateFragment : Fragment() {
+class TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
 
     private val binding: FragmentTasksTemplateBinding by lazy {
         FragmentTasksTemplateBinding.inflate(layoutInflater)
     }
 
     private val adapter: AdapterTasksTemplate by lazy{
-        AdapterTasksTemplate()
+        AdapterTasksTemplate().apply {
+            onRunTaskItemClick = this@TasksTemplateFragment
+        }
     }
 
     private val model: TaskTemplateViewModel by activityViewModels()
+    private val modelRunTask: RunTaskViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,5 +51,14 @@ class TasksTemplateFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    override fun onRunTaskItemClick(idTask: Long) {
+        modelRunTask.curIdTask = idTask
+        modelRunTask.curIdRunTask = 0L
+
+        findNavController().navigate(
+            TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskViewFragment()
+        )
     }
 }

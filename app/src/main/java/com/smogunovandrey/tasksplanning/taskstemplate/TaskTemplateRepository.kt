@@ -92,4 +92,5 @@ class TaskTemplateRepository(private val mainDao: MainDao) {
         mainDao.deleteTask(taskWithPointDB.task)
     }
 
+    fun activeTask() = mainDao.activeTask()
 }

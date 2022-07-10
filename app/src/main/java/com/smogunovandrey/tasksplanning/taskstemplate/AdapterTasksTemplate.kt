@@ -21,11 +21,16 @@ import com.smogunovandrey.tasksplanning.runtask.RunBroadcastReceiver
 import com.smogunovandrey.tasksplanning.runtask.RunService
 import com.smogunovandrey.tasksplanning.runtask.RunTaskNotification
 
+interface OnRunTaskItemClick{
+    fun onRunTaskItemClick(idTask: Long)
+}
 
 class AdapterTasksTemplate :
     ListAdapter<Task, AdapterTasksTemplate.TaskItemHolder>(DiffUtilsTasks) {
 
-    class TaskItemHolder(val binding: ItemTasksTemplateBinding) :
+    var onRunTaskItemClick: OnRunTaskItemClick? = null
+
+    class TaskItemHolder(val binding: ItemTasksTemplateBinding, val onRunTaskItemClick: OnRunTaskItemClick? = null) :
         RecyclerView.ViewHolder(binding.root) {
         var task: Task = Task()
 
@@ -44,37 +49,20 @@ class AdapterTasksTemplate :
             }
 
             binding.btnStart.setOnClickListener {
-                val appContext = itemView.context.applicationContext
-//                val intent = Intent(appContext, RunService::class.java).apply { action = "intent" }
-//                val pendingIntent = PendingIntent.getForegroundService(appContext, 1, intent, PendingIntent.FLAG_MUTABLE)
-//                pendingIntent.send()
-//                Log.d("RunService", "pendingIntent=$pendingIntent")
-//
-//                val intent2 = Intent(appContext, RunService::class.java).apply { action = "intent2" }
-//                val pendingIntent2 = PendingIntent.getForegroundService(appContext, 1, intent2, PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_MUTABLE)
-//                Log.d("RunService", "pendingIntent2=$pendingIntent2")
-                RunService.runTask(
-                    appContext, RunTaskNotification(
-                        1, 1, "Lift", 6, 1, 1, false
-                    )
-                )
-                return@setOnClickListener
-//                val intent = Intent(itemView.context, RunService::class.java)
-//                ContextCompat.startForegroundService(itemView.context.applicationContext, intent)
-//                val intent = Intent(itemView.context.applicationContext, RunBroadcastReceiver::class.java).apply {
-//                    putExtra("idTask", task.id)
-//                }
-//                itemView.context.applicationContext.sendBroadcast(intent)
+//                val appContext = itemView.context.applicationContext
+//                RunService.runTask(
+//                    appContext, RunTaskNotification(
+//                        1, 1, "Lift", 6, 1, 1, false
+//                    )
+//                )
 
                 val task = binding.taskItem
-                return@setOnClickListener
                 task?.let {
-                    val action =
-                        TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskViewFragment(
-                            0,
-                            it.id
-                        )
-                    itemView.findNavController().navigate(action)
+                    val idRunTask = 0L
+                    val idTask = task.id
+                    onRunTaskItemClick?.let {
+                        it.onRunTaskItemClick(idTask)
+                    }
                 }
             }
 
@@ -89,7 +77,7 @@ class AdapterTasksTemplate :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskItemHolder {
         val binding =
             ItemTasksTemplateBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return TaskItemHolder(binding)
+        return TaskItemHolder(binding, onRunTaskItemClick)
     }
 
     override fun onBindViewHolder(holder: TaskItemHolder, position: Int) {

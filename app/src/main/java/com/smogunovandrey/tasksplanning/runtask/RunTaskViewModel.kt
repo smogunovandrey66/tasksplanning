@@ -2,16 +2,19 @@ package com.smogunovandrey.tasksplanning.runtask
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.smogunovandrey.tasksplanning.db.AppDatabase
 import com.smogunovandrey.tasksplanning.db.RunPointDB
 import com.smogunovandrey.tasksplanning.taskstemplate.RunPoint
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTask
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTaskWithPoints
-import com.smogunovandrey.tasksplanning.taskstemplate.Task
 import com.smogunovandrey.tasksplanning.utils.toRunPoint
+import com.smogunovandrey.tasksplanning.utils.toRunPointDB
+import com.smogunovandrey.tasksplanning.utils.toRunTaskDB
 import com.smogunovandrey.tasksplanning.utils.toTaskWithPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 
 //Need whether repository???
 
@@ -22,10 +25,10 @@ sealed class Result{
 }
 
 class RunTaskViewModel(application: Application) : AndroidViewModel(application) {
-    private val _loadedRunTaskWithPoints: MutableStateFlow<RunTaskWithPoints> = MutableStateFlow(
+    private val _curRunTaskWithPoints: MutableStateFlow<RunTaskWithPoints> = MutableStateFlow(
         RunTaskWithPoints()
     )
-    val loadedRunTaskWithPoints: Flow<RunTaskWithPoints> = _loadedRunTaskWithPoints
+    val curRunTaskWithPoints: Flow<RunTaskWithPoints> = _curRunTaskWithPoints
     //Working data
     val workingRunTaskWithPoints: RunTaskWithPoints = RunTaskWithPoints()
 
@@ -33,8 +36,13 @@ class RunTaskViewModel(application: Application) : AndroidViewModel(application)
         AppDatabase.getInstance(application.applicationContext).mainDao()
     }
 
-    suspend fun loadRunTask(idTask: Long, idRunTask: Long = 0L){
-        val cashData = _loadedRunTaskWithPoints.value.runTask
+    var curIdRunTask = 0L
+    var curIdTask = 0L
+
+    suspend fun loadRunTask(){
+        val idTask: Long = curIdTask
+        val idRunTask: Long = curIdRunTask
+        val cashData = _curRunTaskWithPoints.value.runTask
         if((cashData.id == idRunTask) && (cashData.idTask == idTask))
             return
 
@@ -75,13 +83,18 @@ class RunTaskViewModel(application: Application) : AndroidViewModel(application)
             }
         }
 
-        _loadedRunTaskWithPoints.emit(data)
+        _curRunTaskWithPoints.emit(data)
     }
 
-    suspend fun activeTask(): RunTask?{
-        dao.activeTask()?.let {
-            return RunTask(it.runTask.id, it.task.id, it.task.name, it.runTask.dateCreate, it.runTask.active)
+    fun runTask(runTaskWithPoints: RunTaskWithPoints){
+        viewModelScope.launch {
+            val idRunTask = dao.insertRunTask(runTaskWithPoints.runTask.toRunTaskDB())
+            for(point in runTaskWithPoints.points){
+                dao.insertRunPoint(point.toRunPointDB(idRunTask))
+            }
+            curIdRunTask = idRunTask
+            curIdTask = runTaskWithPoints.runTask.idTask
+            loadRunTask()
         }
-        return null
     }
 }
