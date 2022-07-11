@@ -1,6 +1,7 @@
 package com.smogunovandrey.tasksplanning.runtask
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.smogunovandrey.tasksplanning.db.AppDatabase
@@ -109,10 +110,12 @@ class RunTaskViewModel(application: Application) : AndroidViewModel(application)
                     break
                 }
             }
+            Log.d("AdapterRunPoints", "AdapterRunPoints=$nextPoint")
             if(nextPoint != null){
                 nextPoint.dateMark = Date()
                 val pointDB = nextPoint.toRunPointDB(runTaskWithPoints.runTask.id)
                 dao.insertRunPoint(pointDB)
+                runTask()
             }
         }
     }

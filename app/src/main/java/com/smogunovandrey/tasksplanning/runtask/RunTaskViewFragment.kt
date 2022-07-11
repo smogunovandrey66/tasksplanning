@@ -38,7 +38,7 @@ class RunTaskViewFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 model.loadRunTask()
                 model.curRunTaskWithPoints.collect {
-                    Log.d("AdapterRunPoints", "collect")
+                    Log.d("AdapterRunPoints", "collect $it")
                     runTaskWithPoints = it
                     binding.task = it.runTask
                     adapter.submitList(it.points)
