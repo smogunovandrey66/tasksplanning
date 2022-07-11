@@ -58,7 +58,6 @@ class AdapterTasksTemplate :
 
                 val task = binding.taskItem
                 task?.let {
-                    val idRunTask = 0L
                     val idTask = task.id
                     onRunTaskItemClick?.let {
                         it.onRunTaskItemClick(idTask)

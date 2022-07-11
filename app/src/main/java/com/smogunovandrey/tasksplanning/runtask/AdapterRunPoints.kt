@@ -11,9 +11,6 @@ import com.smogunovandrey.tasksplanning.databinding.ItemRunPointBinding
 import com.smogunovandrey.tasksplanning.taskstemplate.RunPoint
 
 class AdapterRunPoints: ListAdapter<RunPoint, AdapterRunPoints.RunPointHolder>(diffUtilCallback) {
-    init {
-        Log.d("AdapterRunPoints", "init")
-    }
     class RunPointHolder(val binding: ItemRunPointBinding) : RecyclerView.ViewHolder(binding.root){
 
     }

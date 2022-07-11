@@ -15,6 +15,7 @@ import com.smogunovandrey.tasksplanning.utils.toTaskWithPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import java.util.Date
 
 //Need whether repository???
 
@@ -95,6 +96,24 @@ class RunTaskViewModel(application: Application) : AndroidViewModel(application)
             curIdRunTask = idRunTask
             curIdTask = runTaskWithPoints.runTask.idTask
             loadRunTask()
+        }
+    }
+
+    fun nextPointHand(){
+        viewModelScope.launch {
+            val runTaskWithPoints = _curRunTaskWithPoints.value
+            var nextPoint: RunPoint? = null
+            for(point in runTaskWithPoints.points){
+                if(point.dateMark == null){
+                    nextPoint = point
+                    break
+                }
+            }
+            if(nextPoint != null){
+                nextPoint.dateMark = Date()
+                val pointDB = nextPoint.toRunPointDB(runTaskWithPoints.runTask.id)
+                dao.insertRunPoint(pointDB)
+            }
         }
     }
 }

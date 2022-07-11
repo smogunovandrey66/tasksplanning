@@ -50,10 +50,10 @@ class RunTaskViewFragment : Fragment() {
         }
 
         binding.btnStart.setOnClickListener {
-//            if(model.curIdRunTask == 0L)
-//                model.runTask(runTaskWithPoints)
-//            else
-//                //TODO
+            if(model.curIdRunTask == 0L)
+                model.runTask(runTaskWithPoints)
+            else
+                model.nextPointHand()
         }
 
         return binding.root
