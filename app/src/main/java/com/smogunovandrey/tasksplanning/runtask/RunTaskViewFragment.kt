@@ -10,11 +10,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.navArgs
-import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.databinding.FragmentRunTaskViewBinding
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTaskWithPoints
-import com.smogunovandrey.tasksplanning.taskstemplate.TasksTemplateFragmentDirections
 import kotlinx.coroutines.launch
 
 class RunTaskViewFragment : Fragment() {
@@ -36,15 +33,12 @@ class RunTaskViewFragment : Fragment() {
         binding.rvRunPoints.adapter = adapter
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                model.loadRunTask()
+                model.updateCurRunTask()
                 model.curRunTaskWithPoints.collect {
                     Log.d("AdapterRunPoints", "collect $it")
                     runTaskWithPoints = it
-                    binding.task = it.runTask
+                    binding.runTaskWithPoints = it
                     adapter.submitList(it.points)
-
-                    if (it.runTask.id == 0L) //else "Next" caption
-                        binding.btnStart.text = getString(R.string.start)
                 }
             }
         }

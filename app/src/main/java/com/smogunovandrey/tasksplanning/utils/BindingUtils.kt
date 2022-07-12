@@ -2,9 +2,13 @@ package com.smogunovandrey.tasksplanning.utils
 
 import android.annotation.SuppressLint
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.db.TriggerType
+import com.smogunovandrey.tasksplanning.taskstemplate.RunTask
+import com.smogunovandrey.tasksplanning.taskstemplate.RunTaskWithPoints
 import java.util.Date
 
 
@@ -30,4 +34,32 @@ fun bindDateRunTask(view: TextView, date: Date?){
         return
     }
     view.text = ""
+}
+
+@BindingAdapter("android:status_button")
+fun bindStatusRunTask(view: Button, runTaskWithPoints: RunTaskWithPoints?){
+    val runTask = runTaskWithPoints?.runTask
+    if(runTask != null){
+        view.visibility = View.VISIBLE
+        if(runTask.dateCreate == null){
+            view.text = view.context.getString(R.string.start)
+            return
+        }
+
+        var existNull = false
+        for(item in runTaskWithPoints.points){
+            if(item.dateMark == null){
+                existNull = true
+                break
+            }
+        }
+
+        if(existNull)
+            view.text = view.context.getString(R.string.next)
+        else
+            view.visibility = View.GONE
+
+    } else {
+        view.visibility = View.GONE
+    }
 }

@@ -159,13 +159,18 @@ interface MainDao{
     @Insert
     suspend fun insertRunTask(runTask: RunTaskDB): Long
 
+    @Update
+    suspend fun updateRunTask(runTask: RunTaskDB)
+
     @Delete
     suspend fun deleteRunTask(runTask: RunTaskDB)
 
     //RunPoint
     @Insert
-    suspend fun insertRunPoint(runPoint: RunPointDB)
+    suspend fun insertRunPoint(runPoint: RunPointDB): Long
 
+    @Update
+    suspend fun updateRunPoint(runPoint: RunPointDB)
     @Delete
     suspend fun deleteRunPoint(runPoint: RunPointDB)
 

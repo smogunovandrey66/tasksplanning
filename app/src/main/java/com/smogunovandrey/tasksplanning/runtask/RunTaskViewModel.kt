@@ -41,12 +41,9 @@ class RunTaskViewModel(application: Application) : AndroidViewModel(application)
     var curIdRunTask = 0L
     var curIdTask = 0L
 
-    suspend fun loadRunTask(){
+    suspend fun updateCurRunTask(){
         val idTask: Long = curIdTask
         val idRunTask: Long = curIdRunTask
-        val cashData = _curRunTaskWithPoints.value.runTask
-        if((cashData.id == idRunTask) && (cashData.idTask == idTask))
-            return
 
         //Template
         val taskWithPoints = dao.taskWithPointsSuspend(idTask).toTaskWithPoint()
@@ -61,10 +58,10 @@ class RunTaskViewModel(application: Application) : AndroidViewModel(application)
             data.points.add(point.toRunPoint())
         }
         //Sort by number
-        data.points.sortWith(Comparator{p1, p2 -> (p1.num - p2.num).toInt()})
+        data.points.sortWith{p1, p2 -> (p1.num - p2.num).toInt()}
 
         if(idRunTask > 0){
-            var runTaskDB = dao.runTaskWithPointsByIdSuspend(idRunTask)
+            val runTaskDB = dao.runTaskWithPointsByIdSuspend(idRunTask)
             data.runTask.active = runTaskDB.runTask.active
             data.runTask.dateCreate = runTaskDB.runTask.dateCreate
 
@@ -74,6 +71,8 @@ class RunTaskViewModel(application: Application) : AndroidViewModel(application)
                 val pointDB: RunPointDB = runTaskDB.listRunPoint[i]
                 val point:  RunPoint = data.points[i]
 
+                point.idRunPoint = pointDB.idRunPoint
+
                 //Need equals
                 if(point.num != pointDB.num)
                     continue
@@ -82,6 +81,8 @@ class RunTaskViewModel(application: Application) : AndroidViewModel(application)
                 point.dateMark?.let {
                     point.duration = it.time - runTaskDB.runTask.dateCreate.time
                 }
+
+                Log.d("AdapterRunPoints", "get one point pointDB=$pointDB, point=$point")
             }
         }
 
@@ -90,33 +91,45 @@ class RunTaskViewModel(application: Application) : AndroidViewModel(application)
 
     fun runTask(runTaskWithPoints: RunTaskWithPoints){
         viewModelScope.launch {
+            runTaskWithPoints.runTask.active = true
             val idRunTask = dao.insertRunTask(runTaskWithPoints.runTask.toRunTaskDB())
             for(point in runTaskWithPoints.points){
                 dao.insertRunPoint(point.toRunPointDB(idRunTask))
             }
             curIdRunTask = idRunTask
             curIdTask = runTaskWithPoints.runTask.idTask
-            loadRunTask()
+            updateCurRunTask()
         }
     }
 
     fun nextPointHand(){
         viewModelScope.launch {
             val runTaskWithPoints = _curRunTaskWithPoints.value
+            Log.d("AdapterRunPoints", "in nextPointHand runTaskWithPoints=$runTaskWithPoints")
             var nextPoint: RunPoint? = null
+            val lastPos = runTaskWithPoints.points.size - 1
+            var curPos = -1
             for(point in runTaskWithPoints.points){
+                curPos++
                 if(point.dateMark == null){
                     nextPoint = point
                     break
                 }
             }
-            Log.d("AdapterRunPoints", "AdapterRunPoints=$nextPoint")
+
             if(nextPoint != null){
                 nextPoint.dateMark = Date()
                 val pointDB = nextPoint.toRunPointDB(runTaskWithPoints.runTask.id)
-                dao.insertRunPoint(pointDB)
-                runTask()
+                val idPoint = dao.updateRunPoint(pointDB)
+                Log.d("AdapterRunPoints", "after insert=$idPoint, $pointDB")
             }
+            if(curPos == lastPos){
+                val task = runTaskWithPoints.runTask
+                task.active = false
+                dao.updateRunTask(task.toRunTaskDB())
+            }
+
+            updateCurRunTask()
         }
     }
 }
