@@ -1,6 +1,7 @@
 package com.smogunovandrey.tasksplanning.db
 
 import android.content.Context
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 import java.util.*
@@ -12,7 +13,9 @@ import java.util.*
 
 @Entity(tableName = "tasks")
 data class TaskDB(
-    @PrimaryKey(autoGenerate = true) val id: Long,
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    val idTask: Long,
     val name: String
 )
 
@@ -57,7 +60,9 @@ data class TaskWithPointDB(
 
 @Entity(tableName = "run_tasks")
 data class RunTaskDB(
-    @PrimaryKey(autoGenerate = true) val id: Long,
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    val idRunTask: Long,
     @ColumnInfo(name = "id_task")
     val idTask: Long,
     val dateCreate: Date = Date(),
@@ -82,7 +87,7 @@ data class RunTaskWithPointDB(
     @Embedded val runTask: RunTaskDB,
 
     @Relation(parentColumn = "id", entityColumn = "id_run_task")
-    val listRunPoint: MutableList<RunPointDB>
+    val runPoints: MutableList<RunPointDB>
 )
 
 data class AcitveTask(
@@ -140,6 +145,8 @@ interface MainDao{
     @Query("select * from points where id_task = :idTask")
     fun pointsByTaskId(idTask: Long): Flow<List<PointDB>>
 
+    @Query("select * from points where id = :idPoint")
+    fun pointByIdSuspend(idPoint: Long): PointDB
 
     //GPS point
     @Query("select * from points_gps where id_point = :idPoint")
@@ -185,8 +192,11 @@ interface MainDao{
     @Query("select * from run_tasks where id = :idRunTask")
     suspend fun runTaskWithPointsByIdSuspend(idRunTask: Long): RunTaskWithPointDB
 
-    @Query("select * from run_tasks where active = true")
+    @Query("select * from run_tasks where active = 'true'")
     suspend fun activeRunTaskWithPointsSuspend(): RunTaskWithPointDB?
+
+    @Query("select * from run_tasks where active = 'true'")
+    suspend fun activeRunTaskWithPointsLiveData(): LiveData<RunTaskWithPointDB?>
 }
 
 @Database(entities = [PointDB::class, PointGpsDB::class, TaskDB::class, RunPointDB::class, RunTaskDB::class], version = 1)

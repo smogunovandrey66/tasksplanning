@@ -65,10 +65,10 @@ class RunTaskViewModel(application: Application) : AndroidViewModel(application)
             data.runTask.active = runTaskDB.runTask.active
             data.runTask.dateCreate = runTaskDB.runTask.dateCreate
 
-            runTaskDB.listRunPoint.sortWith{p1, p2 -> (p1.num - p2.num).toInt()}
+            runTaskDB.runPoints.sortWith{ p1, p2 -> (p1.num - p2.num).toInt()}
 
             for(i in 0 until data.points.size){
-                val pointDB: RunPointDB = runTaskDB.listRunPoint[i]
+                val pointDB: RunPointDB = runTaskDB.runPoints[i]
                 val point:  RunPoint = data.points[i]
 
                 point.idRunPoint = pointDB.idRunPoint
@@ -131,7 +131,7 @@ class RunTaskViewModel(application: Application) : AndroidViewModel(application)
 
             if(nextPoint != null){
                 nextPoint.dateMark = Date()
-                val pointDB = nextPoint.toRunPointDB(runTaskWithPoints.runTask.id)
+                val pointDB = nextPoint.toRunPointDB(runTaskWithPoints.runTask.idRunTask)
                 val idPoint = dao.updateRunPoint(pointDB)
                 Log.d("AdapterRunPoints", "after insert=$idPoint, $pointDB")
             }
@@ -146,7 +146,7 @@ class RunTaskViewModel(application: Application) : AndroidViewModel(application)
             RunService.runTask(
                 getApplication<Application>().applicationContext,
                 RunTaskNotification(
-                    idRunTask = runTaskWithPoints.runTask.id,
+                    idRunTask = runTaskWithPoints.runTask.idRunTask,
                     idTask = runTaskWithPoints.runTask.idTask,
                     nameTask = runTaskWithPoints.runTask.name,
                     countPoints = runTaskWithPoints.points.size,

@@ -17,7 +17,7 @@ fun <T> MutableList<T>.swap(index1: Int, index2: Int){
 
 fun Task.toTaskDB() = TaskDB(id, name)
 
-fun TaskDB.toTask() = Task(id, name)
+fun TaskDB.toTask() = Task(idTask, name)
 
 fun Point.toPointDB() = PointDB(id, idTask, name, num, triggerType)
 
@@ -36,7 +36,7 @@ fun RunPointDB.toRunPoint(idTask: Long = 0, num: Long = 0, name: String = "") =
     RunPoint(idRunPoint, idTask, idPoint, num, name)
 
 fun RunTask.toRunTaskDB() =
-    RunTaskDB(id, idTask, dateCreate ?: Date(), active)
+    RunTaskDB(idRunTask, idTask, dateCreate ?: Date(), active)
 
 fun List<Point>.toListPointDB() = map{
     it.toPointDB()

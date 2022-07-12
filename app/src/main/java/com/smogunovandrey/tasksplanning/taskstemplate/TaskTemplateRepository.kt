@@ -1,6 +1,5 @@
 package com.smogunovandrey.tasksplanning.taskstemplate
 
-import android.util.Log
 import com.smogunovandrey.tasksplanning.db.MainDao
 import com.smogunovandrey.tasksplanning.utils.toPointDB
 import com.smogunovandrey.tasksplanning.utils.toTaskDB
@@ -11,7 +10,7 @@ import kotlinx.coroutines.flow.map
 class TaskTemplateRepository(private val mainDao: MainDao) {
     val tasksTemplate = mainDao.allTasksFlow().map {
         it.map{taskDB ->
-            Task(taskDB.id, taskDB.name)
+            Task(taskDB.idTask, taskDB.name)
         }
     }
 
@@ -23,7 +22,7 @@ class TaskTemplateRepository(private val mainDao: MainDao) {
 
     fun taskById(idTask: Long): Flow<Task?> = mainDao.taskById(idTask).map { taskDB ->
         taskDB?.let {
-            Task(taskDB.id, taskDB.name)
+            Task(taskDB.idTask, taskDB.name)
         }
     }
 
@@ -31,7 +30,7 @@ class TaskTemplateRepository(private val mainDao: MainDao) {
      * Task with Points sorted by num
      */
     fun taskWithPoints(idTask: Long): Flow<TaskWithPoints> = mainDao.taskWithPoints(idTask).map {
-        TaskWithPoints(Task(it.task.id, it.task.name), it.listTaskPoint.map { pointDB ->
+        TaskWithPoints(Task(it.task.idTask, it.task.name), it.listTaskPoint.map { pointDB ->
             Point(pointDB.id, idTask, pointDB.name, pointDB.num, pointDB.triggerType)
         }.sortedWith { point1, point2 -> (point1.num - point2.num).toInt() }.toMutableList())
     }

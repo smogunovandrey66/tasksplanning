@@ -67,7 +67,7 @@ data class RunPoint(
 )
 
 data class RunTask(
-    var id: Long = 0L,
+    var idRunTask: Long = 0L,
     var idTask: Long = 0,
     var name: String = "",
     var dateCreate: Date? = null,
