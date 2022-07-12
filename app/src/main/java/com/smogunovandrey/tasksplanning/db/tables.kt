@@ -184,6 +184,9 @@ interface MainDao{
 
     @Query("select * from run_tasks where id = :idRunTask")
     suspend fun runTaskWithPointsByIdSuspend(idRunTask: Long): RunTaskWithPointDB
+
+    @Query("select * from run_tasks where active = true")
+    suspend fun activeRunTaskWithPointsSuspend(): RunTaskWithPointDB?
 }
 
 @Database(entities = [PointDB::class, PointGpsDB::class, TaskDB::class, RunPointDB::class, RunTaskDB::class], version = 1)

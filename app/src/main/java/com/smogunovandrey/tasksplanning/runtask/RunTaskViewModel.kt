@@ -99,6 +99,18 @@ class RunTaskViewModel(application: Application) : AndroidViewModel(application)
             curIdRunTask = idRunTask
             curIdTask = runTaskWithPoints.runTask.idTask
             updateCurRunTask()
+
+            RunService.runTask(
+                getApplication<Application>().applicationContext,
+                RunTaskNotification(
+                    idRunTask = idRunTask,
+                    idTask = runTaskWithPoints.runTask.idTask,
+                    nameTask = runTaskWithPoints.runTask.name,
+                    countPoints = runTaskWithPoints.points.size,
+                    curNumPoint = 0L
+                ),
+                RunService.COMMAND_START
+            )
         }
     }
 
@@ -130,6 +142,18 @@ class RunTaskViewModel(application: Application) : AndroidViewModel(application)
             }
 
             updateCurRunTask()
+
+            RunService.runTask(
+                getApplication<Application>().applicationContext,
+                RunTaskNotification(
+                    idRunTask = runTaskWithPoints.runTask.id,
+                    idTask = runTaskWithPoints.runTask.idTask,
+                    nameTask = runTaskWithPoints.runTask.name,
+                    countPoints = runTaskWithPoints.points.size,
+                    curNumPoint = (curPos + 1).toLong()
+                ),
+                RunService.COMMAND_NEXT
+            )
         }
     }
 }

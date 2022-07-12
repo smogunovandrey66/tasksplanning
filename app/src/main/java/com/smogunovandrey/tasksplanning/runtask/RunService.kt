@@ -34,9 +34,20 @@ class RunService : Service() {
         AppDatabase.getInstance(this).mainDao()
     }
     private val coroutine: CoroutineScope = CoroutineScope(Dispatchers.Main)
-    private val idsWithRunTask = mutableMapOf<Int, RunTaskNotification>()
     private val notificationManager by lazy {
         getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        createNotificationChannel(CHANNEL_ID, CHANNEL_NAME)
+        val layoutRemoteViews = RemoteViews(packageName, R.layout.notification_run_task)
+        layoutRemoteViews.setImageViewResource(R.id.btn_next, R.drawable.baseline_play_arrow_24)
+        val notificationBuilder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+            .setCustomContentView(layoutRemoteViews)
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setSmallIcon(R.drawable.baseline_run_circle_24)
+        startForeground(ID_NOTIFICATION_INT, notificationBuilder.build())
     }
 
     private fun createNotificationChannel(channelId: String, channelName: String) {
@@ -62,35 +73,17 @@ class RunService : Service() {
         val nameTask = intent.getStringExtra(NAME_TASK) ?: ""
         var curNumPoint = intent.getLongExtra(CUR_NUM_POINT, 0L)
         val countPoints = intent.getIntExtra(COUNT_POINTS, 0)
-        var idNotification: Int = 0
-
-        if (command == COMMAND_NEXT) {
-            curNumPoint++
-            idNotification = intent.getIntExtra(ID_NOTIFICATION, 0)
-        } else{
-            //start command
-            idNotification = idsWithRunTask.size + 1
-            idsWithRunTask.put(idNotification, RunTaskNotification(
-                idRunTask, 0L, nameTask, countPoints, curNumPoint, idNotification
-            )
-            )
-        }
+        var idNotification: Int = ID_NOTIFICATION_INT
 
         if (curNumPoint >= countPoints) {
-            if (idNotification > 1) {
-                notificationManager.cancel(idNotification)
-                idsWithRunTask.remove(idNotification)
-                //TODO Rebild upper
-            } else {
-                //TODO Rebild all
-            }
             stopSelf()
             return
         }
 
         val layoutRemoteViews = RemoteViews(packageName, R.layout.notification_run_task)
         layoutRemoteViews.setTextViewText(R.id.txt_name, nameTask.toString())
-        layoutRemoteViews.setTextViewText(R.id.txt_number, curNumPoint.toString())
+        if(curNumPoint > 0L)
+            layoutRemoteViews.setTextViewText(R.id.txt_number, curNumPoint.toString())
 
         val intentNext = Intent(this.applicationContext, RunService::class.java)
             .apply { action = "intentNext_$idNotification" }
@@ -101,7 +94,7 @@ class RunService : Service() {
         intentNext.putExtra(COUNT_POINTS, countPoints)
         intentNext.putExtra(COMMAND, COMMAND_NEXT)
 
-        val pendingIntent =
+        val pendingIntentNext =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) PendingIntent.getForegroundService(
                 applicationContext,
                 1,
@@ -113,7 +106,9 @@ class RunService : Service() {
                 intentNext,
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )
-        layoutRemoteViews.setOnClickPendingIntent(R.id.btn_next, pendingIntent)
+        if(curNumPoint == 0L)
+            layoutRemoteViews.setImageViewResource(R.id.btn_next, R.drawable.baseline_play_arrow_24)
+        layoutRemoteViews.setOnClickPendingIntent(R.id.btn_next, pendingIntentNext)
         val intentStop = Intent(this.applicationContext, RunService::class.java)
             .apply { action = "intentStop_$idNotification" }
         intentStop.putExtra(ID_NOTIFICATION, idNotification)
@@ -141,13 +136,7 @@ class RunService : Service() {
             .setCustomContentView(layoutRemoteViews)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setSmallIcon(R.drawable.baseline_run_circle_24)
-
-        if(command == COMMAND_START && idNotification == 1){
-            createNotificationChannel(CHANNEL_ID, CHANNEL_NAME)
-            startForeground(idNotification, notificationBuilder.build())
-        } else {
-            notificationManager.notify(idNotification, notificationBuilder.build())
-        }
+        notificationManager.notify(ID_NOTIFICATION_INT, notificationBuilder.build())
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -176,6 +165,8 @@ class RunService : Service() {
         const val COMMAND_NEXT = COMMAND_START + 1
         const val COMMAND_STOP = COMMAND_START + 2
 
+        const val ID_NOTIFICATION_INT = 1
+
         const val TASK_ID = "id task"
         const val ID_NOTIFICATION = "id notification"
         const val ID_RUN_TASK = "id_run_task"
@@ -183,9 +174,9 @@ class RunService : Service() {
         const val CUR_NUM_POINT = "current number point"
         const val COUNT_POINTS = "count points"
 
-        fun runTask(context: Context, runTaskNotification: RunTaskNotification) {
+        fun runTask(context: Context, runTaskNotification: RunTaskNotification, command: Int) {
             val intent = Intent(context, RunService::class.java)
-            intent.putExtra(COMMAND, COMMAND_START)
+            intent.putExtra(COMMAND, command)
             intent.putExtra(ID_RUN_TASK, runTaskNotification.idRunTask)
             intent.putExtra(NAME_TASK, runTaskNotification.nameTask)
             intent.putExtra(CUR_NUM_POINT, runTaskNotification.curNumPoint)

@@ -48,8 +48,6 @@ fun TaskWithPointDB.toTaskWithPoint() = TaskWithPoints(this.task.toTask(), this.
 
 fun TaskWithPoints.toTaskWithPointDB() = TaskWithPointDB(this.task.toTaskDB(), this.points.toListPointDB())
 
-
-
 //***********Convert function DB<->not DB************************
 
 /**
