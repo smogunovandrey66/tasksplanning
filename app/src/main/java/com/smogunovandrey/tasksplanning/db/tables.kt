@@ -31,11 +31,13 @@ enum class TriggerType{
  */
 @Entity(tableName = "points")
 data class PointDB(
-    @PrimaryKey(autoGenerate = true) val id: Long,
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    val idPoint: Long,
     @ColumnInfo(name = "id_task")
     val idTask: Long,
     val name: String,
-    val num: Long,
+    val num: Int,
     val triggerType: TriggerType
 )
 
@@ -55,7 +57,7 @@ data class TaskWithPointDB(
     @Embedded val task: TaskDB,
 
     @Relation(parentColumn = "id", entityColumn = "id_task")
-    val listTaskPoint: List<PointDB>
+    val points: List<PointDB>
 )
 
 @Entity(tableName = "run_tasks")
@@ -78,7 +80,7 @@ data class RunPointDB(
     val idRunTask: Long,
     @ColumnInfo(name = "id_point")
     val idPoint: Long,
-    val num: Long,
+    val num: Int,
     @ColumnInfo(name = "date_mark")
     var dateMark: Date? = null
 )
@@ -196,7 +198,7 @@ interface MainDao{
     suspend fun activeRunTaskWithPointsSuspend(): RunTaskWithPointDB?
 
     @Query("select * from run_tasks where active = 'true'")
-    suspend fun activeRunTaskWithPointsLiveData(): LiveData<RunTaskWithPointDB?>
+    fun activeRunTaskWithPointsLiveData(): LiveData<RunTaskWithPointDB?>
 }
 
 @Database(entities = [PointDB::class, PointGpsDB::class, TaskDB::class, RunPointDB::class, RunTaskDB::class], version = 1)

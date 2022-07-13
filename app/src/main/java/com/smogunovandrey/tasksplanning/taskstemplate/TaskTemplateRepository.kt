@@ -16,7 +16,7 @@ class TaskTemplateRepository(private val mainDao: MainDao) {
 
     fun pointsByTaskId(idTask: Long): Flow<List<Point>> = mainDao.pointsByTaskId(idTask).map { listPointsDB ->
         listPointsDB.map{
-            Point(it.id, idTask, it.name, it.num, it.triggerType)
+            Point(it.idPoint, idTask, it.name, it.num, it.triggerType)
         }
     }
 
@@ -30,8 +30,8 @@ class TaskTemplateRepository(private val mainDao: MainDao) {
      * Task with Points sorted by num
      */
     fun taskWithPoints(idTask: Long): Flow<TaskWithPoints> = mainDao.taskWithPoints(idTask).map {
-        TaskWithPoints(Task(it.task.idTask, it.task.name), it.listTaskPoint.map { pointDB ->
-            Point(pointDB.id, idTask, pointDB.name, pointDB.num, pointDB.triggerType)
+        TaskWithPoints(Task(it.task.idTask, it.task.name), it.points.map { pointDB ->
+            Point(pointDB.idPoint, idTask, pointDB.name, pointDB.num, pointDB.triggerType)
         }.sortedWith { point1, point2 -> (point1.num - point2.num).toInt() }.toMutableList())
     }
 
@@ -86,7 +86,7 @@ class TaskTemplateRepository(private val mainDao: MainDao) {
 
     suspend fun deleteTask(idTask: Long){
         val taskWithPointDB = mainDao.taskWithPointsSuspend(idTask)
-        for(point in taskWithPointDB.listTaskPoint)
+        for(point in taskWithPointDB.points)
             mainDao.deletePoint(point)
         mainDao.deleteTask(taskWithPointDB.task)
     }

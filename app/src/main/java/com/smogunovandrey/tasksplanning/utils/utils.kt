@@ -21,10 +21,10 @@ fun TaskDB.toTask() = Task(idTask, name)
 
 fun Point.toPointDB() = PointDB(id, idTask, name, num, triggerType)
 
-fun PointDB.toPoint() = Point(id, idTask, name, num, triggerType)
+fun PointDB.toPoint() = Point(idPoint, idTask, name, num, triggerType)
 
 fun PointDB.toRunPoint(idRunPoint: Long = 0, duration: Long = 0, dateMark: Date? = null) =
-    RunPoint(idRunPoint, idTask, id, num, name, triggerType, duration, dateMark)
+    RunPoint(idRunPoint, idTask, idPoint, num, name, triggerType, duration, dateMark)
 
 fun Point.toRunPoint(idRunPoint: Long = 0, duration: Long = 0, dateMark: Date? = null) =
     RunPoint(idRunPoint, idTask, id, num, name, triggerType, duration, dateMark)
@@ -32,7 +32,7 @@ fun Point.toRunPoint(idRunPoint: Long = 0, duration: Long = 0, dateMark: Date? =
 fun List<PointDB>.toListPoint() = map{
     it.toPoint()
 }
-fun RunPointDB.toRunPoint(idTask: Long = 0, num: Long = 0, name: String = "") =
+fun RunPointDB.toRunPoint(idTask: Long = 0, num: Int = 0, name: String = "") =
     RunPoint(idRunPoint, idTask, idPoint, num, name)
 
 fun RunTask.toRunTaskDB() =
@@ -44,7 +44,7 @@ fun List<Point>.toListPointDB() = map{
 fun RunPoint.toRunPointDB(idRunTask: Long) =
     RunPointDB(idRunPoint, idRunTask, idPoint, num, dateMark)
 
-fun TaskWithPointDB.toTaskWithPoint() = TaskWithPoints(this.task.toTask(), this.listTaskPoint.toListPoint().toMutableList())
+fun TaskWithPointDB.toTaskWithPoint() = TaskWithPoints(this.task.toTask(), this.points.toListPoint().toMutableList())
 
 fun TaskWithPoints.toTaskWithPointDB() = TaskWithPointDB(this.task.toTaskDB(), this.points.toListPointDB())
 

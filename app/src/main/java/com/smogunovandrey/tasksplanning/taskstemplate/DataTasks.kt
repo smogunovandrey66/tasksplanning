@@ -8,14 +8,14 @@ data class Point(
     var id: Long = 0L,
     var idTask: Long = 0L,
     var name: String = "",
-    var num: Long = 0L,
+    var num: Int = 0,
     var triggerType: TriggerType = TriggerType.HAND
 ){
     fun clear(){
         id = 0L
         idTask = 0L
         name = ""
-        num = 0L
+        num = 0
         triggerType = TriggerType.HAND
     }
     fun copy(other: Point): Point{
@@ -59,7 +59,7 @@ data class RunPoint(
     var idRunPoint: Long = 0,
     var idTask: Long = 0,
     var idPoint: Long = 0,
-    var num: Long = 0,
+    var num: Int = 0,
     var name: String = "",
     var triggerType: TriggerType = TriggerType.HAND,
     var duration: Long = 0,

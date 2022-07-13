@@ -1,13 +1,15 @@
 package com.smogunovandrey.tasksplanning.runtask
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.smogunovandrey.tasksplanning.db.AppDatabase
-import com.smogunovandrey.tasksplanning.db.RunTaskWithPointDB
+import com.smogunovandrey.tasksplanning.db.RunPointDB
+import com.smogunovandrey.tasksplanning.db.RunTaskDB
+import com.smogunovandrey.tasksplanning.db.TaskWithPointDB
 import com.smogunovandrey.tasksplanning.taskstemplate.RunPoint
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTask
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTaskWithPoints
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.util.Date
 
 class ManagerActiveTask private constructor(val context: Context) {
@@ -15,9 +17,12 @@ class ManagerActiveTask private constructor(val context: Context) {
         AppDatabase.getInstance(context).mainDao()
     }
 
-    suspend fun activiTask(): RunTaskWithPoints?{
-        val runTaskWithPointsDBFlow = dao.activeRunTaskWithPointsLiveData()
-        val runTaskWithPointsDB = runTaskWithPointsDBFlow.value
+    private val _curRunTaskWithPointsFlow = MutableStateFlow<RunTaskWithPoints?>(null)
+    val curRunTaskWithPointsFlow: StateFlow<RunTaskWithPoints?> = _curRunTaskWithPointsFlow
+
+    suspend fun reloadActiviTask(): RunTaskWithPoints?{
+        val runTaskWithPointsDB = dao.activeRunTaskWithPointsSuspend()
+
 
         var runTaskWithPoints: RunTaskWithPoints? = null
 
@@ -51,7 +56,34 @@ class ManagerActiveTask private constructor(val context: Context) {
                 }.toMutableList()
             )
         }
+        _curRunTaskWithPointsFlow.emit(runTaskWithPoints)
         return runTaskWithPoints
+    }
+
+    suspend fun startTask(idTask: Long){
+        val taskWithPointsDB: TaskWithPointDB = dao.taskWithPointsSuspend(idTask)
+        val taskRunDB = RunTaskDB(0, idTask)
+        val idRunTask = dao.insertRunTask(taskRunDB)
+        val points = taskWithPointsDB.points.sortedWith{p1, p2 ->
+            p1.num - p2.num
+        }
+        for(pointDB in taskWithPointsDB.points){
+            dao.insertRunPoint(RunPointDB(
+                0,
+                idRunTask,
+                pointDB.idPoint,
+                pointDB.num,
+
+            ))
+        }
+    }
+
+    fun markPoint(){ //or name as 'nextPoint'
+
+    }
+
+    fun cancelTask(){
+
     }
 
     @Volatile

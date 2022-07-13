@@ -34,18 +34,6 @@ class MainActivity : AppCompatActivity() {
         val appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-//        val db = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "tasks.db").build()
-//        val dao = db.mainDao()
-
-        lifecycleScope.launch {
-//            return@launch
-////            delay(5000)
-//            taskTemplateViewModel.tasksTemplate.collect{
-//                Log.d("MainActivity", "begin collect")
-//                for(item in it)
-//                    Log.d("MainActivity", item.toString())
-//            }
-        }
         //For test first time if database is empty
         lifecycleScope.launch {
             val dao = AppDatabase.getInstance(applicationContext).mainDao()
@@ -63,32 +51,6 @@ class MainActivity : AppCompatActivity() {
                 dao.insertPoint(PointDB(0, idTask, "Goznak", 2, TriggerType.HAND))
                 dao.insertPoint(PointDB(0, idTask, "Work", 3, TriggerType.HAND))
             }
-        }
-
-        lifecycleScope.launch {
-            return@launch
-//            delay(2000)
-            Log.d("MainActivity", "insert")
-            //Insert Test
-            for (i in 1..2) {
-//                delay(2000)
-                val taskDB = TaskDB(0, "task $i")
-                val dao = AppDatabase.getInstance(applicationContext).mainDao()
-                val idTask = dao.insertTask(taskDB)
-
-//                dao.insertRunTask(RunTask(0, idTask))
-                for (triggerType in TriggerType.values()) {
-                    val pointDb = PointDB(0, idTask, "name ${triggerType.name}", triggerType.ordinal + 1L, triggerType)
-                    val idPoint = dao.insertPoint(pointDb)
-                }
-            }
-
-            //Test get
-//            dao.runTaskById(1L)?.let {
-//                for(item in it.listRunPoint)
-//                    Log.d("MainActivity", item.toString())
-//            }
-
         }
 
     }

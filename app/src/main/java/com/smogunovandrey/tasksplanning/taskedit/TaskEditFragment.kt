@@ -142,8 +142,8 @@ class TaskEditFragment: Fragment(), AdapterEditPoints.OnClickPoint {
 
                 editedPoints.swap(fromPos, toPos)
 
-                editedPoints[fromPos].num = fromPos + 1L
-                editedPoints[toPos].num = toPos + 1L
+                editedPoints[fromPos].num = fromPos + 1
+                editedPoints[toPos].num = toPos + 1
 
                 (viewHolder as AdapterEditPoints.ViewHolderPointItem).binding.point = editedPoints[toPos]
                 (target as AdapterEditPoints.ViewHolderPointItem).binding.point = editedPoints[fromPos]
@@ -159,7 +159,7 @@ class TaskEditFragment: Fragment(), AdapterEditPoints.OnClickPoint {
                 val delPos = viewHolder.adapterPosition
                 editedPoints.removeAt(delPos)
                 for(i in delPos  until editedPoints.size){
-                    editedPoints[i].num = i.toLong() - 1L
+                    editedPoints[i].num = i - 1
                 }
                 adapter.notifyItemRemoved(delPos)
                 checkSave()
@@ -195,7 +195,7 @@ class TaskEditFragment: Fragment(), AdapterEditPoints.OnClickPoint {
         binding.btnAddPoint.setOnClickListener{
             model.flagEditPoint = false
             model.editedPoint.clear()
-            model.editedPoint.num = model.editedTaskWithPoints.points.size + 1L
+            model.editedPoint.num = model.editedTaskWithPoints.points.size + 1
             model.editedPoint.idTask = editedTask.id
 
             findNavController().navigate(TaskEditFragmentDirections.actionTaskEditFragmentToPointEditFragment())
