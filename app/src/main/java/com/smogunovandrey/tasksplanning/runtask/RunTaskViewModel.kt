@@ -31,11 +31,14 @@ class RunTaskViewModel(application: Application) : AndroidViewModel(application)
         RunTaskWithPoints()
     )
     val curRunTaskWithPoints: Flow<RunTaskWithPoints> = _curRunTaskWithPoints
-    //Working data
-    val workingRunTaskWithPoints: RunTaskWithPoints = RunTaskWithPoints()
 
     private val dao by lazy {
-        AppDatabase.getInstance(application.applicationContext).mainDao()
+        AppDatabase
+            .getInstance(application.applicationContext).mainDao()
+    }
+
+    private val managerActiveTask by lazy {
+        ManagerActiveTask.getInstance(application.applicationContext)
     }
 
     var curIdRunTask = 0L
