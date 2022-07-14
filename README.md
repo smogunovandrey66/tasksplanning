@@ -1,1 +1,1 @@
-Training project navigation, MVVM, Room, GPS, broadcastreceiver
+Training project navigation, MVVM, Room, GPS, broadcastreceiver, services, JetPack
