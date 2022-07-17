@@ -10,21 +10,22 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.smogunovandrey.tasksplanning.databinding.FragmentRunTaskActiveBinding
 import com.smogunovandrey.tasksplanning.databinding.FragmentRunTaskViewBinding
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTaskWithPoints
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class RunTaskViewFragment : Fragment() {
+class RunTaskActiveFragment : Fragment() {
     private val binding by lazy {
-        FragmentRunTaskViewBinding.inflate(layoutInflater)
+        FragmentRunTaskActiveBinding.inflate(layoutInflater)
     }
 
     private val adapter by lazy {
         AdapterRunPoints()
     }
 
-    private val managerActiveTask by lazy{
+    private val managerActiveTask by lazy {
         ManagerActiveTask.getInstance(requireContext().applicationContext)
     }
 
@@ -39,7 +40,7 @@ class RunTaskViewFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 managerActiveTask.activeRunTaskWithPointsFlow.collect{
-
+                    Log.d("RunTaskViewFragment", "$it")
                 }
             }
         }

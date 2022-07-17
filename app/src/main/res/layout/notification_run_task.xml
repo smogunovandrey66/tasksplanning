@@ -23,7 +23,7 @@
         android:layout_below="@+id/txt_name"/>
 
     <ImageButton
-        android:id="@+id/btn_stop"
+        android:id="@+id/btn_cancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

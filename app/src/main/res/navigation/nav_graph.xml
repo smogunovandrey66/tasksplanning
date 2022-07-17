@@ -15,9 +15,6 @@
             android:id="@+id/action_tasksTemplateFragment_to_taskEditFragment"
             app:destination="@id/taskEditFragment" />
         <action
-            android:id="@+id/action_tasksTemplateFragment_to_runTaskViewFragment"
-            app:destination="@id/runTaskViewFragment" />
-        <action
             android:id="@+id/action_tasksTemplateFragment_to_statisticsFragment"
             app:destination="@id/statisticsFragment" />
     </fragment>
@@ -54,23 +51,11 @@
         android:name="com.smogunovandrey.tasksplanning.taskedit.PointEditFragment"
         android:label="PointEditFragment" />
     <fragment
-        android:id="@+id/runTaskViewFragment"
-        android:name="com.smogunovandrey.tasksplanning.runtask.RunTaskViewFragment"
-        android:label="RunTaskViewFragment" />
-    <fragment
         android:id="@+id/statisticsFragment"
         android:name="com.smogunovandrey.tasksplanning.statistics.StatisticsFragment"
-        android:label="StatisticsFragment" >
-        <action
-            android:id="@+id/action_statisticsFragment_to_runTasksWithDateFragment"
-            app:destination="@id/runTasksWithDateFragment" />
-    </fragment>
+        android:label="StatisticsFragment" />
     <fragment
-        android:id="@+id/runTasksWithDateFragment"
-        android:name="com.smogunovandrey.tasksplanning.runtask.RunTasksWithDateFragment"
-        android:label="RunTasksWithDateFragment" >
-        <action
-            android:id="@+id/action_runTasksWithDateFragment_to_runTaskViewFragment"
-            app:destination="@id/runTaskViewFragment" />
-    </fragment>
+        android:id="@+id/runTaskActiveFragment"
+        android:name="com.smogunovandrey.tasksplanning.runtask.RunTaskActiveFragment"
+        android:label="RunTaskActiveFragment" />
 </navigation>

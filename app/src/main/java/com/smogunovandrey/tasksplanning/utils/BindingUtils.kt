@@ -36,7 +36,7 @@ fun bindDateRunTask(view: TextView, date: Date?){
     view.text = ""
 }
 
-@BindingAdapter("android:status_button")
+@BindingAdapter("android:status_button_next")
 fun bindStatusRunTask(view: Button, runTaskWithPoints: RunTaskWithPoints?){
     val runTask = runTaskWithPoints?.runTask
     if(runTask != null){

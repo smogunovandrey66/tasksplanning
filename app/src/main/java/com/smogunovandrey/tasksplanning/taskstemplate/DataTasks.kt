@@ -77,6 +77,14 @@ data class RunTask(
 data class RunTaskWithPoints(
     var runTask: RunTask = RunTask(),
     val points: MutableList<RunPoint> = mutableListOf()
-)
+){
+    fun curPoint(): RunPoint? {
+        for(point in points){
+            if(point.dateMark == null)
+                return point
+        }
+        return null
+    }
+}
 
 

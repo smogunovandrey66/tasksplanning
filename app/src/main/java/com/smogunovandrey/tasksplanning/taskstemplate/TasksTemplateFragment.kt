@@ -10,7 +10,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.databinding.FragmentTasksTemplateBinding
+import com.smogunovandrey.tasksplanning.runtask.ManagerActiveTask
 import com.smogunovandrey.tasksplanning.runtask.RunTaskViewModel
 import kotlinx.coroutines.launch
 
@@ -24,6 +26,9 @@ class TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
         AdapterTasksTemplate().apply {
             onRunTaskItemClick = this@TasksTemplateFragment
         }
+    }
+    private val managerActiveTask by lazy {
+        ManagerActiveTask.getInstance(requireContext().applicationContext)
     }
 
     private val model: TaskTemplateViewModel by activityViewModels()
@@ -54,11 +59,11 @@ class TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
     }
 
     override fun onRunTaskItemClick(idTask: Long) {
-        modelRunTask.curIdTask = idTask
-        modelRunTask.curIdRunTask = 0L
-
-        findNavController().navigate(
-            TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskViewFragment()
-        )
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+                managerActiveTask.startTask(idTask)
+                findNavController().navigate(R.id.runTaskActiveFragment)
+            }
+        }
     }
 }

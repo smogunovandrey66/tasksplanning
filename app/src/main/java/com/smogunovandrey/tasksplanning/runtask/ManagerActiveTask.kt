@@ -1,7 +1,14 @@
 package com.smogunovandrey.tasksplanning.runtask
 
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
 import android.content.Context
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import android.content.Intent
+import android.widget.RemoteViews
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.db.*
 import com.smogunovandrey.tasksplanning.taskstemplate.RunPoint
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTask
@@ -19,6 +26,45 @@ class ManagerActiveTask private constructor(val context: Context) {
 
     private val _activeRunTaskWithPointsFlow = MutableStateFlow<RunTaskWithPoints?>(null)
     val activeRunTaskWithPointsFlow: StateFlow<RunTaskWithPoints?> = _activeRunTaskWithPointsFlow
+
+    private val notificationManager by lazy {
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
+
+    fun notificationBuilder(commandId: Int) = NotificationCompat.Builder(context, CHANNEL_ID)
+        .setCustomContentView(
+            RemoteViews(context.packageName, R.layout.notification_run_task)
+                .apply {
+                    val intentNext = Intent(context, RunBroadcastReceiver::class.java)
+                    intentNext.putExtra(COMMAND_ID, commandId)
+
+                    val pendingIntentNext = PendingIntent.getBroadcast(context, 1,
+                    intentNext, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+
+                    setOnClickPendingIntent(R.id.btn_next, pendingIntentNext)
+                    _activeRunTaskWithPointsFlow.value?.let {runTaskWithPoints ->
+                        setTextViewText(R.id.txt_name, runTaskWithPoints.runTask.name)
+
+                        val curPoint = runTaskWithPoints.curPoint()
+                        if(curPoint == null)
+                            setImageViewResource(R.id.btn_next, R.drawable.baseline_play_arrow_24)
+                        else
+                            setTextViewText(R.id.txt_number, curPoint.num.toString())
+                    }
+
+                    val intentCancel = Intent(context, RunBroadcastReceiver::class.java)
+                    intentCancel.putExtra(COMMAND_ID, COMMAND_CANCEL)
+
+                    val pendingIntentCancel = PendingIntent.getBroadcast(context, 1,
+                    intentCancel, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+
+                    setOnClickPendingIntent(R.id.btn_cancel, pendingIntentCancel)
+                }
+        )
+        .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+        .setSmallIcon(R.drawable.baseline_run_circle_24)
+
+
 
 
     suspend fun reloadActiviTask() {
@@ -68,6 +114,7 @@ class ManagerActiveTask private constructor(val context: Context) {
     }
 
     suspend fun startTask(idTask: Long) {
+        //1 Insert in DB
         val taskWithPointsDB: TaskWithPointDB = dao.taskWithPointsSuspend(idTask)
         val idRunTask = dao.insertRunTask(RunTaskDB(0, idTask))
         val points = taskWithPointsDB.points.sortedWith { p1, p2 ->
@@ -84,9 +131,17 @@ class ManagerActiveTask private constructor(val context: Context) {
             )
         }
         _activeRunTaskWithPointsFlow.emit(getRunTask(idRunTask))
+
+        //2 Start Foreground Service
+        ContextCompat.startForegroundService(context,
+            Intent(context, RunService::class.java).apply {
+                putExtra(COMMAND_ID, COMMAND_START)
+            }
+        )
     }
 
     suspend fun markPoint() { //or name as 'nextPoint'
+        //Update DB
         val runTaskWithPoints = _activeRunTaskWithPointsFlow.value
         runTaskWithPoints?.let {
             var curIdx = 0
@@ -100,9 +155,16 @@ class ManagerActiveTask private constructor(val context: Context) {
                     //Set active to false for RunTask if last point
                     if (curIdx == lastIdx) {
                         dao.updateRunTask(runTaskWithPoints.runTask.toRunTaskDB())
+                        //Stop service
+                        context.stopService(Intent(context, RunService::class.java))
                     }
 
                     _activeRunTaskWithPointsFlow.emit(getRunTask(idRunTask))
+
+                    //Update notification
+                    if(curIdx < lastIdx)
+                        notificationManager.notify(NOTIFICATION_ID, notificationBuilder(COMMAND_NEXT).build())
+
                     break
                 }
                 curIdx++
@@ -112,6 +174,7 @@ class ManagerActiveTask private constructor(val context: Context) {
 
     suspend fun cancelTask() {
         val runTaskWithPoints = _activeRunTaskWithPointsFlow.value
+        //Delete from DB
         runTaskWithPoints?.let {
             for (point in it.points) {
                 val idRunTask = runTaskWithPoints.runTask.idRunTask
@@ -119,10 +182,23 @@ class ManagerActiveTask private constructor(val context: Context) {
             }
 
             dao.deleteRunTask(runTaskWithPoints.runTask.toRunTaskDB())
+            //Stop service
+            context.stopService(Intent(context, Service::class.java))
+
+            _activeRunTaskWithPointsFlow.value = null
         }
     }
 
     companion object {
+        const val NOTIFICATION_ID = 1
+
+        const val CHANNEL_ID = "channel id for run task"
+        const val CHANNEL_NAME = "channel name for run task"
+        const val COMMAND_ID = "command for run task"
+
+        const val COMMAND_START = 1
+        const val COMMAND_NEXT = COMMAND_START + 1
+        const val COMMAND_CANCEL = COMMAND_START + 2
         @Volatile
         private var instance: ManagerActiveTask? = null
 

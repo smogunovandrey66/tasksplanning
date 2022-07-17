@@ -129,7 +129,7 @@ class RunService : Service() {
                 intentStop,
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )
-        layoutRemoteViews.setOnClickPendingIntent(R.id.btn_stop, pendingIntentStop)
+        layoutRemoteViews.setOnClickPendingIntent(R.id.btn_cancel, pendingIntentStop)
 
 
         val notificationBuilder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)

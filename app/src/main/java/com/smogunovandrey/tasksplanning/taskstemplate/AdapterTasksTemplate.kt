@@ -29,6 +29,7 @@ class AdapterTasksTemplate :
     ListAdapter<Task, AdapterTasksTemplate.TaskItemHolder>(DiffUtilsTasks) {
 
     var onRunTaskItemClick: OnRunTaskItemClick? = null
+    var activeRunTaskWithPoints: RunTaskWithPoints? = null
 
     class TaskItemHolder(val binding: ItemTasksTemplateBinding, val onRunTaskItemClick: OnRunTaskItemClick? = null) :
         RecyclerView.ViewHolder(binding.root) {
