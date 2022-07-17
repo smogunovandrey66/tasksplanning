@@ -6,7 +6,7 @@
             type="com.smogunovandrey.tasksplanning.taskstemplate.Task" />
         <variable
             name="activeRunTask"
-            type="" />
+            type="com.smogunovandrey.tasksplanning.taskstemplate.RunTaskWithPoints" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
