@@ -17,6 +17,9 @@
         <action
             android:id="@+id/action_tasksTemplateFragment_to_statisticsFragment"
             app:destination="@id/statisticsFragment" />
+        <action
+            android:id="@+id/action_tasksTemplateFragment_to_runTaskActiveFragment"
+            app:destination="@id/runTaskActiveFragment" />
     </fragment>
     <fragment
         android:id="@+id/taskViewFragment"

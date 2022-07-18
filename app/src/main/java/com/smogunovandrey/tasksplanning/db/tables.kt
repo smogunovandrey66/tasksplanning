@@ -183,7 +183,7 @@ interface MainDao{
     @Delete
     suspend fun deleteRunPoint(runPoint: RunPointDB)
 
-    @Query("select * from run_tasks where active='true'")
+    @Query("select * from run_tasks where active='1'")
     fun activeTask(): Flow<RunTaskDB?>
 
 
@@ -194,10 +194,10 @@ interface MainDao{
     @Query("select * from run_tasks where id = :idRunTask")
     suspend fun runTaskWithPointsByIdSuspend(idRunTask: Long): RunTaskWithPointDB
 
-    @Query("select * from run_tasks where active = 'true'")
+    @Query("select * from run_tasks where active = '1'")
     suspend fun activeRunTaskWithPointsSuspend(): RunTaskWithPointDB?
 
-    @Query("select * from run_tasks where active = 'true'")
+    @Query("select * from run_tasks where active = '1'")
     fun activeRunTaskWithPointsLiveData(): LiveData<RunTaskWithPointDB?>
 }
 

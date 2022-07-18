@@ -20,15 +20,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class RunBroadcastReceiver: BroadcastReceiver() {
-    private fun createNotificationChannel(context: Context){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            val notificationManager = context.getSystemService(NotificationManager::class.java)
-            val channel = NotificationChannel(
-                RunService.CHANNEL_ID,
-                RunService.CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
 
     private fun dao(context: Context) = AppDatabase.getInstance(context).mainDao()
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
@@ -38,7 +29,6 @@ class RunBroadcastReceiver: BroadcastReceiver() {
     }
 
     private fun createNotification(context: Context) {
-        createNotificationChannel(context)
 
         val layoutNotification = RemoteViews(context.packageName, R.layout.notification_run_task)
         layoutNotification.setImageViewResource(R.id.btn_next, R.drawable.baseline_add_24)

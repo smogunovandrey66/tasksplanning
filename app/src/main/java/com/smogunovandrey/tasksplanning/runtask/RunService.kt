@@ -30,24 +30,17 @@ data class RunTaskNotification(
 
 class RunService : Service() {
 
-    private val dao: MainDao by lazy {
-        AppDatabase.getInstance(this).mainDao()
-    }
-    private val coroutine: CoroutineScope = CoroutineScope(Dispatchers.Main)
     private val notificationManager by lazy {
         getSystemService(NOTIFICATION_SERVICE) as NotificationManager
     }
 
     override fun onCreate() {
         super.onCreate()
-        createNotificationChannel(CHANNEL_ID, CHANNEL_NAME)
-        val layoutRemoteViews = RemoteViews(packageName, R.layout.notification_run_task)
-        layoutRemoteViews.setImageViewResource(R.id.btn_next, R.drawable.baseline_play_arrow_24)
-        val notificationBuilder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-            .setCustomContentView(layoutRemoteViews)
-            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            .setSmallIcon(R.drawable.baseline_run_circle_24)
-        startForeground(ID_NOTIFICATION_INT, notificationBuilder.build())
+        createNotificationChannel(ManagerActiveTask.CHANNEL_ID, ManagerActiveTask.CHANNEL_NAME)
+        startForeground(ManagerActiveTask.NOTIFICATION_ID,
+            ManagerActiveTask.getInstance(applicationContext)
+                .notificationBuilder(ManagerActiveTask.COMMAND_START).build()
+        )
     }
 
     private fun createNotificationChannel(channelId: String, channelName: String) {
@@ -61,128 +54,19 @@ class RunService : Service() {
         }
     }
 
-    private fun updateNotification(intent: Intent) {
-        val command = intent.getIntExtra(COMMAND, 0)
-
-        if (command == COMMAND_STOP) {
-            stopSelf()
-            return
-        }
-
-        val idRunTask = intent.getLongExtra(ID_RUN_TASK, 0)
-        val nameTask = intent.getStringExtra(NAME_TASK) ?: ""
-        var curNumPoint = intent.getLongExtra(CUR_NUM_POINT, 0L)
-        val countPoints = intent.getIntExtra(COUNT_POINTS, 0)
-        var idNotification: Int = ID_NOTIFICATION_INT
-
-        if (curNumPoint >= countPoints) {
-            stopSelf()
-            return
-        }
-
-        val layoutRemoteViews = RemoteViews(packageName, R.layout.notification_run_task)
-        layoutRemoteViews.setTextViewText(R.id.txt_name, nameTask.toString())
-        if(curNumPoint > 0L)
-            layoutRemoteViews.setTextViewText(R.id.txt_number, curNumPoint.toString())
-
-        val intentNext = Intent(this.applicationContext, RunService::class.java)
-            .apply { action = "intentNext_$idNotification" }
-        intentNext.putExtra(ID_NOTIFICATION, idNotification)
-        intentNext.putExtra(ID_RUN_TASK, idRunTask)
-        intentNext.putExtra(NAME_TASK, nameTask)
-        intentNext.putExtra(CUR_NUM_POINT, curNumPoint)
-        intentNext.putExtra(COUNT_POINTS, countPoints)
-        intentNext.putExtra(COMMAND, COMMAND_NEXT)
-
-        val pendingIntentNext =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) PendingIntent.getForegroundService(
-                applicationContext,
-                1,
-                intentNext,
-                PendingIntent.FLAG_IMMUTABLE + PendingIntent.FLAG_UPDATE_CURRENT
-            ) else PendingIntent.getService(
-                applicationContext,
-                1,
-                intentNext,
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            )
-        if(curNumPoint == 0L)
-            layoutRemoteViews.setImageViewResource(R.id.btn_next, R.drawable.baseline_play_arrow_24)
-        layoutRemoteViews.setOnClickPendingIntent(R.id.btn_next, pendingIntentNext)
-        val intentStop = Intent(this.applicationContext, RunService::class.java)
-            .apply { action = "intentStop_$idNotification" }
-        intentStop.putExtra(ID_NOTIFICATION, idNotification)
-        intentStop.putExtra(ID_RUN_TASK, idRunTask)
-        intentStop.putExtra(NAME_TASK, nameTask)
-        intentStop.putExtra(CUR_NUM_POINT, curNumPoint)
-        intentStop.putExtra(COUNT_POINTS, countPoints)
-        intentStop.putExtra(COMMAND, COMMAND_STOP)
-
-        val pendingIntentStop =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) PendingIntent.getForegroundService(
-                applicationContext,
-                1, intentStop,
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            ) else PendingIntent.getService(
-                applicationContext,
-                1,
-                intentStop,
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            )
-        layoutRemoteViews.setOnClickPendingIntent(R.id.btn_cancel, pendingIntentStop)
-
-
-        val notificationBuilder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-            .setCustomContentView(layoutRemoteViews)
-            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            .setSmallIcon(R.drawable.baseline_run_circle_24)
-        notificationManager.notify(ID_NOTIFICATION_INT, notificationBuilder.build())
-    }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         Log.d("RunService", "onStartCommand intent=${intent.extras.toList()}")
-        updateNotification(intent)
         return START_STICKY
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        coroutine.cancel()
         Log.d("RunService", "Destroy")
     }
 
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
-    }
-
-    companion object {
-        const val CHANNEL_ID = "id channel1"
-        const val CHANNEL_NAME = "name channel1"
-
-        const val COMMAND = "command"
-        const val COMMAND_START = 1
-        const val COMMAND_NEXT = COMMAND_START + 1
-        const val COMMAND_STOP = COMMAND_START + 2
-
-        const val ID_NOTIFICATION_INT = 1
-
-        const val TASK_ID = "id task"
-        const val ID_NOTIFICATION = "id notification"
-        const val ID_RUN_TASK = "id_run_task"
-        const val NAME_TASK = "name task"
-        const val CUR_NUM_POINT = "current number point"
-        const val COUNT_POINTS = "count points"
-
-        fun runTask(context: Context, runTaskNotification: RunTaskNotification, command: Int) {
-            val intent = Intent(context, RunService::class.java)
-            intent.putExtra(COMMAND, command)
-            intent.putExtra(ID_RUN_TASK, runTaskNotification.idRunTask)
-            intent.putExtra(NAME_TASK, runTaskNotification.nameTask)
-            intent.putExtra(CUR_NUM_POINT, runTaskNotification.curNumPoint)
-            intent.putExtra(COUNT_POINTS, runTaskNotification.countPoints)
-            Log.d("RunService", "in fun runTask = $runTaskNotification")
-            ContextCompat.startForegroundService(context, intent)
-        }
     }
 }

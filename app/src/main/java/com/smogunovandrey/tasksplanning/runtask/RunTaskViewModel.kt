@@ -92,31 +92,6 @@ class RunTaskViewModel(application: Application) : AndroidViewModel(application)
         _curRunTaskWithPoints.emit(data)
     }
 
-    fun runTask(runTaskWithPoints: RunTaskWithPoints){
-        viewModelScope.launch {
-            runTaskWithPoints.runTask.active = true
-            val idRunTask = dao.insertRunTask(runTaskWithPoints.runTask.toRunTaskDB())
-            for(point in runTaskWithPoints.points){
-                dao.insertRunPoint(point.toRunPointDB(idRunTask))
-            }
-            curIdRunTask = idRunTask
-            curIdTask = runTaskWithPoints.runTask.idTask
-            updateCurRunTask()
-
-            RunService.runTask(
-                getApplication<Application>().applicationContext,
-                RunTaskNotification(
-                    idRunTask = idRunTask,
-                    idTask = runTaskWithPoints.runTask.idTask,
-                    nameTask = runTaskWithPoints.runTask.name,
-                    countPoints = runTaskWithPoints.points.size,
-                    curNumPoint = 0L
-                ),
-                RunService.COMMAND_START
-            )
-        }
-    }
-
     fun nextPointHand(){
         viewModelScope.launch {
             val runTaskWithPoints = _curRunTaskWithPoints.value
@@ -145,18 +120,6 @@ class RunTaskViewModel(application: Application) : AndroidViewModel(application)
             }
 
             updateCurRunTask()
-
-            RunService.runTask(
-                getApplication<Application>().applicationContext,
-                RunTaskNotification(
-                    idRunTask = runTaskWithPoints.runTask.idRunTask,
-                    idTask = runTaskWithPoints.runTask.idTask,
-                    nameTask = runTaskWithPoints.runTask.name,
-                    countPoints = runTaskWithPoints.points.size,
-                    curNumPoint = (curPos + 1).toLong()
-                ),
-                RunService.COMMAND_NEXT
-            )
         }
     }
 }

@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -76,7 +77,7 @@ class ManagerActiveTask private constructor(val context: Context) {
         _activeRunTaskWithPointsFlow.emit(activeRunTaskWithPoints)
     }
 
-    suspend fun getRunTask(idRunTask: Long): RunTaskWithPoints? {
+    private suspend fun getRunTask(idRunTask: Long): RunTaskWithPoints? {
         val runTaskWithPointsDB = dao.runTaskWithPointsByIdSuspend(idRunTask)
 
         var runTaskWithPoints: RunTaskWithPoints? = null
@@ -130,7 +131,10 @@ class ManagerActiveTask private constructor(val context: Context) {
                 )
             )
         }
-        _activeRunTaskWithPointsFlow.emit(getRunTask(idRunTask))
+        reloadActiviTask()
+
+        Log.d("RunTaskViewFragment", "in startTask 2 ${_activeRunTaskWithPointsFlow.value}")
+        Log.d("RunTaskViewFragment", "in startTask 3 ${activeRunTaskWithPointsFlow.value}")
 
         //2 Start Foreground Service
         ContextCompat.startForegroundService(context,
@@ -199,6 +203,7 @@ class ManagerActiveTask private constructor(val context: Context) {
         const val COMMAND_START = 1
         const val COMMAND_NEXT = COMMAND_START + 1
         const val COMMAND_CANCEL = COMMAND_START + 2
+
         @Volatile
         private var instance: ManagerActiveTask? = null
 
@@ -207,6 +212,8 @@ class ManagerActiveTask private constructor(val context: Context) {
          */
         fun getInstance(context: Context): ManagerActiveTask = instance ?: synchronized(this) {
             val res = instance ?: ManagerActiveTask(context)
+            Log.d("RunTaskViewFragment", "getInstance $res")
+            instance = res
             res
         }
     }

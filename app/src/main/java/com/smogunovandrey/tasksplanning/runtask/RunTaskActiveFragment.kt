@@ -13,6 +13,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.smogunovandrey.tasksplanning.databinding.FragmentRunTaskActiveBinding
 import com.smogunovandrey.tasksplanning.databinding.FragmentRunTaskViewBinding
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTaskWithPoints
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -40,7 +41,16 @@ class RunTaskActiveFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 managerActiveTask.activeRunTaskWithPointsFlow.collect{
-                    Log.d("RunTaskViewFragment", "$it")
+                    Log.d("RunTaskViewFragment", "collect1 $it")
+                }
+            }
+        }
+
+        binding.btnCancel.setOnClickListener {
+            lifecycleScope.launch {
+                managerActiveTask.activeRunTaskWithPointsFlow.collect{
+                    Log.d("RunTaskViewFragment", "binding.btnStart $it")
+                    cancel()
                 }
             }
         }
