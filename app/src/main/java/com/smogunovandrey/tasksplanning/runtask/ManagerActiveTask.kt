@@ -180,14 +180,20 @@ class ManagerActiveTask private constructor(val context: Context) {
 
     suspend fun cancelTask() {
         val runTaskWithPoints = _activeRunTaskWithPointsFlow.value
+        Log.d("TasksTemplateFragment", "cancel task $runTaskWithPoints")
         //Delete from DB
         runTaskWithPoints?.let {
             for (point in it.points) {
                 val idRunTask = runTaskWithPoints.runTask.idRunTask
-                dao.deleteRunPoint(point.toRunPointDB(idRunTask))
+                val delRunPointDB = point.toRunPointDB(idRunTask)
+                Log.d("TasksTemplateFragment", "delRunPointDB=$delRunPointDB")
+                val delId = dao.deleteRunPoint(delRunPointDB)
+                Log.d("TasksTemplateFragment", "delId=$delId")
             }
 
-            dao.deleteRunTask(runTaskWithPoints.runTask.toRunTaskDB())
+            val delRunTaskDB = runTaskWithPoints.runTask.toRunTaskDB()
+            Log.d("TasksTemplateFragment", "delRunTaskDB=$delRunTaskDB")
+            dao.deleteRunTask(delRunTaskDB)
             //Stop service
             context.stopService(Intent(context, Service::class.java))
 

@@ -93,6 +93,8 @@ class AdapterTasksTemplate :
         val task = holder.task
         val activeRunTask = holder.activeRunTaskWithPoints
 
+//        Log.d("TasksTemplateFragment", "onBindViewHolder task=$task,activeRunTask=$activeRunTask")
+
         //Login for text and enable of button
         if(activeRunTask == null){
             button.text = button.context.getString(R.string.run)

@@ -181,7 +181,7 @@ interface MainDao{
     @Update
     suspend fun updateRunPoint(runPoint: RunPointDB)
     @Delete
-    suspend fun deleteRunPoint(runPoint: RunPointDB)
+    suspend fun deleteRunPoint(runPoint: RunPointDB): Int
 
     @Query("select * from run_tasks where active='1'")
     fun activeTask(): Flow<RunTaskDB?>

@@ -69,6 +69,7 @@ class RunTaskActiveFragment : Fragment() {
         }
 
         binding.btnCancel.setOnClickListener {
+            findNavController().popBackStack()
             lifecycleScope.launch {
                 managerActiveTask.cancelTask()
             }

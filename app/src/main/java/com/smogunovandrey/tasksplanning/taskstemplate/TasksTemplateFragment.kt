@@ -19,7 +19,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlin.math.log
 
-class TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
+class
+TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
 
     private val binding: FragmentTasksTemplateBinding by lazy {
         FragmentTasksTemplateBinding.inflate(layoutInflater)
@@ -46,14 +47,13 @@ class TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                withContext(Dispatchers.Default){
+                withContext(Dispatchers.Default) {
                     Log.d("TasksTemplateFragment", "before reloadActiviTask")
                     managerActiveTask.reloadActiviTask()
                 }
-                managerActiveTask.activeRunTaskWithPointsFlow.collect{
+                managerActiveTask.activeRunTaskWithPointsFlow.collect {
                     Log.d("TasksTemplateFragment", "collect activeRunTaskWithPointsFlow $it")
                     adapter.activeRunTaskWithPoints = it
-                    adapter.notifyDataSetChanged()
                 }
             }
         }
@@ -62,6 +62,7 @@ class TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 model.tasksTemplate.collect { listTasks ->
                     Log.d("TasksTemplateFragment", "collect listTasks $listTasks")
+                    adapter.submitList(null)
                     adapter.submitList(listTasks)
                 }
             }
