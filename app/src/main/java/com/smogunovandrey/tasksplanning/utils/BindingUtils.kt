@@ -7,8 +7,8 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.db.TriggerType
-import com.smogunovandrey.tasksplanning.taskstemplate.RunTask
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTaskWithPoints
+import com.smogunovandrey.tasksplanning.taskstemplate.Task
 import java.util.Date
 
 
@@ -37,7 +37,7 @@ fun bindDateRunTask(view: TextView, date: Date?){
 }
 
 @BindingAdapter("android:status_button_next")
-fun bindStatusRunTask(view: Button, runTaskWithPoints: RunTaskWithPoints?){
+fun bindStatusButtonNext(view: Button, runTaskWithPoints: RunTaskWithPoints?){
     val runTask = runTaskWithPoints?.runTask
     if(runTask != null){
         view.visibility = View.VISIBLE

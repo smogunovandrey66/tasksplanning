@@ -21,7 +21,7 @@ import com.smogunovandrey.tasksplanning.runtask.RunBroadcastReceiver
 import com.smogunovandrey.tasksplanning.runtask.RunService
 import com.smogunovandrey.tasksplanning.runtask.RunTaskNotification
 
-interface OnRunTaskItemClick{
+interface OnRunTaskItemClick {
     fun onRunTaskItemClick(idTask: Long)
 }
 
@@ -31,7 +31,11 @@ class AdapterTasksTemplate :
     var onRunTaskItemClick: OnRunTaskItemClick? = null
     var activeRunTaskWithPoints: RunTaskWithPoints? = null
 
-    class TaskItemHolder(val binding: ItemTasksTemplateBinding, val onRunTaskItemClick: OnRunTaskItemClick? = null) :
+    class TaskItemHolder(
+        val binding: ItemTasksTemplateBinding,
+        val onRunTaskItemClick: OnRunTaskItemClick? = null,
+        val activeRunTaskWithPoints: RunTaskWithPoints? = null
+    ) :
         RecyclerView.ViewHolder(binding.root) {
         var task: Task = Task()
 
@@ -77,12 +81,31 @@ class AdapterTasksTemplate :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskItemHolder {
         val binding =
             ItemTasksTemplateBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return TaskItemHolder(binding, onRunTaskItemClick)
+        return TaskItemHolder(binding, onRunTaskItemClick, activeRunTaskWithPoints)
     }
 
     override fun onBindViewHolder(holder: TaskItemHolder, position: Int) {
         holder.task = getItem(position)
         holder.binding.taskItem = holder.task
+        holder.binding.activeRunTask = holder.activeRunTaskWithPoints
+
+        val button = holder.binding.btnStart
+        val task = holder.task
+        val activeRunTask = holder.activeRunTaskWithPoints
+
+        //Login for text and enable of button
+        if(activeRunTask == null){
+            button.text = button.context.getString(R.string.run)
+            button.isEnabled = true
+        } else {
+            if(activeRunTask.runTask.idTask == task.id){
+                button.text = button.context.getString(R.string.view)
+                button.isEnabled = true
+            } else {
+                button.text = button.context.getString(R.string.run)
+                button.isEnabled = false
+            }
+        }
     }
 }
 

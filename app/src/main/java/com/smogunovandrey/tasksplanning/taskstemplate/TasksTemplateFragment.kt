@@ -46,14 +46,19 @@ class TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                model.tasksTemplate.collect { listTasks ->
-                    adapter.submitList(listTasks)
+                withContext(Dispatchers.Default){
+                    managerActiveTask.reloadActiviTask()
+                }
+                managerActiveTask.activeRunTaskWithPointsFlow.collect{
+                    adapter.activeRunTaskWithPoints = it
                 }
             }
-            repeatOnLifecycle(Lifecycle.State.STARTED){
-                managerActiveTask.activeRunTaskWithPointsFlow.collect{
-                    Log.d("RunTaskViewFragment", "collect 5 $it")
-                    adapter.activeRunTaskWithPoints = it
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                model.tasksTemplate.collect { listTasks ->
+                    adapter.submitList(listTasks)
                 }
             }
         }
@@ -70,12 +75,15 @@ class TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
 
     override fun onRunTaskItemClick(idTask: Long) {
         lifecycleScope.launch {
-            if(managerActiveTask.activeRunTaskWithPointsFlow.value == null) {
+            val activeRunTask = managerActiveTask.activeRunTaskWithPointsFlow.value
+            if(activeRunTask == null) {
                 withContext(Dispatchers.Default) {
                     managerActiveTask.startTask(idTask)
                 }
+                findNavController().navigate(TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskActiveFragment())
+            } else {
+                //id mus equals
             }
-            findNavController().navigate(TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskActiveFragment())
         }
     }
 }

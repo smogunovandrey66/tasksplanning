@@ -34,12 +34,15 @@ class RunService : Service() {
         getSystemService(NOTIFICATION_SERVICE) as NotificationManager
     }
 
+    private val managerActiveTask by lazy {
+        ManagerActiveTask.getInstance(applicationContext)
+    }
+
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel(ManagerActiveTask.CHANNEL_ID, ManagerActiveTask.CHANNEL_NAME)
         startForeground(ManagerActiveTask.NOTIFICATION_ID,
-            ManagerActiveTask.getInstance(applicationContext)
-                .notificationBuilder(ManagerActiveTask.COMMAND_START).build()
+            managerActiveTask.notificationBuilder(ManagerActiveTask.COMMAND_START).build()
         )
     }
 
