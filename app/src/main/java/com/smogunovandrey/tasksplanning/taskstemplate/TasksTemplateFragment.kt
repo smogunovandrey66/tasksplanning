@@ -47,10 +47,13 @@ class TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 withContext(Dispatchers.Default){
+                    Log.d("TasksTemplateFragment", "before reloadActiviTask")
                     managerActiveTask.reloadActiviTask()
                 }
                 managerActiveTask.activeRunTaskWithPointsFlow.collect{
+                    Log.d("TasksTemplateFragment", "collect activeRunTaskWithPointsFlow $it")
                     adapter.activeRunTaskWithPoints = it
+                    adapter.notifyDataSetChanged()
                 }
             }
         }
@@ -58,6 +61,7 @@ class TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 model.tasksTemplate.collect { listTasks ->
+                    Log.d("TasksTemplateFragment", "collect listTasks $listTasks")
                     adapter.submitList(listTasks)
                 }
             }
@@ -83,6 +87,9 @@ class TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
                 findNavController().navigate(TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskActiveFragment())
             } else {
                 //id mus equals
+                if(activeRunTask.runTask.idTask == idTask){
+                    findNavController().navigate(TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskActiveFragment())
+                }
             }
         }
     }

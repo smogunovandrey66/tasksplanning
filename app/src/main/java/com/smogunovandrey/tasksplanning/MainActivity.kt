@@ -71,10 +71,10 @@ class MainActivity : AppCompatActivity() {
                     managerActiveTask.reloadActiviTask()
                 }
                 if(managerActiveTask.activeRunTaskWithPointsFlow.value != null) {
-                    //2 Start Foreground Service
+                    //Start Foreground Service
                     ContextCompat.startForegroundService(applicationContext,
                         Intent(applicationContext, RunService::class.java).apply {
-                            putExtra(ManagerActiveTask.COMMAND_ID, ManagerActiveTask.COMMAND_START)
+                            putExtra(ManagerActiveTask.COMMAND_ID, ManagerActiveTask.COMMAND_NEXT)
                         }
                     )
                 } else {

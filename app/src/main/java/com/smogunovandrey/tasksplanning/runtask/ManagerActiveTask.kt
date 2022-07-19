@@ -77,14 +77,12 @@ class ManagerActiveTask private constructor(val context: Context) {
         _activeRunTaskWithPointsFlow.emit(activeRunTaskWithPoints)
     }
 
-    private suspend fun getRunTask(idRunTask: Long): RunTaskWithPoints? {
+    suspend fun getRunTask(idRunTask: Long): RunTaskWithPoints {
         val runTaskWithPointsDB = dao.runTaskWithPointsByIdSuspend(idRunTask)
-
-        var runTaskWithPoints: RunTaskWithPoints? = null
 
         val runTaskDB = runTaskWithPointsDB.runTask
         val taskDB = dao.taskByIdSuspend(runTaskDB.idTask)
-        runTaskWithPoints = RunTaskWithPoints(
+        val runTaskWithPoints = RunTaskWithPoints(
             RunTask(
                 runTaskDB.idRunTask,
                 runTaskDB.idTask,
@@ -158,7 +156,11 @@ class ManagerActiveTask private constructor(val context: Context) {
 
                     //Set active to false for RunTask if last point
                     if (curIdx == lastIdx) {
+                        //Deactivate task
+                        runTaskWithPoints.runTask.active = false
                         dao.updateRunTask(runTaskWithPoints.runTask.toRunTaskDB())
+                        reloadActiviTask()
+
                         //Stop service
                         context.stopService(Intent(context, RunService::class.java))
                     }

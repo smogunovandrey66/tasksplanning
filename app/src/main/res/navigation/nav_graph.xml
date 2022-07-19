@@ -20,6 +20,9 @@
         <action
             android:id="@+id/action_tasksTemplateFragment_to_runTaskActiveFragment"
             app:destination="@id/runTaskActiveFragment" />
+        <action
+            android:id="@+id/action_tasksTemplateFragment_to_runTaskViewFragment"
+            app:destination="@id/runTaskViewFragment" />
     </fragment>
     <fragment
         android:id="@+id/taskViewFragment"
@@ -60,5 +63,17 @@
     <fragment
         android:id="@+id/runTaskActiveFragment"
         android:name="com.smogunovandrey.tasksplanning.runtask.RunTaskActiveFragment"
-        android:label="RunTaskActiveFragment" />
+        android:label="RunTaskActiveFragment" >
+        <action
+            android:id="@+id/action_runTaskActiveFragment_to_runTaskViewFragment"
+            app:destination="@id/runTaskViewFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/runTaskViewFragment"
+        android:name="com.smogunovandrey.tasksplanning.runtask.RunTaskViewFragment"
+        android:label="RunTaskViewFragment" >
+        <argument
+            android:name="idRunTask"
+            app:argType="long" />
+    </fragment>
 </navigation>

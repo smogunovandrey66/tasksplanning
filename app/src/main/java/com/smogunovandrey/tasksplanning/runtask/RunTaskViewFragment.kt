@@ -10,10 +10,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.smogunovandrey.tasksplanning.databinding.FragmentRunTaskViewBinding
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTaskWithPoints
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RunTaskViewFragment : Fragment() {
     private val binding by lazy {
@@ -24,9 +28,9 @@ class RunTaskViewFragment : Fragment() {
         AdapterRunPoints()
     }
 
-    private val managerActiveTask by lazy{
-        ManagerActiveTask.getInstance(requireContext().applicationContext)
-    }
+    private val args: RunTaskViewFragmentArgs by navArgs()
+
+    private val model: RunTaskViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,10 +42,16 @@ class RunTaskViewFragment : Fragment() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED){
-                managerActiveTask.activeRunTaskWithPointsFlow.collect{
-
+                model.loadRunTask(args.idRunTask)
+                model.curRunTaskWithPoints.collect{
+                    adapter.submitList(it.points)
+                    binding.runTaskWithPoints = it
                 }
             }
+        }
+
+        binding.btnBack.setOnClickListener {
+            findNavController().popBackStack()
         }
 
         return binding.root
