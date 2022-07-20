@@ -41,7 +41,7 @@ TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.rvTasks.adapter = adapter
 

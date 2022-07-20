@@ -25,7 +25,7 @@ import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
-    private val binding: ActivityMainBinding by lazy{
+    private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
@@ -41,8 +41,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         //Cause use FragmentContainerView(not <fragment>) need supportFragmentManager
-        val navHost = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        navController =  navHost.navController
+        val navHost =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHost.navController
         val appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
@@ -50,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val dao = AppDatabase.getInstance(applicationContext).mainDao()
             val tasks = dao.allTasksSuspend()
-            if(tasks.isEmpty()){
+            if (tasks.isEmpty()) {
                 var taskDB = TaskDB(0, "Morning")
                 var idTask = dao.insertTask(taskDB)
                 dao.insertPoint(PointDB(0, idTask, "Lift", 1, TriggerType.HAND))
@@ -66,23 +67,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED){
-                withContext(Dispatchers.Default){
-                    managerActiveTask.reloadActiviTask()
-                }
-                if(managerActiveTask.activeRunTaskWithPointsFlow.value != null) {
-                    //Start Foreground Service
-                    ContextCompat.startForegroundService(applicationContext,
-                        Intent(applicationContext, RunService::class.java).apply {
-                            putExtra(ManagerActiveTask.COMMAND_ID, ManagerActiveTask.COMMAND_NEXT)
-                        }
-                    )
-                } else {
-                    stopService(Intent(applicationContext, RunService::class.java))
-                }
+            withContext(Dispatchers.Default) {
+                managerActiveTask.reloadActiviTask()
+            }
+            if (managerActiveTask.activeRunTaskWithPointsFlow.value != null) {
+                //Start Foreground Service
+                ContextCompat.startForegroundService(applicationContext,
+                    Intent(applicationContext, RunService::class.java).apply {
+                        putExtra(ManagerActiveTask.COMMAND_ID, ManagerActiveTask.COMMAND_NEXT)
+                    }
+                )
+            } else {
+                stopService(Intent(applicationContext, RunService::class.java))
             }
         }
-
     }
 
     override fun onSupportNavigateUp(): Boolean {

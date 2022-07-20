@@ -30,10 +30,6 @@ data class RunTaskNotification(
 
 class RunService : Service() {
 
-    private val notificationManager by lazy {
-        getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-    }
-
     private val managerActiveTask by lazy {
         ManagerActiveTask.getInstance(applicationContext)
     }
@@ -59,13 +55,13 @@ class RunService : Service() {
 
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        Log.d("RunService", "onStartCommand intent=${intent.extras.toList()}")
+        Log.d("TasksTemplateFragment", "RunService onStartCommand intent=${intent.extras.toList()}")
         return START_STICKY
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("RunService", "Destroy")
+        Log.d("TasksTemplateFragment", "Destroy")
     }
 
 

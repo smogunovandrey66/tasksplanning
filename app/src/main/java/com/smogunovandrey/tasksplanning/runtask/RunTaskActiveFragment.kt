@@ -50,7 +50,9 @@ class RunTaskActiveFragment : Fragment() {
                 managerActiveTask.activeRunTaskWithPointsFlow.collect{
                     if(it == null){
                         findNavController().popBackStack()
-                        findNavController().navigate(TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskViewFragment(idRunTask))
+
+                        if(idRunTask > 0L)
+                            findNavController().navigate(TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskViewFragment(idRunTask))
                     } else {
                         binding.runTaskWithPoints = it
                         idRunTask = it.runTask.idRunTask
@@ -69,7 +71,8 @@ class RunTaskActiveFragment : Fragment() {
         }
 
         binding.btnCancel.setOnClickListener {
-            findNavController().popBackStack()
+//            findNavController().popBackStack()
+            idRunTask = 0L
             lifecycleScope.launch {
                 managerActiveTask.cancelTask()
             }
