@@ -10,62 +10,39 @@ import android.os.Build
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import androidx.work.CoroutineWorker
+import androidx.work.Worker
+import androidx.work.WorkerParameters
 import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.db.AppDatabase
 import com.smogunovandrey.tasksplanning.db.MainDao
 import com.smogunovandrey.tasksplanning.utils.toTask
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
+
+class RunTaskWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context,
+    workerParams
+){
+    override suspend fun doWork(): Result {
+        return Result.success()
+    }
+}
 class RunBroadcastReceiver: BroadcastReceiver() {
-
-    private fun dao(context: Context) = AppDatabase.getInstance(context).mainDao()
-    private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     init {
         Log.d("RunBroadcastReceiver", "init")
     }
 
-    private fun createNotification(context: Context) {
-
-        val layoutNotification = RemoteViews(context.packageName, R.layout.notification_run_task)
-        layoutNotification.setImageViewResource(R.id.btn_next, R.drawable.baseline_add_24)
-        val notificationBuilder = NotificationCompat.Builder(
-            context.applicationContext, CHANNEL_ID
-        )
-            .setCustomContentView(layoutNotification)
-            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
-            .setSmallIcon(R.drawable.baseline_run_circle_24)
-            .setOngoing(true)
-
-        val notifyManager =
-            context.getSystemService(Service.NOTIFICATION_SERVICE) as NotificationManager
-        notifyManager.notify(
-            NOTIFICATION_ID,
-            notificationBuilder.setSmallIcon(R.drawable.baseline_add_24).build()
-        )
-    }
-
-
     override fun onReceive(context: Context, intent: Intent) {
         Log.d("RunBroadcastReceiver", "onReceive,context=${context.toString()}")
-        val idTask = intent.getLongExtra("idTask", 0L)
-        if (idTask > 0L) {
+        val managerActiveTask = ManagerActiveTask.getInstance(context)
+        val task = managerActiveTask.activeRunTaskWithPointsFlow.value
+        if(task != null){
+            val coroutineScope = CoroutineScope(Dispatchers.Default)
             coroutineScope.launch {
-                val task = dao(context).taskByIdSuspend(idTask).toTask()
-
-                createNotification(context)
-
+                managerActiveTask.markPoint()
                 cancel()
             }
         }
-    }
-
-    companion object{
-        val CHANNEL_ID = "id channel1"
-        val CHANNEL_NAME = "name channel1"
-        val NOTIFICATION_ID = 1
     }
 }

@@ -2,7 +2,6 @@ package com.smogunovandrey.tasksplanning.runtask
 
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -10,7 +9,10 @@ import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.smogunovandrey.tasksplanning.R
-import com.smogunovandrey.tasksplanning.db.*
+import com.smogunovandrey.tasksplanning.db.AppDatabase
+import com.smogunovandrey.tasksplanning.db.RunPointDB
+import com.smogunovandrey.tasksplanning.db.RunTaskDB
+import com.smogunovandrey.tasksplanning.db.TaskWithPointDB
 import com.smogunovandrey.tasksplanning.taskstemplate.RunPoint
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTask
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTaskWithPoints
@@ -18,8 +20,7 @@ import com.smogunovandrey.tasksplanning.utils.toRunPointDB
 import com.smogunovandrey.tasksplanning.utils.toRunTaskDB
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import java.util.Date
-import kotlin.time.Duration.Companion.milliseconds
+import java.util.*
 
 class ManagerActiveTask private constructor(val context: Context) {
     private val dao by lazy {
@@ -40,15 +41,19 @@ class ManagerActiveTask private constructor(val context: Context) {
                     val intentNext = Intent(context, RunBroadcastReceiver::class.java)
                     intentNext.putExtra(COMMAND_ID, commandId)
 
-                    val pendingIntentNext = PendingIntent.getBroadcast(context, 1,
-                    intentNext, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+                    val pendingIntentNext = PendingIntent.getBroadcast(
+                        context,
+                        1,
+                        intentNext,
+                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                    )
 
                     setOnClickPendingIntent(R.id.btn_next, pendingIntentNext)
-                    _activeRunTaskWithPointsFlow.value?.let {runTaskWithPoints ->
+                    _activeRunTaskWithPointsFlow.value?.let { runTaskWithPoints ->
                         setTextViewText(R.id.txt_name, runTaskWithPoints.runTask.name)
 
                         val curPoint = runTaskWithPoints.curPoint()
-                        if(curPoint == null)
+                        if (curPoint == null)
                             setImageViewResource(R.id.btn_next, R.drawable.baseline_play_arrow_24)
                         else
                             setTextViewText(R.id.txt_number, curPoint.num.toString())
@@ -57,16 +62,18 @@ class ManagerActiveTask private constructor(val context: Context) {
                     val intentCancel = Intent(context, RunBroadcastReceiver::class.java)
                     intentCancel.putExtra(COMMAND_ID, COMMAND_CANCEL)
 
-                    val pendingIntentCancel = PendingIntent.getBroadcast(context, 1,
-                    intentCancel, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+                    val pendingIntentCancel = PendingIntent.getBroadcast(
+                        context,
+                        1,
+                        intentCancel,
+                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                    )
 
                     setOnClickPendingIntent(R.id.btn_cancel, pendingIntentCancel)
                 }
         )
         .setStyle(NotificationCompat.DecoratedCustomViewStyle())
         .setSmallIcon(R.drawable.baseline_run_circle_24)
-
-
 
 
     suspend fun reloadActiviTask() {
@@ -97,12 +104,12 @@ class ManagerActiveTask private constructor(val context: Context) {
                 var dateMark = 0L
                 it.dateMark?.let { date ->
                     //First point
-                    if(it.num == 1)
+                    if (it.num == 1)
                         dateMark = date.time - runTaskDB.dateCreate.time
                     else {
                         //Other points
                         val prevDate = runTaskWithPointsDB.runPoints[it.num - 2].dateMark
-                        if(prevDate != null)
+                        if (prevDate != null)
                             dateMark = date.time - prevDate.time
                     }
                 }
@@ -180,8 +187,11 @@ class ManagerActiveTask private constructor(val context: Context) {
                     _activeRunTaskWithPointsFlow.emit(getRunTask(idRunTask))
 
                     //Update notification
-                    if(curIdx < lastIdx)
-                        notificationManager.notify(NOTIFICATION_ID, notificationBuilder(COMMAND_NEXT).build())
+                    if (curIdx < lastIdx)
+                        notificationManager.notify(
+                            NOTIFICATION_ID,
+                            notificationBuilder(COMMAND_NEXT).build()
+                        )
 
                     break
                 }

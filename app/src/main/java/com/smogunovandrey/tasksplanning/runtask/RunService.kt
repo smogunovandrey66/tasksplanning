@@ -38,7 +38,7 @@ class RunService : Service() {
         super.onCreate()
         createNotificationChannel(ManagerActiveTask.CHANNEL_ID, ManagerActiveTask.CHANNEL_NAME)
         startForeground(ManagerActiveTask.NOTIFICATION_ID,
-            managerActiveTask.notificationBuilder(ManagerActiveTask.COMMAND_START).build()
+            managerActiveTask.notificationBuilder(ManagerActiveTask.COMMAND_NEXT).build()
         )
     }
 
