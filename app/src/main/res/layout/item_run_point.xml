@@ -23,7 +23,7 @@
             app:layout_constraintTop_toTopOf="parent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:duration="@{item.duration}"
+            android:duration_task="@{item.duration}"
             android:background="@drawable/border_green"/>
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cnstrnt_content"

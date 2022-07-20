@@ -10,6 +10,8 @@ import com.smogunovandrey.tasksplanning.db.TriggerType
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTaskWithPoints
 import com.smogunovandrey.tasksplanning.taskstemplate.Task
 import java.util.Date
+import kotlin.math.min
+import kotlin.time.Duration.Companion.milliseconds
 
 
 @SuppressLint("SetTextI18n")
@@ -62,4 +64,22 @@ fun bindStatusButtonNext(view: Button, runTaskWithPoints: RunTaskWithPoints?){
     } else {
         view.visibility = View.GONE
     }
+}
+
+@BindingAdapter("android:duration_task")
+fun bindDuration(txt: TextView, duration: Long?){
+    if(duration != null){
+        val strDuration = duration.milliseconds.toComponents { days, hours, minutes, seconds, _ ->
+            var res = "%02d:%02d:%02d".format(hours, minutes, seconds)
+            if(days > 0){
+                val daysStr = if(days == 1L) "%d day ".format(days) else "%d days "
+                res = daysStr + res
+            }
+
+            res
+        }
+
+        txt.text = strDuration
+    } else
+        txt.text = "null"
 }

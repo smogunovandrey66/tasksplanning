@@ -19,6 +19,7 @@ import com.smogunovandrey.tasksplanning.utils.toRunTaskDB
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.Date
+import kotlin.time.Duration.Companion.milliseconds
 
 class ManagerActiveTask private constructor(val context: Context) {
     private val dao by lazy {
@@ -80,6 +81,7 @@ class ManagerActiveTask private constructor(val context: Context) {
     suspend fun getRunTask(idRunTask: Long): RunTaskWithPoints {
         Log.d("TasksTemplateFragment", "getRunTask idRunTask=$idRunTask")
         val runTaskWithPointsDB = dao.runTaskWithPointsByIdSuspend(idRunTask)
+        Log.d("TasksTemplateFragment", "getRunTask runTaskWithPointsDB=$runTaskWithPointsDB")
 
         val runTaskDB = runTaskWithPointsDB.runTask
         val taskDB = dao.taskByIdSuspend(runTaskDB.idTask)
@@ -92,11 +94,21 @@ class ManagerActiveTask private constructor(val context: Context) {
                 runTaskDB.active
             ),
             runTaskWithPointsDB.runPoints.map {
-                val pointDB = dao.pointByIdSuspend(it.idPoint)
                 var dateMark = 0L
-                it.dateMark?.let {
-                    dateMark = it.time - Date().time
+                it.dateMark?.let { date ->
+                    //First point
+                    if(it.num == 1)
+                        dateMark = date.time - runTaskDB.dateCreate.time
+                    else {
+                        //Other points
+                        val prevDate = runTaskWithPointsDB.runPoints[it.num - 2].dateMark
+                        if(prevDate != null)
+                            dateMark = date.time - prevDate.time
+                    }
                 }
+
+                val pointDB = dao.pointByIdSuspend(it.idPoint)
+
                 RunPoint(
                     it.idRunPoint,
                     taskDB.idTask,
@@ -148,7 +160,7 @@ class ManagerActiveTask private constructor(val context: Context) {
         val runTaskWithPoints = _activeRunTaskWithPointsFlow.value
         runTaskWithPoints?.let {
             var curIdx = 0
-            var lastIdx = it.points.size - 1
+            val lastIdx = it.points.size - 1
             for (point in it.points) {
                 if (point.dateMark == null) {
                     point.dateMark = Date()
@@ -160,7 +172,6 @@ class ManagerActiveTask private constructor(val context: Context) {
                         //Deactivate task
                         runTaskWithPoints.runTask.active = false
                         dao.updateRunTask(runTaskWithPoints.runTask.toRunTaskDB())
-                        reloadActiviTask()
 
                         //Stop service
                         context.stopService(Intent(context, RunService::class.java))
@@ -176,6 +187,8 @@ class ManagerActiveTask private constructor(val context: Context) {
                 }
                 curIdx++
             }
+
+            reloadActiviTask()
         }
     }
 
