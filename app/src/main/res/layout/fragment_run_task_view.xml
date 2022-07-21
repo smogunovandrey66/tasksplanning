@@ -12,7 +12,7 @@
         <TextView
             android:id="@+id/txt_name_label"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBaseline_toBaselineOf="@+id/txt_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/name_task"/>
@@ -23,44 +23,50 @@
             app:layout_constraintTop_toTopOf="parent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:padding="5dp"
             android:text="@{runTaskWithPoints.runTask.name}"
+            android:layout_marginStart="10dp"
             android:background="@drawable/border_blue"/>
         <TextView
             android:id="@+id/txt_date_create_label"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txt_name_label"
+            app:layout_constraintBaseline_toBaselineOf="@+id/txt_date_create"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/date_create"/>
         <TextView
             android:id="@+id/txt_date_create"
             app:layout_constraintStart_toEndOf="@+id/txt_date_create_label"
-            app:layout_constraintTop_toBottomOf="@+id/txt_name_label"
+            app:layout_constraintTop_toBottomOf="@+id/txt_name"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:date="@{runTaskWithPoints.runTask.dateCreate}"/>
+            android:padding="5dp"
+            android:date="@{runTaskWithPoints.runTask.dateCreate}"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/border_blue"/>
         <TextView
             android:id="@+id/txt_active_label"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txt_date_create_label"
+            app:layout_constraintBaseline_toBaselineOf="@+id/txt_active"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/active"/>
         <TextView
             android:id="@+id/txt_active"
             app:layout_constraintStart_toEndOf="@+id/txt_active_label"
-            app:layout_constraintTop_toBottomOf="@+id/txt_date_create_label"
+            app:layout_constraintTop_toBottomOf="@+id/txt_date_create"
             android:layout_marginStart="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{Boolean.toString(runTaskWithPoints.runTask.active)}"
+            android:padding="5dp"
             android:background="@drawable/border_green"/>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_run_points"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/btn_start"
-            app:layout_constraintTop_toBottomOf="@+id/txt_active_label"
+            app:layout_constraintBottom_toTopOf="@+id/btn_back"
+            app:layout_constraintTop_toBottomOf="@+id/txt_active"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_width="match_parent"
             android:layout_height="0dp"
