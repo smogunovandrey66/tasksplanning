@@ -189,7 +189,10 @@ interface MainDao{
 
     //RunTaskWithPoint
     @Query("select * from run_tasks")
-    suspend fun allRunTask(): List<RunTaskWithPointDB>
+    suspend fun allRunTaskSuspend(): List<RunTaskWithPointDB>
+
+    @Query("select * from run_tasks where active = :active and id_task = :idTask")
+    suspend fun runTasksByIdTaskSuspend(idTask: Long, active: String = "0"): List<RunTaskWithPointDB>
 
     @Query("select * from run_tasks where id = :idRunTask")
     suspend fun runTaskWithPointsByIdSuspend(idRunTask: Long): RunTaskWithPointDB

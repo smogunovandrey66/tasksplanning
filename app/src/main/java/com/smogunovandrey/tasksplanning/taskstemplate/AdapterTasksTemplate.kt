@@ -72,7 +72,7 @@ class AdapterTasksTemplate :
 
             binding.btnStatistics.setOnClickListener {
                 val action =
-                    TasksTemplateFragmentDirections.actionTasksTemplateFragmentToStatisticsFragment()
+                    TasksTemplateFragmentDirections.actionTasksTemplateFragmentToStatisticsFragment(task.id)
                 itemView.findNavController().navigate(action)
             }
         }

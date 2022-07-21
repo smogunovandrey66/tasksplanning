@@ -59,7 +59,11 @@
     <fragment
         android:id="@+id/statisticsFragment"
         android:name="com.smogunovandrey.tasksplanning.statistics.StatisticsFragment"
-        android:label="StatisticsFragment" />
+        android:label="StatisticsFragment" >
+        <argument
+            android:name="idTask"
+            app:argType="long" />
+    </fragment>
     <fragment
         android:id="@+id/runTaskActiveFragment"
         android:name="com.smogunovandrey.tasksplanning.runtask.RunTaskActiveFragment"

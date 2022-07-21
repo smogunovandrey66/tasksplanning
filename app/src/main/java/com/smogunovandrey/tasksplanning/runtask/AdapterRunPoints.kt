@@ -4,6 +4,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +23,13 @@ class AdapterRunPoints: ListAdapter<RunPoint, AdapterRunPoints.RunPointHolder>(d
 
     override fun onBindViewHolder(holder: RunPointHolder, position: Int) {
         holder.binding.item = getItem(position)
+        if(position == 0){
+            holder.binding.txtDuration.visibility = View.GONE
+            holder.binding.txtDurationLabel.visibility = View.GONE
+        } else {
+            holder.binding.txtDuration.visibility = View.VISIBLE
+            holder.binding.txtDurationLabel.visibility = View.VISIBLE
+        }
     }
 }
 
