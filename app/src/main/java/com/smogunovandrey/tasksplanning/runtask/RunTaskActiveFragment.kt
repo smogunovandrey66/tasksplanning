@@ -35,7 +35,6 @@ class RunTaskActiveFragment : Fragment() {
     }
 
     private val model: RunTaskViewModel by activityViewModels()
-    private var idRunTask = 0L
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,11 +50,11 @@ class RunTaskActiveFragment : Fragment() {
                     if(it == null){
                         findNavController().popBackStack()
 
-                        if(idRunTask > 0L)
-                            findNavController().navigate(TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskViewFragment(idRunTask))
+                        if(managerActiveTask.idRunTask > 0L)
+                            findNavController().navigate(TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskViewFragment(managerActiveTask.idRunTask))
                     } else {
                         binding.runTaskWithPoints = it
-                        idRunTask = it.runTask.idRunTask
+                        managerActiveTask.idRunTask = it.runTask.idRunTask
                         adapter.submitList(it.points)
                     }
                 }
@@ -72,7 +71,7 @@ class RunTaskActiveFragment : Fragment() {
 
         binding.btnCancel.setOnClickListener {
 //            findNavController().popBackStack()
-            idRunTask = 0L
+            managerActiveTask.idRunTask = 0L
             lifecycleScope.launch {
                 managerActiveTask.cancelTask()
             }

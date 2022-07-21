@@ -27,6 +27,8 @@ class ManagerActiveTask private constructor(val context: Context) {
         AppDatabase.getInstance(context).mainDao()
     }
 
+    var idRunTask = 0L
+
     private val _activeRunTaskWithPointsFlow = MutableStateFlow<RunTaskWithPoints?>(null)
     val activeRunTaskWithPointsFlow: StateFlow<RunTaskWithPoints?> = _activeRunTaskWithPointsFlow
 

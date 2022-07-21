@@ -40,7 +40,13 @@ class RunBroadcastReceiver: BroadcastReceiver() {
         if(task != null){
             val coroutineScope = CoroutineScope(Dispatchers.Default)
             coroutineScope.launch {
-                managerActiveTask.markPoint()
+                when(intent.getIntExtra(ManagerActiveTask.COMMAND_ID, 0)) {
+                    ManagerActiveTask.COMMAND_NEXT -> managerActiveTask.markPoint()
+                    ManagerActiveTask.COMMAND_CANCEL -> {
+                        managerActiveTask.idRunTask = 0L
+                        managerActiveTask.cancelTask()
+                    }
+                }
                 cancel()
             }
         }
