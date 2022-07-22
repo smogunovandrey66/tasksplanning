@@ -28,4 +28,7 @@
     <string name="run">Run</string>
     <string name="view">View</string>
     <string name="back">Back</string>
+    <string name="minimum">Minimum</string>
+    <string name="average">Average</string>
+    <string name="maximum">Maximum</string>
 </resources>

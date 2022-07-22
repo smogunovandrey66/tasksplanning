@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="statisticsItem"
+            type="com.smogunovandrey.tasksplanning.statistics.StatisticPointItem" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:padding="5dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cnstrnt_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="0dp"
+            android:padding="5dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/border_green">
+
+            <TextView
+                android:id="@+id/txt_min_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/minimum"
+                app:layout_constraintBaseline_toBaselineOf="@+id/txt_min"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/txt_min"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:duration_time="@{statisticsItem.minDuration}"
+                android:padding="5dp"
+                android:text="@string/minimum"
+                app:layout_constraintStart_toEndOf="@+id/txt_min_label"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <TextView
+                android:id="@+id/txt_average_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="@string/average"
+                app:layout_constraintBaseline_toBaselineOf="@+id/txt_average"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/txt_average"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:duration_time="@{statisticsItem.averageDuration}"
+                android:padding="5dp"
+                android:text="@string/average"
+                app:layout_constraintStart_toEndOf="@+id/txt_average_label"
+                app:layout_constraintTop_toBottomOf="@+id/txt_min" />
+
+            <TextView
+                android:id="@+id/txt_max_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="@string/maximum"
+                app:layout_constraintBaseline_toBaselineOf="@+id/txt_max"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/txt_max"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:duration_time="@{statisticsItem.maxDuration}"
+                android:padding="5dp"
+                android:text="@string/maximum"
+                app:layout_constraintStart_toEndOf="@+id/txt_max_label"
+                app:layout_constraintTop_toBottomOf="@+id/txt_average" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/txt_name_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="@string/name_point"
+            app:layout_constraintBaseline_toBaselineOf="@+id/txt_name"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/txt_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="@{statisticsItem.namePoint}"
+            app:layout_constraintTop_toBottomOf="@+id/cnstrnt_content"
+            app:layout_constraintStart_toEndOf="@+id/txt_name_label"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -66,8 +66,8 @@ fun bindStatusButtonNext(view: Button, runTaskWithPoints: RunTaskWithPoints?){
     }
 }
 
-@BindingAdapter("android:duration_task")
-fun bindDuration(txt: TextView, duration: Long?){
+@BindingAdapter("android:duration_time")
+fun bindDurationTime(txt: TextView, duration: Long?){
     if(duration != null){
         val strDuration = duration.milliseconds.toComponents { days, hours, minutes, seconds, _ ->
             var res = "%02d:%02d:%02d".format(hours, minutes, seconds)
