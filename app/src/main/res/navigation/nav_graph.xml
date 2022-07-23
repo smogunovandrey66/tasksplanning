@@ -63,6 +63,9 @@
         <argument
             android:name="idTask"
             app:argType="long" />
+        <action
+            android:id="@+id/action_statisticsFragment_to_runTaskViewFragment"
+            app:destination="@id/runTaskViewFragment" />
     </fragment>
     <fragment
         android:id="@+id/runTaskActiveFragment"

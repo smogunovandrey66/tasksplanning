@@ -10,11 +10,16 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavOptions
+import androidx.navigation.NavOptionsBuilder
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.databinding.FragmentStatisticsBinding
+import com.smogunovandrey.tasksplanning.taskstemplate.RunTask
 import kotlinx.coroutines.launch
 
-class StatisticsFragment: Fragment() {
+class StatisticsFragment: Fragment(), OnRunTaskClick {
     private val binding by lazy{
         FragmentStatisticsBinding.inflate(layoutInflater)
     }
@@ -28,7 +33,7 @@ class StatisticsFragment: Fragment() {
     }
 
     private val runTasksAdapter by lazy{
-        RunTasksAdapter()
+        RunTasksAdapter(this)
     }
 
     override fun onCreateView(
@@ -70,5 +75,10 @@ class StatisticsFragment: Fragment() {
         }
 
         return binding.root
+    }
+
+    override fun onRunTaskClick(runTask: RunTask) {
+        val navAction = StatisticsFragmentDirections.actionStatisticsFragmentToRunTaskViewFragment(runTask.idRunTask)
+        findNavController().navigate(navAction)
     }
 }
