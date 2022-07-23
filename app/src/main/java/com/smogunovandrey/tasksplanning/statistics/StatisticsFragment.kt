@@ -7,7 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import com.smogunovandrey.tasksplanning.databinding.FragmentStatisticsBinding
 import kotlinx.coroutines.launch
@@ -21,28 +23,49 @@ class StatisticsFragment: Fragment() {
 
     private val args by navArgs<StatisticsFragmentArgs>()
 
-    private val adapter by lazy{
+    private val statisticsAdapter by lazy{
         StatisticsAdapter()
+    }
+
+    private val runTasksAdapter by lazy{
+        RunTasksAdapter()
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         model.loadStatistics(args.idTask)
-        binding.rvStatistics.adapter = adapter
+        binding.rvStatistics.adapter = statisticsAdapter
+        binding.rvRunTasks.adapter = runTasksAdapter
         binding.lifecycleOwner = viewLifecycleOwner
 
         lifecycleScope.launch {
-            model.statisticPoints.collect{ listStatisticsPointItems ->
-                adapter.submitList(listStatisticsPointItems)
-                Log.d("StatisticsFragment", "statistics collect=$listStatisticsPointItems")
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                model.statisticPoints.collect{ listStatisticsPointItems ->
+                    statisticsAdapter.submitList(listStatisticsPointItems)
+                    Log.d("StatisticsFragment", "statistics collect=$listStatisticsPointItems")
+                }
             }
         }
         lifecycleScope.launch {
-            model.taskFlow.collect{task ->
-                binding.task = task
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    model.taskFlow.collect{task ->
+                        binding.task = task
+                    }
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                repeatOnLifecycle(Lifecycle.State.STARTED){
+                    model.runTasks.collect{
+                        Log.d("StatisticsFragment", "model.runTasks.collect=$it")
+                        runTasksAdapter.submitList(it)
+                    }
+                }
             }
         }
 

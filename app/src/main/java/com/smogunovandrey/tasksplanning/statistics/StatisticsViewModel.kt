@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.smogunovandrey.tasksplanning.db.AppDatabase
+import com.smogunovandrey.tasksplanning.taskstemplate.RunTask
 import com.smogunovandrey.tasksplanning.taskstemplate.Task
 import com.smogunovandrey.tasksplanning.utils.toTask
 import kotlinx.coroutines.Dispatchers
@@ -41,6 +42,9 @@ class StatisticsViewModel(application: Application) : AndroidViewModel(applicati
     private val _taskFlow: MutableStateFlow<Task> = MutableStateFlow(Task())
     val taskFlow: StateFlow<Task> = _taskFlow
 
+    private val _runTasks: MutableStateFlow<List<RunTask>> = MutableStateFlow(mutableListOf())
+    val runTasks: StateFlow<List<RunTask>> = _runTasks
+
     fun loadStatistics(idTask: Long) {
         viewModelScope.launch {
             val res: MutableList<StatisticPointItem> = mutableListOf()
@@ -63,7 +67,17 @@ class StatisticsViewModel(application: Application) : AndroidViewModel(applicati
                 dao.runTasksByIdTaskSuspend(idTask)
             }
 
-            Log.d("StatisticsFragment", "$runTasksWithPointsDB")
+            runTasksWithPointsDB.map {
+                RunTask(
+                    idRunTask = it.runTask.idRunTask,
+                    dateCreate = it.runTask.dateCreate
+                )
+            }.apply {
+                Log.d("StatisticsFragment", "_runTasks.emit $this")
+                _runTasks.emit(this)
+            }
+
+            Log.d("StatisticsFragment", "runTasksWithPointsDB=$runTasksWithPointsDB")
 
             for (runTaskWithPointsDB in runTasksWithPointsDB) {
                 val lastIdx = runTaskWithPointsDB.runPoints.size - 1

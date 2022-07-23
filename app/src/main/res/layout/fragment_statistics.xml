@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable
             name="task"
             type="com.smogunovandrey.tasksplanning.taskstemplate.Task" />
     </data>
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <TextView
@@ -34,17 +35,25 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:orientation="vertical"
+            android:padding="5dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/border_green"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_statistics"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_run_tasks"
-            app:layout_constraintTop_toBottomOf="@+id/rv_statistics"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:orientation="vertical"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+            android:padding="5dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/border_blue"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rv_statistics"
+            tools:layout_editor_absoluteX="41dp"
+            tools:listitem="@layout/item_run_task" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

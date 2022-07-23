@@ -35,7 +35,7 @@ fun bindDateRunTask(view: TextView, date: Date?){
         view.text = it.toString()
         return
     }
-    view.text = ""
+    view.text = "date null"
 }
 
 @BindingAdapter("android:status_button_next")

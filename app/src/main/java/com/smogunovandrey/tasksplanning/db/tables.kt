@@ -174,6 +174,9 @@ interface MainDao{
     @Delete
     suspend fun deleteRunTask(runTask: RunTaskDB)
 
+    @Query("select * from run_tasks where id_task = :idTask")
+    suspend fun runTasksByIdTask(idTask: Long): List<RunTaskDB>
+
     //RunPoint
     @Insert
     suspend fun insertRunPoint(runPoint: RunPointDB): Long
