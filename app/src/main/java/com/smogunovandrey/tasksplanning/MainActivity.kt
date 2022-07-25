@@ -1,8 +1,10 @@
 package com.smogunovandrey.tasksplanning
 
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -35,8 +37,27 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var navController: NavController
 
+    fun checkAndSetPermissions(){
+        val locationPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){permissions ->
+            when{
+                permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+
+                }
+                permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+
+                } else -> {
+
+                }
+            }
+        }
+
+        locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        checkAndSetPermissions()
 
         setContentView(R.layout.activity_main)
 
