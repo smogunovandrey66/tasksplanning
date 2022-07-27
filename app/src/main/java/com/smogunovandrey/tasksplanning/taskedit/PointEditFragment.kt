@@ -1,28 +1,20 @@
 package com.smogunovandrey.tasksplanning.taskedit
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
-import androidx.cardview.R
-import androidx.core.text.isDigitsOnly
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.smogunovandrey.tasksplanning.databinding.FragmentPointEditBinding
 import com.smogunovandrey.tasksplanning.db.TriggerType
 import com.smogunovandrey.tasksplanning.taskstemplate.TaskTemplateViewModel
-import com.smogunovandrey.tasksplanning.utils.swap
-import kotlinx.coroutines.launch
 import com.smogunovandrey.tasksplanning.taskstemplate.Point
-import com.smogunovandrey.tasksplanning.taskstemplate.Task
 
 class PointEditFragment: Fragment() {
     private val model: TaskTemplateViewModel by activityViewModels()

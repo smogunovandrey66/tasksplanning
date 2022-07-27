@@ -4,12 +4,15 @@ import com.google.gson.Gson
 import com.smogunovandrey.tasksplanning.db.TriggerType
 import java.util.*
 
+
+
 data class Point(
     var id: Long = 0L,
     var idTask: Long = 0L,
     var name: String = "",
     var num: Int = 0,
-    var triggerType: TriggerType = TriggerType.HAND
+    var triggerType: TriggerType = TriggerType.HAND,
+    var gpsPoint: com.yandex.mapkit.geometry.Point? = null
 ){
     fun clear(){
         id = 0L

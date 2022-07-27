@@ -49,8 +49,8 @@ data class PointGpsDB(
     @PrimaryKey
     @ColumnInfo(name = "id_point")
     val idPoint: Long,
-    val latitude: Float,
-    val longitude: Float
+    val latitude: Double,
+    val longitude: Double
 )
 
 data class TaskWithPointDB(

@@ -31,4 +31,5 @@
     <string name="minimum">Minimum</string>
     <string name="average">Average</string>
     <string name="maximum">Maximum</string>
+    <string name="trigger_type">Trigger type</string>
 </resources>
