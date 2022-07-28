@@ -21,6 +21,7 @@ import com.smogunovandrey.tasksplanning.db.TaskDB
 import com.smogunovandrey.tasksplanning.db.TriggerType
 import com.smogunovandrey.tasksplanning.runtask.ManagerActiveTask
 import com.smogunovandrey.tasksplanning.runtask.RunService
+import com.yandex.mapkit.MapKitFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -34,6 +35,7 @@ class MainActivity : AppCompatActivity() {
     private val managerActiveTask by lazy {
         ManagerActiveTask.getInstance(applicationContext)
     }
+
 
     private lateinit var navController: NavController
 
@@ -56,6 +58,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
+        MapKitFactory.initialize(this)
 
         checkAndSetPermissions()
 
