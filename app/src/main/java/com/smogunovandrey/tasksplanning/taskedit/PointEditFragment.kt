@@ -14,6 +14,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
+import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.databinding.FragmentPointEditBinding
 import com.smogunovandrey.tasksplanning.db.TriggerType
 import com.smogunovandrey.tasksplanning.taskstemplate.TaskTemplateViewModel
@@ -46,6 +47,9 @@ class PointEditFragment: Fragment() {
         binding.spnTriggerType.setSelection(listTrigger.indexOf(point.triggerType.name))
         binding.txtNumber.text = point.num.toString()
         updateGpsPoint()
+        binding.txtLocationInfo.setOnClickListener {
+            findNavController().navigate(R.id.mapFragment)
+        }
 
 
         binding.edtName.addTextChangedListener {

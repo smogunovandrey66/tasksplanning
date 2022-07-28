@@ -83,4 +83,8 @@
             android:name="idRunTask"
             app:argType="long" />
     </fragment>
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.smogunovandrey.tasksplanning.map.MapFragment"
+        android:label="MapFragment" />
 </navigation>
