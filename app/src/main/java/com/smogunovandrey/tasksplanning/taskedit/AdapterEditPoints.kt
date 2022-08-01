@@ -9,7 +9,7 @@ import com.smogunovandrey.tasksplanning.taskstemplate.Point
 class AdapterEditPoints(private var points: MutableList<Point> = mutableListOf(), private var onClickPoint: OnClickPoint? = null): RecyclerView.Adapter<AdapterEditPoints.ViewHolderPointItem>() {
 
     interface OnClickPoint{
-        fun onClick(point: Point)
+        fun onClickPoint(point: Point)
     }
 
     class ViewHolderPointItem(val binding: ItemPointsTemplateBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -22,7 +22,7 @@ class AdapterEditPoints(private var points: MutableList<Point> = mutableListOf()
         binding.root.setOnClickListener {
             val point = binding.point
             if(point != null)
-                onClickPoint?.onClick(point)
+                onClickPoint?.onClickPoint(point)
         }
         return ViewHolderPointItem(binding)
     }

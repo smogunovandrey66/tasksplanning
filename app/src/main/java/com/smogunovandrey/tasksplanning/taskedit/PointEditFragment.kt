@@ -19,6 +19,7 @@ import com.smogunovandrey.tasksplanning.databinding.FragmentPointEditBinding
 import com.smogunovandrey.tasksplanning.db.TriggerType
 import com.smogunovandrey.tasksplanning.taskstemplate.TaskTemplateViewModel
 import com.smogunovandrey.tasksplanning.taskstemplate.Point
+import com.smogunovandrey.tasksplanning.taskstemplate.Task
 
 class PointEditFragment: Fragment() {
     private val model: TaskTemplateViewModel by activityViewModels()
@@ -26,7 +27,7 @@ class PointEditFragment: Fragment() {
         FragmentPointEditBinding.inflate(layoutInflater)
     }
 
-    private val point by lazy {
+    private val editedPoint by lazy {
         model.editedPoint
     }
 
@@ -34,7 +35,7 @@ class PointEditFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         model.posPointInserted = null
         model.posPointUpdate = null
 
@@ -43,9 +44,9 @@ class PointEditFragment: Fragment() {
         }
         binding.spnTriggerType.adapter = ArrayAdapter(requireActivity(), android.R.layout.simple_spinner_item, listTrigger)
 
-        binding.edtName.setText(point.name)
-        binding.spnTriggerType.setSelection(listTrigger.indexOf(point.triggerType.name))
-        binding.txtNumber.text = point.num.toString()
+        binding.edtName.setText(editedPoint.name)
+        binding.spnTriggerType.setSelection(listTrigger.indexOf(editedPoint.triggerType.name))
+        binding.txtNumber.text = editedPoint.num.toString()
         updateGpsPoint()
         binding.txtLocationInfo.setOnClickListener {
             findNavController().navigate(R.id.mapFragment)
@@ -53,7 +54,7 @@ class PointEditFragment: Fragment() {
 
 
         binding.edtName.addTextChangedListener {
-            point.name = it.toString()
+            editedPoint.name = it.toString()
         }
         binding.spnTriggerType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(
@@ -62,15 +63,15 @@ class PointEditFragment: Fragment() {
                 position: Int,
                 id: Long
             ) {
-                point.triggerType = TriggerType.values()[position]
-                Log.d("PointEditFragment", "triggerType=${point.triggerType}")
-                if(point.triggerType == TriggerType.GPS_IN){
+                editedPoint.triggerType = TriggerType.values()[position]
+                Log.d("PointEditFragment", "triggerType=${editedPoint.triggerType}")
+                if(editedPoint.triggerType == TriggerType.GPS_IN){
                     val fUsedLocationClient =  LocationServices.getFusedLocationProviderClient(requireActivity())
                     fUsedLocationClient.lastLocation.addOnSuccessListener {location: Location? ->
                         Log.d("PointEditFragment", "location=${location}")
                         location?.let {
                             val pointGps: com.yandex.mapkit.geometry.Point = com.yandex.mapkit.geometry.Point(it.latitude, it.longitude)
-                            point.gpsPoint = pointGps
+                            editedPoint.gpsPoint = pointGps
                             Log.d("PointEditFragment", "pointGps=$pointGps")
                         }
                         updateGpsPoint()
@@ -79,7 +80,7 @@ class PointEditFragment: Fragment() {
                         updateGpsPoint()
                     }
                 } else {
-                    point.gpsPoint = null
+                    editedPoint.gpsPoint = null
                     updateGpsPoint()
                 }
             }
@@ -96,11 +97,11 @@ class PointEditFragment: Fragment() {
         binding.btnAddPoint.setOnClickListener {
             if(canSave()){
                 if(model.flagEditPoint){
-                    model.selectedPoint.copy(point)
-                    model.posPointUpdate = point.num.toInt() - 1
+                    model.selectedPoint.copy(editedPoint)
+                    model.posPointUpdate = editedPoint.num.toInt() - 1
                 } else {
-                    model.editedTaskWithPoints.points.add(Point().copy(point))
-                    model.posPointInserted = point.num.toInt() - 1
+                    model.editedTaskWithPoints.points.add(Point().copy(editedPoint))
+                    model.posPointInserted = editedPoint.num.toInt() - 1
                 }
                 findNavController().popBackStack()
             }
@@ -122,12 +123,12 @@ class PointEditFragment: Fragment() {
     }
 
     private fun updateGpsPoint(){
-        Log.d("PointEditFragment", "updateGpsPoint point.gpsPoint=${point.gpsPoint}")
-        if(point.gpsPoint == null){
+        Log.d("PointEditFragment", "updateGpsPoint point.gpsPoint=${editedPoint.gpsPoint}")
+        if(editedPoint.gpsPoint == null){
             binding.txtLocationInfo.visibility = View.GONE
         } else {
             binding.txtLocationInfo.visibility = View.VISIBLE
-            binding.txtLocationInfo.text = "${point.gpsPoint!!.latitude},${point.gpsPoint!!.longitude}"
+            binding.txtLocationInfo.text = "${editedPoint.gpsPoint!!.latitude},${editedPoint.gpsPoint!!.longitude}"
         }
     }
 }

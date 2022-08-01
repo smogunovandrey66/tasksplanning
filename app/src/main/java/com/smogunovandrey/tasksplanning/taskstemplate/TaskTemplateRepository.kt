@@ -1,6 +1,7 @@
 package com.smogunovandrey.tasksplanning.taskstemplate
 
 import com.smogunovandrey.tasksplanning.db.MainDao
+import com.smogunovandrey.tasksplanning.db.PointGpsDB
 import com.smogunovandrey.tasksplanning.utils.toPointDB
 import com.smogunovandrey.tasksplanning.utils.toTaskDB
 import com.smogunovandrey.tasksplanning.utils.toTaskWithPoint
@@ -31,7 +32,11 @@ class TaskTemplateRepository(private val mainDao: MainDao) {
      */
     fun taskWithPoints(idTask: Long): Flow<TaskWithPoints> = mainDao.taskWithPoints(idTask).map {
         TaskWithPoints(Task(it.task.idTask, it.task.name), it.points.map { pointDB ->
-            Point(pointDB.idPoint, idTask, pointDB.name, pointDB.num, pointDB.triggerType)
+            val point = Point(pointDB.idPoint, idTask, pointDB.name, pointDB.num, pointDB.triggerType)
+            val pointGpsDB = mainDao.gpsPointSuspend(pointDB.idPoint)
+            if(pointGpsDB != null)
+                point.gpsPoint = com.yandex.mapkit.geometry.Point(pointGpsDB.latitude, pointGpsDB.longitude)
+            point
         }.sortedWith { point1, point2 -> (point1.num - point2.num).toInt() }.toMutableList())
     }
 
@@ -57,8 +62,22 @@ class TaskTemplateRepository(private val mainDao: MainDao) {
             //Insert
             if(point.id == 0L){
                 point.id = mainDao.insertPoint(point.toPointDB())
+                point.gpsPoint?.let {
+                    mainDao.insertGpsPoint(PointGpsDB(point.id, it.latitude, it.longitude))
+                }
             } else{
                 mainDao.updatePoint(point.toPointDB())
+                val pointGpsDB = mainDao.gpsPointSuspend(point.id)
+                if(point.gpsPoint == null) {
+                    if (pointGpsDB != null) {
+                        mainDao.deleteGpsPoint(pointGpsDB)
+                    }
+                } else {
+                    if(pointGpsDB != null)
+                        mainDao.updateGpsPoint(pointGpsDB)
+                    else
+                        mainDao.insertGpsPoint(PointGpsDB(point.id, point.gpsPoint!!.latitude, point.gpsPoint!!.longitude))
+                }
             }
         }
 

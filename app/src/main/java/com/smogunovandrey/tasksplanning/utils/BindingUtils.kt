@@ -9,6 +9,7 @@ import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.db.TriggerType
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTaskWithPoints
 import com.smogunovandrey.tasksplanning.taskstemplate.Task
+import com.yandex.mapkit.geometry.Point
 import java.util.Date
 import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
@@ -82,4 +83,14 @@ fun bindDurationTime(txt: TextView, duration: Long?){
         txt.text = strDuration
     } else
         txt.text = "null"
+}
+
+@BindingAdapter("android:gps_point")
+fun bindGpsPoint(txt: TextView, gpsPoint: Point?){
+    if(gpsPoint == null){
+        txt.visibility = View.GONE
+    } else {
+        txt.visibility = View.VISIBLE
+        txt.text = "${gpsPoint.latitude},${gpsPoint.longitude}"
+    }
 }

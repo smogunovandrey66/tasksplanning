@@ -70,7 +70,7 @@ class TaskEditFragment: Fragment(), AdapterEditPoints.OnClickPoint {
         var ena = editedTask != dbTask || editedPoints.size != dbPoints.size
         if(!ena){
             for(i in editedPoints.indices){
-                ena = editedPoints[i] != dbPoints[i]
+                ena = !editedPoints[i].equals(dbPoints[i])
                 if(ena)
                     break
             }
@@ -236,7 +236,7 @@ class TaskEditFragment: Fragment(), AdapterEditPoints.OnClickPoint {
             itemTouchHelper.attachToRecyclerView(binding.rvPoints)
     }
 
-    override fun onClick(point: Point) {
+    override fun onClickPoint(point: Point) {
         //Only mode click
         if(!model.editClickPoint)
             return

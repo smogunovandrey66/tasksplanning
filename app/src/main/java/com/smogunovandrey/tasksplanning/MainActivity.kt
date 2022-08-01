@@ -15,10 +15,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.smogunovandrey.tasksplanning.databinding.ActivityMainBinding
-import com.smogunovandrey.tasksplanning.db.AppDatabase
-import com.smogunovandrey.tasksplanning.db.PointDB
-import com.smogunovandrey.tasksplanning.db.TaskDB
-import com.smogunovandrey.tasksplanning.db.TriggerType
+import com.smogunovandrey.tasksplanning.db.*
 import com.smogunovandrey.tasksplanning.runtask.ManagerActiveTask
 import com.smogunovandrey.tasksplanning.runtask.RunService
 import com.yandex.mapkit.MapKitFactory

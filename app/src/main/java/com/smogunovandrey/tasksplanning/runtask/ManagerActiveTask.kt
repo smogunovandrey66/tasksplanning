@@ -8,6 +8,9 @@ import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.google.android.gms.location.Geofence
+import com.google.android.gms.location.GeofencingRequest
+import com.google.android.gms.location.LocationServices
 import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.db.AppDatabase
 import com.smogunovandrey.tasksplanning.db.RunPointDB
@@ -34,6 +37,20 @@ class ManagerActiveTask private constructor(val context: Context) {
 
     private val notificationManager by lazy {
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
+
+    private val geofenceClient by lazy{
+        LocationServices.getGeofencingClient(context)
+    }
+
+    private fun getGeofencingRequest(): GeofencingRequest{
+        val listGeofences = mutableListOf<Geofence>()
+        listGeofences.add(Geofence.Builder()
+            .build())
+        return GeofencingRequest.Builder()
+            .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+            .addGeofences(listGeofences)
+            .build()
     }
 
     fun notificationBuilder(commandId: Int) = NotificationCompat.Builder(context, CHANNEL_ID)
@@ -237,6 +254,8 @@ class ManagerActiveTask private constructor(val context: Context) {
         const val COMMAND_START = 1
         const val COMMAND_NEXT = COMMAND_START + 1
         const val COMMAND_CANCEL = COMMAND_START + 2
+
+        const val GEOFENCE_RADIUS_IN_METERS = 10
 
         @Volatile
         private var instance: ManagerActiveTask? = null

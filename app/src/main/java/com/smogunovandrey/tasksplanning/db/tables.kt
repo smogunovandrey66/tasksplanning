@@ -152,7 +152,16 @@ interface MainDao{
 
     //GPS point
     @Query("select * from points_gps where id_point = :idPoint")
-    suspend fun gpsPoint(idPoint: Long): PointGpsDB?
+    suspend fun gpsPointSuspend(idPoint: Long): PointGpsDB?
+
+    @Insert
+    suspend fun insertGpsPoint(gpsPointGpsDB: PointGpsDB): Long
+
+    @Delete
+    suspend fun deleteGpsPoint(gpsPointGpsDB: PointGpsDB)
+
+    @Update
+    suspend fun updateGpsPoint(gpsPointGpsDB: PointGpsDB)
 
     //TaskWithPointDB
     @Query("select * from tasks where id = :takId")

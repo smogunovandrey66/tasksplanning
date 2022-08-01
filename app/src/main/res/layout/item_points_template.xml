@@ -43,6 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            app:drawableStartCompat="@drawable/baseline_location_on_24" />
+            app:drawableStartCompat="@drawable/baseline_location_on_24"
+            android:gps_point="@{point.gpsPoint}"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
