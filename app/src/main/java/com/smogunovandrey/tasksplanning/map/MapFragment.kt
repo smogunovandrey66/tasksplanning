@@ -97,7 +97,7 @@ class MapFragment: Fragment(), InputListener {
 
     override fun onMapTap(m: Map, p: Point) {
         map.mapObjects.clear()
-        map.mapObjects.addPlacemark(p, ImageProvider.fromResource(requireContext(), R.drawable.baseline_location_on_24))
+        map.mapObjects.addPlacemark(p, ImageProvider.fromResource(requireContext(), R.drawable.mark))
         Log.d("MapFragment", "onMapTap map=$m,point=$p")
     }
 
