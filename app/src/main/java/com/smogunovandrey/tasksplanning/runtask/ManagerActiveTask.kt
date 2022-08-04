@@ -44,14 +44,20 @@ class ManagerActiveTask private constructor(val context: Context) {
     }
 
     private fun getGeofencingRequest(): GeofencingRequest{
-        val listGeofences = mutableListOf<Geofence>()
-        listGeofences.add(Geofence.Builder()
-            .build())
+//        val listGeofences = mutableListOf<Geofence>()
+//        listGeofences.add(Geofence.Builder()
+//            .build())
+        val runTasWithPoints = _activeRunTaskWithPointsFlow.value ?:  throw Exception("")
+
         return GeofencingRequest.Builder()
             .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-            .addGeofences(listGeofences)
+            .addGeofence(Geofence.Builder()
+                .setRequestId(REQUEST_ID_GEOFENCE)
+                .build())
             .build()
     }
+
+
 
     fun notificationBuilder(commandId: Int) = NotificationCompat.Builder(context, CHANNEL_ID)
         .setCustomContentView(
@@ -254,6 +260,8 @@ class ManagerActiveTask private constructor(val context: Context) {
         const val COMMAND_START = 1
         const val COMMAND_NEXT = COMMAND_START + 1
         const val COMMAND_CANCEL = COMMAND_START + 2
+
+        const val REQUEST_ID_GEOFENCE = "id key geofence"
 
         const val GEOFENCE_RADIUS_IN_METERS = 10
 
