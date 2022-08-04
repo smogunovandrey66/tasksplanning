@@ -73,10 +73,11 @@ class TaskTemplateRepository(private val mainDao: MainDao) {
                         mainDao.deleteGpsPoint(pointGpsDB)
                     }
                 } else {
+                    val newGpsPoint = PointGpsDB(point.id, point.gpsPoint!!.latitude, point.gpsPoint!!.longitude)
                     if(pointGpsDB != null)
-                        mainDao.updateGpsPoint(pointGpsDB)
+                        mainDao.updateGpsPoint(newGpsPoint)
                     else
-                        mainDao.insertGpsPoint(PointGpsDB(point.id, point.gpsPoint!!.latitude, point.gpsPoint!!.longitude))
+                        mainDao.insertGpsPoint(newGpsPoint)
                 }
             }
         }
