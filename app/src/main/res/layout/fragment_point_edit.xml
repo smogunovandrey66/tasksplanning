@@ -29,18 +29,9 @@
             android:id="@+id/spn_trigger_type"
             app:layout_constraintTop_toBottomOf="@+id/edt_name"
             app:layout_constraintStart_toEndOf="@+id/txt_trigger_type"
-            app:layout_constraintEnd_toStartOf="@+id/txt_location_info"
+            app:layout_constraintEnd_toEndOf="parent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"/>
-        <TextView
-            android:id="@+id/txt_location_info"
-            app:layout_constraintStart_toEndOf="@+id/spn_trigger_type"
-            app:layout_constraintTop_toBottomOf="@+id/edt_name"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:drawableStartCompat="@drawable/baseline_location_on_24"
-            android:text="@string/coordinates"/>
         <TextView
             android:id="@+id/txt_num"
             app:layout_constraintStart_toStartOf="parent"
@@ -70,6 +61,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/add_point"/>
+
+        <TextView
+            android:id="@+id/txt_location_info"
+            android:layout_marginTop="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_add_point"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/coordinates"
+            app:drawableEndCompat="@drawable/baseline_location_on_24" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

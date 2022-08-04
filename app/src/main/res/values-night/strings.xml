@@ -22,5 +22,5 @@
     <string name="average">Average</string>
     <string name="maximum">Maximum</string>
     <string name="trigger_type">Trigger type</string>
-    <string name="coordinates">coordinates</string>
+    <string name="coordinates">coordinates:</string>
 </resources>

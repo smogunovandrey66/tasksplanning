@@ -18,8 +18,9 @@ import com.yandex.mapkit.map.GeoObjectSelectionMetadata
 import com.yandex.mapkit.map.InputListener
 import com.yandex.mapkit.map.Map
 import com.yandex.runtime.image.ImageProvider
+import kotlin.math.log
 
-class MapFragment: Fragment(), InputListener {
+class MapFragment : Fragment(), InputListener {
     private val binding by lazy {
         FragmentMapBinding.inflate(layoutInflater)
     }
@@ -32,7 +33,7 @@ class MapFragment: Fragment(), InputListener {
         binding.mvMain
     }
 
-    private val map by lazy{
+    private val map by lazy {
         mapView.map
     }
 
@@ -41,10 +42,17 @@ class MapFragment: Fragment(), InputListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Log.d("MapFragment", "onCreateView model=$model")
         gpsPoint?.let {
-            mapView.map.move(CameraPosition(it, 14.0f, 0.0f, 0.0f),
-            Animation(Animation.Type.SMOOTH, 1.0f),
+            mapView.map.move(
+                CameraPosition(it, 14.0f, 0.0f, 0.0f),
+                Animation(Animation.Type.SMOOTH, 1.0f),
                 null
+            )
+
+            map.mapObjects.addPlacemark(
+                it,
+                ImageProvider.fromResource(requireContext(), R.drawable.mark)
             )
 
 //            map.mapObjects.addPlacemark(it).apply {
@@ -84,20 +92,29 @@ class MapFragment: Fragment(), InputListener {
 
 
     override fun onStart() {
+        Log.d("MapFragment", "onStart begin")
         super.onStart()
         MapKitFactory.getInstance().onStart()
         mapView.onStart()
+        Log.d("MapFragment", "onStart end")
     }
 
     override fun onStop() {
+        Log.d("MapFragment", "onStop begin")
+        map.removeInputListener(this)
+        super.onStop()
         mapView.onStop()
         MapKitFactory.getInstance().onStop()
-        super.onStop()
+        Log.d("MapFragment", "onStop end")
     }
 
     override fun onMapTap(m: Map, p: Point) {
         map.mapObjects.clear()
-        map.mapObjects.addPlacemark(p, ImageProvider.fromResource(requireContext(), R.drawable.mark))
+        map.mapObjects.addPlacemark(
+            p,
+            ImageProvider.fromResource(requireContext(), R.drawable.mark)
+        )
+        model.editedPoint.gpsPoint = Point(p.latitude, p.longitude)
         Log.d("MapFragment", "onMapTap map=$m,point=$p")
     }
 

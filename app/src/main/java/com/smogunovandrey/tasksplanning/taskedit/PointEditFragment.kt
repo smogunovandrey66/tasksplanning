@@ -36,6 +36,7 @@ class PointEditFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Log.d("PointEditFragment", "onCreateView,model=$model")
         model.posPointInserted = null
         model.posPointUpdate = null
 
@@ -63,8 +64,15 @@ class PointEditFragment: Fragment() {
                 position: Int,
                 id: Long
             ) {
+                val posSpinner = binding.spnTriggerType.selectedItemPosition
+                val posModel = listTrigger.indexOf(editedPoint.triggerType.name)
+                if(posSpinner == posModel)
+                    return
+
+                Log.d("PointEditFragment", "onItemSelectedListener posSpinner=$posSpinner,posModel=$posModel")
+
                 editedPoint.triggerType = TriggerType.values()[position]
-                Log.d("PointEditFragment", "triggerType=${editedPoint.triggerType}")
+                Log.d("PointEditFragment", "onItemSelectedListener triggerType=${editedPoint.triggerType}")
                 if(editedPoint.triggerType == TriggerType.GPS_IN){
                     val fUsedLocationClient =  LocationServices.getFusedLocationProviderClient(requireActivity())
                     fUsedLocationClient.lastLocation.addOnSuccessListener {location: Location? ->
@@ -130,5 +138,10 @@ class PointEditFragment: Fragment() {
             binding.txtLocationInfo.visibility = View.VISIBLE
             binding.txtLocationInfo.text = "${editedPoint.gpsPoint!!.latitude},${editedPoint.gpsPoint!!.longitude}"
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("PointEditFragment", "onDestroy")
     }
 }
