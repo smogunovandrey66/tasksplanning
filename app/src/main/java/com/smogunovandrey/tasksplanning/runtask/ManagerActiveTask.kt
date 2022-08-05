@@ -21,6 +21,7 @@ import com.smogunovandrey.tasksplanning.taskstemplate.RunTask
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTaskWithPoints
 import com.smogunovandrey.tasksplanning.utils.toRunPointDB
 import com.smogunovandrey.tasksplanning.utils.toRunTaskDB
+import com.yandex.mapkit.geometry.Point
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.*
@@ -39,25 +40,47 @@ class ManagerActiveTask private constructor(val context: Context) {
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
-    private val geofenceClient by lazy{
+    private val geofenceClient by lazy {
         LocationServices.getGeofencingClient(context)
     }
 
-    private fun getGeofencingRequest(): GeofencingRequest{
-//        val listGeofences = mutableListOf<Geofence>()
-//        listGeofences.add(Geofence.Builder()
-//            .build())
-        val runTasWithPoints = _activeRunTaskWithPointsFlow.value ?:  throw Exception("")
+    private var pendingIntentGeofence: PendingIntent? = null
 
-        return GeofencingRequest.Builder()
-            .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-            .addGeofence(Geofence.Builder()
-                .setRequestId(REQUEST_ID_GEOFENCE)
-                .build())
-            .build()
+
+    private suspend fun checkAndStartGeofence() {
+        val idPoint = _activeRunTaskWithPointsFlow.value?.curPoint()?.idPoint ?: return
+
+        val gpsPointDB = dao.gpsPointSuspend(idPoint) ?: return
+
+        pendingIntentGeofence?.let {
+            geofenceClient.removeGeofences(it)
+        }
+
+        pendingIntentGeofence = PendingIntent.getBroadcast(
+            context,
+            REQUEST_CODE_BROAD_CAST_GEOFENCE,
+            Intent(context, GeofenceBroadcastReceiver::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        geofenceClient.addGeofences(
+            GeofencingRequest.Builder()
+                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+                .addGeofence(
+                    Geofence.Builder()
+                        .setRequestId(REQUEST_ID_GEOFENCE)
+                        .setCircularRegion(
+                            gpsPointDB.latitude,
+                            gpsPointDB.longitude,
+                            GEOFENCE_RADIUS_IN_METERS
+                        )
+                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+                        .setExpirationDuration(GEOFENCE_EXPIRATION_IN_MILLISECONDS)
+                        .build()
+                )
+                .build(),
+            pendingIntentGeofence
+        )
     }
-
-
 
     fun notificationBuilder(commandId: Int) = NotificationCompat.Builder(context, CHANNEL_ID)
         .setCustomContentView(
@@ -111,9 +134,9 @@ class ManagerActiveTask private constructor(val context: Context) {
     }
 
     suspend fun getRunTask(idRunTask: Long): RunTaskWithPoints {
-        Log.d("TasksTemplateFragment", "getRunTask idRunTask=$idRunTask")
+        Log.d("ManagerActiveTask", "getRunTask idRunTask=$idRunTask")
         val runTaskWithPointsDB = dao.runTaskWithPointsByIdSuspend(idRunTask)
-        Log.d("TasksTemplateFragment", "getRunTask runTaskWithPointsDB=$runTaskWithPointsDB")
+        Log.d("ManagerActiveTask", "getRunTask runTaskWithPointsDB=$runTaskWithPointsDB")
 
         val runTaskDB = runTaskWithPointsDB.runTask
         val taskDB = dao.taskByIdSuspend(runTaskDB.idTask)
@@ -175,9 +198,7 @@ class ManagerActiveTask private constructor(val context: Context) {
             )
         }
         reloadActiviTask()
-
-        Log.d("RunTaskViewFragment", "in startTask 2 ${_activeRunTaskWithPointsFlow.value}")
-        Log.d("RunTaskViewFragment", "in startTask 3 ${activeRunTaskWithPointsFlow.value}")
+        checkAndStartGeofence()
 
         //2 Start Foreground Service
         ContextCompat.startForegroundService(context,
@@ -188,6 +209,7 @@ class ManagerActiveTask private constructor(val context: Context) {
     }
 
     suspend fun markPoint() { //or name as 'nextPoint'
+        Log.d("ManagerActiveTask", "makrPoint")
         //Update DB
         val runTaskWithPoints = _activeRunTaskWithPointsFlow.value
         runTaskWithPoints?.let {
@@ -218,6 +240,14 @@ class ManagerActiveTask private constructor(val context: Context) {
                             notificationBuilder(COMMAND_NEXT).build()
                         )
 
+                    pendingIntentGeofence?.let {
+                        geofenceClient.removeGeofences(pendingIntentGeofence)
+                        pendingIntentGeofence = null
+                    }
+
+                    //Check and start (if need) geofence
+                    checkAndStartGeofence()
+
                     break
                 }
                 curIdx++
@@ -229,24 +259,28 @@ class ManagerActiveTask private constructor(val context: Context) {
 
     suspend fun cancelTask() {
         val runTaskWithPoints = _activeRunTaskWithPointsFlow.value
-        Log.d("TasksTemplateFragment", "cancel task $runTaskWithPoints")
+        Log.d("ManagerActiveTask", "cancel task $runTaskWithPoints")
         //Delete from DB
         runTaskWithPoints?.let {
             for (point in it.points) {
                 val idRunTask = runTaskWithPoints.runTask.idRunTask
                 val delRunPointDB = point.toRunPointDB(idRunTask)
-                Log.d("TasksTemplateFragment", "delRunPointDB=$delRunPointDB")
+                Log.d("ManagerActiveTask", "delRunPointDB=$delRunPointDB")
                 val delId = dao.deleteRunPoint(delRunPointDB)
-                Log.d("TasksTemplateFragment", "delId=$delId")
+                Log.d("ManagerActiveTask", "delId=$delId")
             }
 
             val delRunTaskDB = runTaskWithPoints.runTask.toRunTaskDB()
-            Log.d("TasksTemplateFragment", "delRunTaskDB=$delRunTaskDB")
+            Log.d("ManagerActiveTask", "delRunTaskDB=$delRunTaskDB")
             dao.deleteRunTask(delRunTaskDB)
             //Stop service
             context.stopService(Intent(context, RunService::class.java))
 
             _activeRunTaskWithPointsFlow.value = null
+
+            pendingIntentGeofence?.let {notNullPendingIntent ->
+                geofenceClient.removeGeofences(notNullPendingIntent)
+            }
         }
     }
 
@@ -262,8 +296,10 @@ class ManagerActiveTask private constructor(val context: Context) {
         const val COMMAND_CANCEL = COMMAND_START + 2
 
         const val REQUEST_ID_GEOFENCE = "id key geofence"
+        const val REQUEST_CODE_BROAD_CAST_GEOFENCE = 1
 
-        const val GEOFENCE_RADIUS_IN_METERS = 10
+        const val GEOFENCE_RADIUS_IN_METERS = 10f
+        const val GEOFENCE_EXPIRATION_IN_MILLISECONDS = 3000L
 
         @Volatile
         private var instance: ManagerActiveTask? = null

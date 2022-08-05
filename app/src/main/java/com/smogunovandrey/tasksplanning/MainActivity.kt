@@ -36,21 +36,29 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var navController: NavController
 
-    fun checkAndSetPermissions(){
-        val locationPermissionRequest = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){permissions ->
-            when{
-                permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+    fun checkAndSetPermissions() {
+        val locationPermissionRequest =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+                when {
+                    permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
 
-                }
-                permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+                    }
+                    permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
 
-                } else -> {
+                    }
+                    else -> {
 
+                    }
                 }
             }
-        }
 
-        locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+        locationPermissionRequest.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            )
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

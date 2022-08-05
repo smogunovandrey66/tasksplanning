@@ -12,6 +12,8 @@ import com.google.android.gms.location.LocationServices
 class GeofenceBroadcastReceiver: BroadcastReceiver() {
     private val TAG = "GeofenceBroadcastReceiver"
     override fun onReceive(context: Context?, intent: Intent?) {
+        Log.d(TAG, "onReceive")
+
         val geoFencingEvent = GeofencingEvent.fromIntent(intent)
         if(geoFencingEvent.hasError()){
             Log.d(TAG, "error in GeofenceBroadcastReceiver=${GeofenceStatusCodes.getStatusCodeString(geoFencingEvent.errorCode)}")
@@ -21,6 +23,9 @@ class GeofenceBroadcastReceiver: BroadcastReceiver() {
         val geofenceTransaction = geoFencingEvent.geofenceTransition
         if(geofenceTransaction == Geofence.GEOFENCE_TRANSITION_ENTER){
             val triggeringFeofences = geoFencingEvent.triggeringGeofences
+            context?.let {
+                it.sendBroadcast(Intent(it, RunBroadcastReceiver::class.java))
+            }
         }
     }
 }
