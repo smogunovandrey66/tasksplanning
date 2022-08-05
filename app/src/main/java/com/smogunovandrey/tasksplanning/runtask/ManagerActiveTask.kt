@@ -48,9 +48,12 @@ class ManagerActiveTask private constructor(val context: Context) {
 
 
     private suspend fun checkAndStartGeofence() {
+        Log.d("ManagerActiveTask", "checkAndStartGeofence 1")
         val idPoint = _activeRunTaskWithPointsFlow.value?.curPoint()?.idPoint ?: return
+        Log.d("ManagerActiveTask", "checkAndStartGeofence idPoint=$idPoint")
 
         val gpsPointDB = dao.gpsPointSuspend(idPoint) ?: return
+        Log.d("ManagerActiveTask", "checkAndStartGeofence gpsPointDB=$gpsPointDB")
 
         pendingIntentGeofence?.let {
             geofenceClient.removeGeofences(it)
