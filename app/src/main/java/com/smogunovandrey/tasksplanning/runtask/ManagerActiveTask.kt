@@ -4,13 +4,13 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import android.os.Looper
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.google.android.gms.location.Geofence
-import com.google.android.gms.location.GeofencingRequest
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
 import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.db.AppDatabase
 import com.smogunovandrey.tasksplanning.db.RunPointDB
@@ -25,6 +25,7 @@ import com.yandex.mapkit.geometry.Point
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class ManagerActiveTask private constructor(val context: Context) {
     private val dao by lazy {
@@ -44,6 +45,10 @@ class ManagerActiveTask private constructor(val context: Context) {
         LocationServices.getGeofencingClient(context)
     }
 
+    private val usedLocationClient by lazy {
+        LocationServices.getFusedLocationProviderClient(context)
+    }
+
     private var pendingIntentGeofence: PendingIntent? = null
 
 
@@ -59,16 +64,28 @@ class ManagerActiveTask private constructor(val context: Context) {
             geofenceClient.removeGeofences(it)
         }
 
+
         pendingIntentGeofence = PendingIntent.getBroadcast(
             context,
             REQUEST_CODE_BROAD_CAST_GEOFENCE,
-            Intent(context, GeofenceBroadcastReceiver::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            Intent(context, GeofenceBroadcastReceiver::class.java)
+                .apply {
+                       action = "ManagerActiveTask.treasureHunt.action.ACTION_GEOFENCE_EVENT"
+                },
+            PendingIntent.FLAG_UPDATE_CURRENT or
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                        PendingIntent.FLAG_MUTABLE
+                    else
+                        0
+        )
+        Log.d(
+            "ManagerActiveTask",
+            "checkAndStartGeofence pendingIntentGeofence=$pendingIntentGeofence"
         )
         geofenceClient.addGeofences(
             GeofencingRequest.Builder()
                 .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-                .addGeofence(
+                .addGeofences(listOf(
                     Geofence.Builder()
                         .setRequestId(REQUEST_ID_GEOFENCE)
                         .setCircularRegion(
@@ -80,9 +97,17 @@ class ManagerActiveTask private constructor(val context: Context) {
                         .setExpirationDuration(GEOFENCE_EXPIRATION_IN_MILLISECONDS)
                         .build()
                 )
+                )
                 .build(),
             pendingIntentGeofence
-        )
+        ).run {
+            addOnFailureListener { exception ->
+                Log.d("ManagerActiveTask", "addGeofences exception=$exception")
+            }
+            addOnSuccessListener {
+                Log.d("ManagerActiveTask", "addGeofences succes")
+            }
+        }
     }
 
     fun notificationBuilder(commandId: Int) = NotificationCompat.Builder(context, CHANNEL_ID)
@@ -209,6 +234,11 @@ class ManagerActiveTask private constructor(val context: Context) {
                 putExtra(COMMAND_ID, COMMAND_START)
             }
         )
+
+        if(stateUpdateLocation)
+            usedLocationClient.removeLocationUpdates(locationCallBack)
+
+        startLocationCheck()
     }
 
     suspend fun markPoint() { //or name as 'nextPoint'
@@ -232,6 +262,8 @@ class ManagerActiveTask private constructor(val context: Context) {
 
                         //Stop service
                         context.stopService(Intent(context, RunService::class.java))
+
+                        stopLocationCheck()
                     }
 
                     _activeRunTaskWithPointsFlow.emit(getRunTask(idRunTask))
@@ -281,10 +313,42 @@ class ManagerActiveTask private constructor(val context: Context) {
 
             _activeRunTaskWithPointsFlow.value = null
 
-            pendingIntentGeofence?.let {notNullPendingIntent ->
+            pendingIntentGeofence?.let { notNullPendingIntent ->
                 geofenceClient.removeGeofences(notNullPendingIntent)
             }
         }
+
+        stopLocationCheck()
+    }
+
+    private val locationCallBack = object : LocationCallback(){
+        override fun onLocationResult(locationResult: LocationResult?) {
+            Log.d("ManagerActiveTask", "locationResult=$locationResult")
+        }
+
+        override fun onLocationAvailability(locationAvailability: LocationAvailability?) {
+            Log.d("ManagerActiveTask", "locationAvailability=$locationAvailability")
+        }
+    }
+
+    private val locationRequest = LocationRequest()
+        .setInterval(3000)
+        .setFastestInterval(1500)
+        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+
+    private var stateUpdateLocation = false
+
+    private fun startLocationCheck(){
+        if(stateUpdateLocation)
+            return
+
+        usedLocationClient.requestLocationUpdates(locationRequest, locationCallBack, Looper.getMainLooper())
+        stateUpdateLocation = true
+    }
+
+    private fun stopLocationCheck(){
+        usedLocationClient.removeLocationUpdates(locationCallBack)
+        stateUpdateLocation = false
     }
 
     companion object {
@@ -301,8 +365,8 @@ class ManagerActiveTask private constructor(val context: Context) {
         const val REQUEST_ID_GEOFENCE = "id key geofence"
         const val REQUEST_CODE_BROAD_CAST_GEOFENCE = 1
 
-        const val GEOFENCE_RADIUS_IN_METERS = 10f
-        const val GEOFENCE_EXPIRATION_IN_MILLISECONDS = 3000L
+        const val GEOFENCE_RADIUS_IN_METERS = 100f
+        val GEOFENCE_EXPIRATION_IN_MILLISECONDS = TimeUnit.HOURS.toMillis(1L)
 
         @Volatile
         private var instance: ManagerActiveTask? = null
@@ -312,7 +376,7 @@ class ManagerActiveTask private constructor(val context: Context) {
          */
         fun getInstance(context: Context): ManagerActiveTask = instance ?: synchronized(this) {
             val res = instance ?: ManagerActiveTask(context)
-            Log.d("RunTaskViewFragment", "getInstance $res")
+            Log.d("ManagerActiveTask", "getInstance $res")
             instance = res
             res
         }

@@ -29,7 +29,7 @@
         </activity>
         <service android:name=".runtask.RunService"/>
         <receiver android:name=".runtask.RunBroadcastReceiver" android:exported="false"/>
-        <receiver android:name=".runtask.GeofenceBroadcastReceiver" android:exported="false"/>
+        <receiver android:name=".runtask.GeofenceBroadcastReceiver"/>
     </application>
 
 </manifest>
