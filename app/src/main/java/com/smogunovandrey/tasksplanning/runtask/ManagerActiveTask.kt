@@ -12,16 +12,12 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.*
 import com.smogunovandrey.tasksplanning.R
-import com.smogunovandrey.tasksplanning.db.AppDatabase
-import com.smogunovandrey.tasksplanning.db.RunPointDB
-import com.smogunovandrey.tasksplanning.db.RunTaskDB
-import com.smogunovandrey.tasksplanning.db.TaskWithPointDB
+import com.smogunovandrey.tasksplanning.db.*
 import com.smogunovandrey.tasksplanning.taskstemplate.RunPoint
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTask
 import com.smogunovandrey.tasksplanning.taskstemplate.RunTaskWithPoints
 import com.smogunovandrey.tasksplanning.utils.toRunPointDB
 import com.smogunovandrey.tasksplanning.utils.toRunTaskDB
-import com.yandex.mapkit.geometry.Point
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.*
@@ -51,11 +47,19 @@ class ManagerActiveTask private constructor(val context: Context) {
 
     private var pendingIntentGeofence: PendingIntent? = null
 
+    private suspend fun curGspPoint(): PointGpsDB? {
+        val idPointGpsDB = _activeRunTaskWithPointsFlow.value?.curPoint()?.idPoint ?: return null
+        return dao.gpsPointSuspend(idPointGpsDB)
+    }
+
 
     private suspend fun checkAndStartGeofence() {
-        Log.d("ManagerActiveTask", "checkAndStartGeofence 1")
-        val idPoint = _activeRunTaskWithPointsFlow.value?.curPoint()?.idPoint ?: return
-        Log.d("ManagerActiveTask", "checkAndStartGeofence idPoint=$idPoint")
+        curGspPoint()?.let {
+            //Logic start gps update(if not add) and logic add geofence
+
+        } ?: run {
+            //Logic remove gps point(if add before)
+        }
 
         val gpsPointDB = dao.gpsPointSuspend(idPoint) ?: return
         Log.d("ManagerActiveTask", "checkAndStartGeofence gpsPointDB=$gpsPointDB")
@@ -70,7 +74,7 @@ class ManagerActiveTask private constructor(val context: Context) {
             REQUEST_CODE_BROAD_CAST_GEOFENCE,
             Intent(context, GeofenceBroadcastReceiver::class.java)
                 .apply {
-                       action = "ManagerActiveTask.treasureHunt.action.ACTION_GEOFENCE_EVENT"
+                    action = "ManagerActiveTask.treasureHunt.action.ACTION_GEOFENCE_EVENT"
                 },
             PendingIntent.FLAG_UPDATE_CURRENT or
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
@@ -85,18 +89,19 @@ class ManagerActiveTask private constructor(val context: Context) {
         geofenceClient.addGeofences(
             GeofencingRequest.Builder()
                 .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-                .addGeofences(listOf(
-                    Geofence.Builder()
-                        .setRequestId(REQUEST_ID_GEOFENCE)
-                        .setCircularRegion(
-                            gpsPointDB.latitude,
-                            gpsPointDB.longitude,
-                            GEOFENCE_RADIUS_IN_METERS
-                        )
-                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
-                        .setExpirationDuration(GEOFENCE_EXPIRATION_IN_MILLISECONDS)
-                        .build()
-                )
+                .addGeofences(
+                    listOf(
+                        Geofence.Builder()
+                            .setRequestId(REQUEST_ID_GEOFENCE)
+                            .setCircularRegion(
+                                gpsPointDB.latitude,
+                                gpsPointDB.longitude,
+                                GEOFENCE_RADIUS_IN_METERS
+                            )
+                            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+                            .setExpirationDuration(GEOFENCE_EXPIRATION_IN_MILLISECONDS)
+                            .build()
+                    )
                 )
                 .build(),
             pendingIntentGeofence
@@ -227,6 +232,7 @@ class ManagerActiveTask private constructor(val context: Context) {
         }
         reloadActiviTask()
         checkAndStartGeofence()
+        checkAndStartLocationCheck()
 
         //2 Start Foreground Service
         ContextCompat.startForegroundService(context,
@@ -234,11 +240,6 @@ class ManagerActiveTask private constructor(val context: Context) {
                 putExtra(COMMAND_ID, COMMAND_START)
             }
         )
-
-        if(stateUpdateLocation)
-            usedLocationClient.removeLocationUpdates(locationCallBack)
-
-        startLocationCheck()
     }
 
     suspend fun markPoint() { //or name as 'nextPoint'
@@ -289,6 +290,7 @@ class ManagerActiveTask private constructor(val context: Context) {
             }
 
             reloadActiviTask()
+            checkAndStartLocationCheck()
         }
     }
 
@@ -321,7 +323,7 @@ class ManagerActiveTask private constructor(val context: Context) {
         stopLocationCheck()
     }
 
-    private val locationCallBack = object : LocationCallback(){
+    private val locationCallBack = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult?) {
             Log.d("ManagerActiveTask", "locationResult=$locationResult")
         }
@@ -338,15 +340,30 @@ class ManagerActiveTask private constructor(val context: Context) {
 
     private var stateUpdateLocation = false
 
-    private fun startLocationCheck(){
-        if(stateUpdateLocation)
-            return
-
-        usedLocationClient.requestLocationUpdates(locationRequest, locationCallBack, Looper.getMainLooper())
+    private fun startLocationCheck() {
+        usedLocationClient.requestLocationUpdates(
+            locationRequest,
+            locationCallBack,
+            Looper.getMainLooper()
+        )
         stateUpdateLocation = true
     }
 
-    private fun stopLocationCheck(){
+    private suspend fun checkAndStartLocationCheck() {
+        val idPointGps = _activeRunTaskWithPointsFlow.value?.curPoint()?.idPoint
+
+        val gpsPointDB = if (idPointGps != null) dao.gpsPointSuspend(idPointGps) else null
+
+        if (gpsPointDB != null) {
+            if (!stateUpdateLocation)
+                startLocationCheck()
+        } else {
+            if (stateUpdateLocation)
+                stopLocationCheck()
+        }
+    }
+
+    private fun stopLocationCheck() {
         usedLocationClient.removeLocationUpdates(locationCallBack)
         stateUpdateLocation = false
     }
