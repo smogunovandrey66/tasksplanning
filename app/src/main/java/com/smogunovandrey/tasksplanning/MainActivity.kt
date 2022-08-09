@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -14,16 +15,18 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.google.android.material.snackbar.Snackbar
 import com.smogunovandrey.tasksplanning.databinding.ActivityMainBinding
 import com.smogunovandrey.tasksplanning.db.*
 import com.smogunovandrey.tasksplanning.runtask.ManagerActiveTask
 import com.smogunovandrey.tasksplanning.runtask.RunService
+import com.smogunovandrey.tasksplanning.utils.showSnackbar
 import com.yandex.mapkit.MapKitFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
 
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
@@ -36,18 +39,32 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var navController: NavController
 
-    fun checkAndSetPermissions() {
+    /**
+     * Other way check and set permissions
+     */
+    private fun checkAndSetPermissions() {
         val locationPermissionRequest =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+                Log.d("MainActivity", "checkAndSetPermissions permissions=$permissions")
                 when {
                     permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+                        Log.d("MainActivity", "getOrDefault 1 = false")
 
                     }
                     permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-
+                        Log.d("MainActivity", "getOrDefault 2 = false")
                     }
                     else -> {
-
+                        Log.d("MainActivity", "getOrDefault else")
+//                        ActivityCompat.requestPermissions(
+//                            this,
+//                            arrayOf(
+//                                Manifest.permission.ACCESS_FINE_LOCATION,
+//                                Manifest.permission.ACCESS_COARSE_LOCATION,
+//                                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+//                            ),
+//                            1
+//                        )
                     }
                 }
             }
@@ -55,11 +72,33 @@ class MainActivity : AppCompatActivity() {
         locationPermissionRequest.launch(
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                Manifest.permission.ACCESS_COARSE_LOCATION
             )
         )
     }
+
+    private fun requestPermissions(){
+        if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION), 101)
+        } else {
+            binding.root.showSnackbar(R.string.need_change_permission, Snackbar.LENGTH_LONG, R.string.ok){
+
+            }
+
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION), 101)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,7 +106,14 @@ class MainActivity : AppCompatActivity() {
         MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
         MapKitFactory.initialize(this)
 
-        checkAndSetPermissions()
+//        checkAndSetPermissions()
+//        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 101)
+
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION), 1)
+
+//        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
+//        101)
 
         setContentView(R.layout.activity_main)
 

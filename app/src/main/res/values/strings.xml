@@ -33,4 +33,6 @@
     <string name="maximum">Maximum</string>
     <string name="trigger_type">Trigger type</string>
     <string name="coordinates">coordinates:</string>
+    <string name="need_change_permission">Need change permissions</string>
+    <string name="ok">Ok</string>
 </resources>
