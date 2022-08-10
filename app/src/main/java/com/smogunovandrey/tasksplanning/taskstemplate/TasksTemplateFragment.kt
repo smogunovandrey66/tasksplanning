@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -80,21 +81,47 @@ TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
         return binding.root
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        Log.d(
+            "TasksTemplateFragment",
+            "onRequestPermissionsResult permissions=${permissions.toList()}," +
+                    "grantResults=${grantResults.toList()}"
+        )
+    }
+
+    private fun infoPermission(permission: String) {
+        val permissionInt = ActivityCompat.checkSelfPermission(requireActivity(), permission)
+        Log.d("TasksTemplateFragment", "$permission=$permissionInt")
+    }
+
     override fun onRunTaskItemClick(idTask: Long) {
-        ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION), 1)
+        infoPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        infoPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+        infoPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+        Log.d("TasksTemplateFragment", "onRunTaskItemClick")
+        ActivityCompat.requestPermissions(
+            requireActivity(), arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+//                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            ), 1
+        )
 
         return
         lifecycleScope.launch {
             val activeRunTask = managerActiveTask.activeRunTaskWithPointsFlow.value
-            if(activeRunTask == null) {
+            if (activeRunTask == null) {
                 withContext(Dispatchers.Default) {
                     managerActiveTask.startTask(idTask)
                 }
                 findNavController().navigate(TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskActiveFragment())
             } else {
                 //id mus equals
-                if(activeRunTask.runTask.idTask == idTask){
+                if (activeRunTask.runTask.idTask == idTask) {
                     findNavController().navigate(TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskActiveFragment())
                 }
             }
