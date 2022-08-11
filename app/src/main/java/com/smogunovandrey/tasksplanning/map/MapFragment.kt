@@ -1,5 +1,6 @@
 package com.smogunovandrey.tasksplanning.map
 
+import android.graphics.drawable.Icon
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -87,6 +88,7 @@ class MapFragment : Fragment(), InputListener {
 //        }
 
         map.addInputListener(this)
+
         return binding.root
     }
 

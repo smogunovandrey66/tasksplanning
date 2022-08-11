@@ -28,9 +28,9 @@ import com.smogunovandrey.tasksplanning.taskstemplate.TaskTemplateViewModel
 import com.smogunovandrey.tasksplanning.taskstemplate.Point
 import com.smogunovandrey.tasksplanning.taskstemplate.Task
 
-class PointEditFragment: Fragment() {
+class PointEditFragment : Fragment() {
     private val model: TaskTemplateViewModel by activityViewModels()
-    private val binding by lazy{
+    private val binding by lazy {
         FragmentPointEditBinding.inflate(layoutInflater)
     }
 
@@ -48,11 +48,14 @@ class PointEditFragment: Fragment() {
         .setInterval(2000L)
         .setFastestInterval(1000L)
         .setPriority(com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY)
-    private val locationCallback = object : LocationCallback(){
+    private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult?) {
             Log.d("PointEditFragment", "locationResult=$locationResult")
-            if(locationResult != null && locationResult.locations.size > 0){
-                editedPoint.gpsPoint = com.yandex.mapkit.geometry.Point(locationResult.lastLocation.latitude, locationResult.lastLocation.longitude)
+            if (locationResult != null && locationResult.locations.size > 0) {
+                editedPoint.gpsPoint = com.yandex.mapkit.geometry.Point(
+                    locationResult.lastLocation.latitude,
+                    locationResult.lastLocation.longitude
+                )
                 stopLocationUpdate()
             }
             updateGpsPoint()
@@ -60,12 +63,16 @@ class PointEditFragment: Fragment() {
     }
 
     private var runningLocationUpdate = false
-    private fun startLocationUpdate(){
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+    private fun startLocationUpdate() {
+        fusedLocationProviderClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
         runningLocationUpdate = true
     }
 
-    private fun stopLocationUpdate(){
+    private fun stopLocationUpdate() {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
         runningLocationUpdate = false
     }
@@ -84,7 +91,8 @@ class PointEditFragment: Fragment() {
         val listTrigger = TriggerType.values().map {
             it.name
         }
-        binding.spnTriggerType.adapter = ArrayAdapter(requireActivity(), android.R.layout.simple_spinner_item, listTrigger)
+        binding.spnTriggerType.adapter =
+            ArrayAdapter(requireActivity(), android.R.layout.simple_spinner_item, listTrigger)
 
         binding.edtName.setText(editedPoint.name)
         binding.spnTriggerType.setSelection(listTrigger.indexOf(editedPoint.triggerType.name))
@@ -98,69 +106,66 @@ class PointEditFragment: Fragment() {
         binding.edtName.addTextChangedListener {
             editedPoint.name = it.toString()
         }
-        binding.spnTriggerType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                val posSpinner = binding.spnTriggerType.selectedItemPosition
-                val posModel = listTrigger.indexOf(editedPoint.triggerType.name)
-                if(posSpinner == posModel)
-                    return
+        binding.spnTriggerType.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val posSpinner = binding.spnTriggerType.selectedItemPosition
+                    val posModel = listTrigger.indexOf(editedPoint.triggerType.name)
+                    if (posSpinner == posModel)
+                        return
 
-                Log.d("PointEditFragment", "onItemSelectedListener posSpinner=$posSpinner,posModel=$posModel")
+                    Log.d(
+                        "PointEditFragment",
+                        "onItemSelectedListener posSpinner=$posSpinner,posModel=$posModel"
+                    )
 
-                editedPoint.triggerType = TriggerType.values()[position]
-                Log.d("PointEditFragment", "onItemSelectedListener triggerType=${editedPoint.triggerType}")
-                if(editedPoint.triggerType == TriggerType.GPS_IN){
-                    if(requireActivity().checkSelfPermission(ACCESS_FINE_LOCATION) == PERMISSION_GRANTED){
-                        val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-                        val locationRequest = com.google.android.gms.location.LocationRequest()
-                            .setInterval(2000)
-                            .setFastestInterval(1000)
-                            .setPriority(com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY)
-                        val locationCallback = object: LocationCallback(){
-                            override fun onLocationResult(locationResult: LocationResult?) {
-
-                            }
+                    editedPoint.triggerType = TriggerType.values()[position]
+                    Log.d(
+                        "PointEditFragment",
+                        "onItemSelectedListener triggerType=${editedPoint.triggerType}"
+                    )
+                    if (editedPoint.triggerType == TriggerType.GPS_IN) {
+                        if (requireActivity().checkSelfPermission(ACCESS_FINE_LOCATION) == PERMISSION_GRANTED) {
+                            startLocationUpdate()
                         }
-                        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+//                    val fUsedLocationClient =  LocationServices.getFusedLocationProviderClient(requireActivity())
+//                    fUsedLocationClient.lastLocation.addOnSuccessListener {location: Location? ->
+//                        Log.d("PointEditFragment", "location=${location}")
+//                        location?.let {
+//                            val pointGps: com.yandex.mapkit.geometry.Point = com.yandex.mapkit.geometry.Point(it.latitude, it.longitude)
+//                            editedPoint.gpsPoint = pointGps
+//                            Log.d("PointEditFragment", "pointGps=$pointGps")
+//                        }
+//                        updateGpsPoint()
+//                    }.addOnFailureListener {exception ->
+//                        Log.d("PointEditFragment", "exception=$exception")
+//                        updateGpsPoint()
+//                    }
+                    } else {
+                        editedPoint.gpsPoint = null
+                        if(runningLocationUpdate)
+                            stopLocationUpdate()
                     }
-
-
-                    val fUsedLocationClient =  LocationServices.getFusedLocationProviderClient(requireActivity())
-                    fUsedLocationClient.lastLocation.addOnSuccessListener {location: Location? ->
-                        Log.d("PointEditFragment", "location=${location}")
-                        location?.let {
-                            val pointGps: com.yandex.mapkit.geometry.Point = com.yandex.mapkit.geometry.Point(it.latitude, it.longitude)
-                            editedPoint.gpsPoint = pointGps
-                            Log.d("PointEditFragment", "pointGps=$pointGps")
-                        }
-                        updateGpsPoint()
-                    }.addOnFailureListener {exception ->
-                        Log.d("PointEditFragment", "exception=$exception")
-                        updateGpsPoint()
-                    }
-                } else {
-                    editedPoint.gpsPoint = null
                     updateGpsPoint()
                 }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                }
+
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-
-            }
-
-        }
-
-        if(model.flagEditPoint)
+        if (model.flagEditPoint)
             binding.btnAddPoint.setText(com.smogunovandrey.tasksplanning.R.string.edit)
 
         binding.btnAddPoint.setOnClickListener {
-            if(canSave()){
-                if(model.flagEditPoint){
+            if (canSave()) {
+                if (model.flagEditPoint) {
                     model.selectedPoint.copy(editedPoint)
                     model.posPointUpdate = editedPoint.num.toInt() - 1
                 } else {
@@ -178,21 +183,30 @@ class PointEditFragment: Fragment() {
         return binding.root
     }
 
-    private fun canSave(): Boolean{
-        if(model.editedPoint.name == ""){
-            Snackbar.make(binding.btnAddPoint, com.smogunovandrey.tasksplanning.R.string.empty_name_point, Snackbar.LENGTH_SHORT).show()
+    private fun canSave(): Boolean {
+        if (model.editedPoint.name == "") {
+            Snackbar.make(
+                binding.btnAddPoint,
+                com.smogunovandrey.tasksplanning.R.string.empty_name_point,
+                Snackbar.LENGTH_SHORT
+            ).show()
             return false
         }
         return true
     }
 
-    private fun updateGpsPoint(){
+    private fun updateGpsPoint() {
         Log.d("PointEditFragment", "updateGpsPoint point.gpsPoint=${editedPoint.gpsPoint}")
-        if(editedPoint.gpsPoint == null){
-            binding.txtLocationInfo.visibility = View.GONE
+        if (editedPoint.gpsPoint == null) {
+            if (editedPoint.triggerType == TriggerType.GPS_IN) {
+                binding.txtLocationInfo.visibility = View.VISIBLE
+                binding.txtLocationInfo.text = "Can't find gps location"
+            } else
+                binding.txtLocationInfo.visibility = View.GONE
         } else {
             binding.txtLocationInfo.visibility = View.VISIBLE
-            binding.txtLocationInfo.text = "${editedPoint.gpsPoint!!.latitude},${editedPoint.gpsPoint!!.longitude}"
+            binding.txtLocationInfo.text =
+                "${editedPoint.gpsPoint!!.latitude},${editedPoint.gpsPoint!!.longitude}"
         }
     }
 
