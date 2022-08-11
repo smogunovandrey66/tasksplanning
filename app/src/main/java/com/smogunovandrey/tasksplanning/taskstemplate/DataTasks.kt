@@ -59,7 +59,8 @@ data class Point(
 
 data class Task(
     var id: Long = 0,
-    var name: String = ""
+    var name: String = "",
+    var containsGps: Boolean = false
 ) {
     fun clear() {
         id = 0

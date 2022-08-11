@@ -1,12 +1,13 @@
 package com.smogunovandrey.tasksplanning.taskstemplate
 
 import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -14,13 +15,16 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.smogunovandrey.tasksplanning.R
+import com.smogunovandrey.tasksplanning.ACCESS_BACKGROUND_LOCATION
+import com.smogunovandrey.tasksplanning.ACCESS_COARSE_LOCATION
+import com.smogunovandrey.tasksplanning.ACCESS_FINE_LOCATION
+import com.smogunovandrey.tasksplanning.MainActivity
 import com.smogunovandrey.tasksplanning.databinding.FragmentTasksTemplateBinding
 import com.smogunovandrey.tasksplanning.runtask.ManagerActiveTask
 import com.smogunovandrey.tasksplanning.runtask.RunTaskViewModel
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
-import kotlin.math.log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class
 TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
@@ -89,42 +93,48 @@ TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
         Log.d(
             "TasksTemplateFragment",
             "onRequestPermissionsResult permissions=${permissions.toList()}," +
-                    "grantResults=${grantResults.toList()}"
+                    "grantResults=${grantResults.toList()},requestCode=$requestCode"
         )
     }
 
     private fun infoPermission(permission: String) {
         val permissionInt = ActivityCompat.checkSelfPermission(requireActivity(), permission)
-        Log.d("TasksTemplateFragment", "$permission=$permissionInt")
+        Log.d("registerForActivityResult", "$permission=$permissionInt")
     }
 
-    override fun onRunTaskItemClick(idTask: Long) {
-        infoPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-        infoPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-        infoPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-        Log.d("TasksTemplateFragment", "onRunTaskItemClick")
-        ActivityCompat.requestPermissions(
-            requireActivity(), arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-//                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION
-            ), 1
-        )
-
-        return
+    private fun startTask(task: Task){
         lifecycleScope.launch {
             val activeRunTask = managerActiveTask.activeRunTaskWithPointsFlow.value
             if (activeRunTask == null) {
                 withContext(Dispatchers.Default) {
-                    managerActiveTask.startTask(idTask)
+                    managerActiveTask.startTask(task.id)
                 }
                 findNavController().navigate(TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskActiveFragment())
             } else {
                 //id mus equals
-                if (activeRunTask.runTask.idTask == idTask) {
+                if (activeRunTask.runTask.idTask == task.id) {
                     findNavController().navigate(TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskActiveFragment())
                 }
             }
         }
+    }
+    override fun onRunTaskItemClick(task: Task) {
+        infoPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        infoPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+        infoPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+        Log.d("TasksTemplateFragment", "onRunTaskItemClick, task=$task")
+
+        val activityResultLauncher = (requireActivity() as MainActivity).activityResultLauncher
+        activityResultLauncher.launch(arrayOf(
+//            ACCESS_BACKGROUND_LOCATION,
+            ACCESS_COARSE_LOCATION,
+            ACCESS_FINE_LOCATION
+        ))
+        if(requireActivity().checkSelfPermission(ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            //Check background
+        }
+
+        return
+
     }
 }

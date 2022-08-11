@@ -147,6 +147,9 @@ interface MainDao{
     @Query("select * from points where id_task = :idTask")
     fun pointsByTaskId(idTask: Long): Flow<List<PointDB>>
 
+    @Query("select * from points where id_task = :idTask")
+    suspend fun pointsByTaskIdSuspend(idTask: Long): List<PointDB>
+
     @Query("select * from points where id = :idPoint")
     fun pointByIdSuspend(idPoint: Long): PointDB
 

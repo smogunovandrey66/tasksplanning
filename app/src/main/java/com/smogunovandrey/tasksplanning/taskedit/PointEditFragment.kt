@@ -1,7 +1,10 @@
 package com.smogunovandrey.tasksplanning.taskedit
 
+import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationRequest
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,8 +15,12 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
+import com.smogunovandrey.tasksplanning.ACCESS_FINE_LOCATION
+import com.smogunovandrey.tasksplanning.PERMISSION_GRANTED
 import com.smogunovandrey.tasksplanning.R
 import com.smogunovandrey.tasksplanning.databinding.FragmentPointEditBinding
 import com.smogunovandrey.tasksplanning.db.TriggerType
@@ -30,6 +37,40 @@ class PointEditFragment: Fragment() {
     private val editedPoint by lazy {
         model.editedPoint
     }
+
+    //***************GPS****************** begin
+
+    private val fusedLocationProviderClient by lazy {
+        LocationServices.getFusedLocationProviderClient(requireActivity())
+    }
+
+    private val locationRequest = com.google.android.gms.location.LocationRequest()
+        .setInterval(2000L)
+        .setFastestInterval(1000L)
+        .setPriority(com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY)
+    private val locationCallback = object : LocationCallback(){
+        override fun onLocationResult(locationResult: LocationResult?) {
+            Log.d("PointEditFragment", "locationResult=$locationResult")
+            if(locationResult != null && locationResult.locations.size > 0){
+                editedPoint.gpsPoint = com.yandex.mapkit.geometry.Point(locationResult.lastLocation.latitude, locationResult.lastLocation.longitude)
+                stopLocationUpdate()
+            }
+            updateGpsPoint()
+        }
+    }
+
+    private var runningLocationUpdate = false
+    private fun startLocationUpdate(){
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+        runningLocationUpdate = true
+    }
+
+    private fun stopLocationUpdate(){
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+        runningLocationUpdate = false
+    }
+
+    //***************GPS****************** end
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -74,6 +115,21 @@ class PointEditFragment: Fragment() {
                 editedPoint.triggerType = TriggerType.values()[position]
                 Log.d("PointEditFragment", "onItemSelectedListener triggerType=${editedPoint.triggerType}")
                 if(editedPoint.triggerType == TriggerType.GPS_IN){
+                    if(requireActivity().checkSelfPermission(ACCESS_FINE_LOCATION) == PERMISSION_GRANTED){
+                        val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+                        val locationRequest = com.google.android.gms.location.LocationRequest()
+                            .setInterval(2000)
+                            .setFastestInterval(1000)
+                            .setPriority(com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY)
+                        val locationCallback = object: LocationCallback(){
+                            override fun onLocationResult(locationResult: LocationResult?) {
+
+                            }
+                        }
+                        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+                    }
+
+
                     val fUsedLocationClient =  LocationServices.getFusedLocationProviderClient(requireActivity())
                     fUsedLocationClient.lastLocation.addOnSuccessListener {location: Location? ->
                         Log.d("PointEditFragment", "location=${location}")

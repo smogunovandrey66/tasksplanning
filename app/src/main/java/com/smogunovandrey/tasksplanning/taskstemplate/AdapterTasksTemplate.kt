@@ -22,7 +22,7 @@ import com.smogunovandrey.tasksplanning.runtask.RunService
 import com.smogunovandrey.tasksplanning.runtask.RunTaskNotification
 
 interface OnRunTaskItemClick {
-    fun onRunTaskItemClick(idTask: Long)
+    fun onRunTaskItemClick(task: Task)
 }
 
 class AdapterTasksTemplate :
@@ -65,7 +65,7 @@ class AdapterTasksTemplate :
                 task?.let {
                     val idTask = task.id
                     onRunTaskItemClick?.let {
-                        it.onRunTaskItemClick(idTask)
+                        it.onRunTaskItemClick(task)
                     }
                 }
             }

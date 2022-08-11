@@ -30,7 +30,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsResultCallback {
+val ACCESS_BACKGROUND_LOCATION = Manifest.permission.ACCESS_BACKGROUND_LOCATION
+val ACCESS_COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION
+val ACCESS_FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION
+val PERMISSION_DENIED = PackageManager.PERMISSION_DENIED
+val PERMISSION_GRANTED = PackageManager.PERMISSION_GRANTED
+class MainActivity : AppCompatActivity() {
 
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
@@ -111,6 +116,10 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         }
     }
 
+    val activityResultLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){permissions ->
+        Log.d("registerForActivityResult", "permissions=$permissions")
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -165,5 +174,13 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp() || super.onSupportNavigateUp()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }

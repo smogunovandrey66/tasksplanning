@@ -11,7 +11,12 @@ import kotlinx.coroutines.flow.map
 class TaskTemplateRepository(private val mainDao: MainDao) {
     val tasksTemplate = mainDao.allTasksFlow().map {
         it.map{taskDB ->
-            Task(taskDB.idTask, taskDB.name)
+            val res = Task(taskDB.idTask, taskDB.name)
+            val pointsDB = mainDao.pointsByTaskIdSuspend(taskDB.idTask)
+            res.containsGps = pointsDB.find {pointDB ->
+                mainDao.gpsPointSuspend(pointDB.idPoint) != null
+            } != null
+            res
         }
     }
 
