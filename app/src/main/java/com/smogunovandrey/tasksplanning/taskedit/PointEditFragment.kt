@@ -99,7 +99,9 @@ class PointEditFragment : Fragment() {
         binding.txtNumber.text = editedPoint.num.toString()
         updateGpsPoint()
         binding.txtLocationInfo.setOnClickListener {
-            findNavController().navigate(R.id.mapFragment)
+            editedPoint.gpsPoint?.let {
+                findNavController().navigate(R.id.mapFragment)
+            }
         }
 
 
@@ -116,6 +118,7 @@ class PointEditFragment : Fragment() {
                 ) {
                     val posSpinner = binding.spnTriggerType.selectedItemPosition
                     val posModel = listTrigger.indexOf(editedPoint.triggerType.name)
+                    //Avoid double set
                     if (posSpinner == posModel)
                         return
 
