@@ -26,6 +26,9 @@ class TaskTemplateViewModel(application: Application) : AndroidViewModel(applica
     //Edited point
     var editedPoint = Point()
 
+    //Edited gpsPoint
+    var editedGpsPoint = com.yandex.mapkit.geometry.Point()
+
     /**
      * true - editing on click
      * false - can't editing on click, can delete point by swap left and right,

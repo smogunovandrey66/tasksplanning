@@ -186,6 +186,12 @@ class PointEditFragment : Fragment() {
         return binding.root
     }
 
+    override fun onPause() {
+        super.onPause()
+        if(runningLocationUpdate)
+            stopLocationUpdate()
+    }
+
     private fun canSave(): Boolean {
         if (model.editedPoint.name == "") {
             Snackbar.make(
