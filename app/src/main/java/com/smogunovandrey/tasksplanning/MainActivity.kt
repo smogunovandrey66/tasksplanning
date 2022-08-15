@@ -1,11 +1,16 @@
 package com.smogunovandrey.tasksplanning
 
 import android.Manifest
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
+import android.provider.Settings
 import android.util.Log
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -87,42 +92,51 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestPermissions() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
-        ) {
-            ActivityCompat.requestPermissions(
-                this, arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                ), 101
-            )
-        } else {
-            binding.root.showSnackbar(
-                R.string.need_change_permission,
-                Snackbar.LENGTH_LONG,
-                R.string.ok
-            ) {
-
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){permissions->
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q){
+                if(!permissions.getOrDefault(ACCESS_FINE_LOCATION, false)){
+                    showDialogWithSettings()
+                }
+            }
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+                if(!permissions.getOrDefault(ACCESS_BACKGROUND_LOCATION, false))
+                    showDialogWithSettings()
             }
 
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
-                101
-            )
-        }
+        }.launch(
+            if(Build.VERSION.SDK_INT == Build.VERSION_CODES.Q)
+                arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, ACCESS_BACKGROUND_LOCATION)
+            else
+                arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
+        )
     }
 
-    val activityResultLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){permissions ->
-        Log.d("registerForActivityResult", "permissions=$permissions")
+    private fun showDialogWithSettings(){
+        AlertDialog.Builder(this)
+            .setTitle("Need set max \n location permissions")
+            .setPositiveButton("Set"
+            ) { dialog, which ->
+                val intent = Intent().apply {
+                    action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                    data = Uri.parse("package:" + applicationContext.packageName)
+                }
+                startActivity(intent)
+            }
+            .show()
+    }
+
+    val activityResultLauncher: ActivityResultLauncher<Array<String>> = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){permissions ->
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q){
+        }
+        if(Build.VERSION.SDK_INT == Build.VERSION_CODES.Q){
+
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        requestPermissions()
+//        showDialogWithSettings()
         MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
         MapKitFactory.initialize(this)
 

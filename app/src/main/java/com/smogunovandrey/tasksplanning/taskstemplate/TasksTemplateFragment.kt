@@ -1,13 +1,19 @@
 package com.smogunovandrey.tasksplanning.taskstemplate
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -15,10 +21,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.smogunovandrey.tasksplanning.ACCESS_BACKGROUND_LOCATION
-import com.smogunovandrey.tasksplanning.ACCESS_COARSE_LOCATION
-import com.smogunovandrey.tasksplanning.ACCESS_FINE_LOCATION
-import com.smogunovandrey.tasksplanning.MainActivity
+import com.smogunovandrey.tasksplanning.*
 import com.smogunovandrey.tasksplanning.databinding.FragmentTasksTemplateBinding
 import com.smogunovandrey.tasksplanning.runtask.ManagerActiveTask
 import com.smogunovandrey.tasksplanning.runtask.RunTaskViewModel
@@ -97,12 +100,7 @@ TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
         )
     }
 
-    private fun infoPermission(permission: String) {
-        val permissionInt = ActivityCompat.checkSelfPermission(requireActivity(), permission)
-        Log.d("registerForActivityResult", "$permission=$permissionInt")
-    }
-
-    private fun startTask(task: Task){
+    private fun startTask(task: Task) {
         lifecycleScope.launch {
             val activeRunTask = managerActiveTask.activeRunTaskWithPointsFlow.value
             if (activeRunTask == null) {
@@ -118,23 +116,41 @@ TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
             }
         }
     }
+
     override fun onRunTaskItemClick(task: Task) {
-        infoPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-        infoPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-        infoPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-        Log.d("TasksTemplateFragment", "onRunTaskItemClick, task=$task")
+        lifecycleScope.launch {
+            val activeRunTask = managerActiveTask.activeRunTaskWithPointsFlow.value
+            if (activeRunTask == null) {
+                val accessBackground = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+                    ActivityCompat.checkSelfPermission(
+                        requireContext(),
+                        ACCESS_BACKGROUND_LOCATION
+                    ) == PERMISSION_DENIED
+                } else {
+                    ActivityCompat.checkSelfPermission(
+                        requireContext(),
+                        ACCESS_FINE_LOCATION
+                    ) == PERMISSION_GRANTED
+                }
 
-        val activityResultLauncher = (requireActivity() as MainActivity).activityResultLauncher
-        activityResultLauncher.launch(arrayOf(
-//            ACCESS_BACKGROUND_LOCATION,
-            ACCESS_COARSE_LOCATION,
-            ACCESS_FINE_LOCATION
-        ))
-        if(requireActivity().checkSelfPermission(ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-            //Check background
+                if (accessBackground) {
+                    withContext(Dispatchers.Default) {
+                        managerActiveTask.startTask(task.id)
+                    }
+                    findNavController().navigate(TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskActiveFragment())
+                } else {
+                    val intent = Intent().apply {
+                        action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                        data = Uri.parse("package:" + requireContext().packageName)
+                    }
+                    requireActivity().startActivity(intent)
+                }
+            } else {
+                //already run task
+                if (activeRunTask.runTask.idTask == task.id) findNavController().navigate(
+                    TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskActiveFragment()
+                )
+            }
         }
-
-        return
-
     }
 }
