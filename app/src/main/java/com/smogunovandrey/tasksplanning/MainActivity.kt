@@ -29,6 +29,7 @@ import com.smogunovandrey.tasksplanning.databinding.ActivityMainBinding
 import com.smogunovandrey.tasksplanning.db.*
 import com.smogunovandrey.tasksplanning.runtask.ManagerActiveTask
 import com.smogunovandrey.tasksplanning.runtask.RunService
+import com.smogunovandrey.tasksplanning.utils.showDialogWithSettings
 import com.smogunovandrey.tasksplanning.utils.showSnackbar
 import com.yandex.mapkit.MapKitFactory
 import kotlinx.coroutines.Dispatchers
@@ -90,21 +91,6 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             )
         )
-    }
-
-    private fun showDialogWithSettings() {
-        AlertDialog.Builder(this)
-            .setTitle("Need set max \n location permissions")
-            .setPositiveButton(
-                "Set"
-            ) { dialog, which ->
-                val intent = Intent().apply {
-                    action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                    data = Uri.parse("package:" + applicationContext.packageName)
-                }
-                startActivity(intent)
-            }
-            .show()
     }
 
     private var launcherBackgroundLocation: ActivityResultLauncher<String>? = null

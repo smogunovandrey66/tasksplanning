@@ -1,6 +1,11 @@
 package com.smogunovandrey.tasksplanning.utils
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
+import androidx.appcompat.app.AlertDialog
 import com.smogunovandrey.tasksplanning.db.*
 import com.smogunovandrey.tasksplanning.taskstemplate.*
 import java.util.*
@@ -61,6 +66,21 @@ fun Bundle?.toList(): kotlin.collections.List<String>? =
     } else {
         null
     }
+
+fun Context.showDialogWithSettings(){
+    AlertDialog.Builder(this)
+        .setTitle("Need set max \n location permissions")
+        .setPositiveButton(
+            "Set"
+        ) { dialog, which ->
+            val intent = Intent().apply {
+                action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                data = Uri.parse("package:" + applicationContext.packageName)
+            }
+            startActivity(intent)
+        }
+        .show()
+}
 
 //fun Any.deepCopy():Any {
 //    val JSON = Gson().toJson(this)

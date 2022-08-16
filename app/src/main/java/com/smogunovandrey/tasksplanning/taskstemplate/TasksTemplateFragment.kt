@@ -25,6 +25,7 @@ import com.smogunovandrey.tasksplanning.*
 import com.smogunovandrey.tasksplanning.databinding.FragmentTasksTemplateBinding
 import com.smogunovandrey.tasksplanning.runtask.ManagerActiveTask
 import com.smogunovandrey.tasksplanning.runtask.RunTaskViewModel
+import com.smogunovandrey.tasksplanning.utils.showDialogWithSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -117,34 +118,29 @@ TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
         }
     }
 
+    fun canWorkBackground(): Boolean{
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+            return true
+
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
+            return requireActivity().checkSelfPermission(ACCESS_FINE_LOCATION) == PERMISSION_GRANTED
+
+        return requireActivity().checkSelfPermission(ACCESS_BACKGROUND_LOCATION) == PERMISSION_GRANTED
+    }
+
     override fun onRunTaskItemClick(task: Task) {
+        if(!canWorkBackground()){
+            requireActivity().showDialogWithSettings()
+            return
+        }
+
         lifecycleScope.launch {
             val activeRunTask = managerActiveTask.activeRunTaskWithPointsFlow.value
             if (activeRunTask == null) {
-                val accessBackground = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
-                    ActivityCompat.checkSelfPermission(
-                        requireContext(),
-                        ACCESS_BACKGROUND_LOCATION
-                    ) == PERMISSION_DENIED
-                } else {
-                    ActivityCompat.checkSelfPermission(
-                        requireContext(),
-                        ACCESS_FINE_LOCATION
-                    ) == PERMISSION_GRANTED
+                withContext(Dispatchers.Default) {
+                    managerActiveTask.startTask(task.id)
                 }
-
-                if (accessBackground) {
-                    withContext(Dispatchers.Default) {
-                        managerActiveTask.startTask(task.id)
-                    }
-                    findNavController().navigate(TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskActiveFragment())
-                } else {
-                    val intent = Intent().apply {
-                        action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                        data = Uri.parse("package:" + requireContext().packageName)
-                    }
-                    requireActivity().startActivity(intent)
-                }
+                findNavController().navigate(TasksTemplateFragmentDirections.actionTasksTemplateFragmentToRunTaskActiveFragment())
             } else {
                 //already run task
                 if (activeRunTask.runTask.idTask == task.id) findNavController().navigate(
