@@ -40,6 +40,7 @@ val ACCESS_COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION
 val ACCESS_FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION
 val PERMISSION_DENIED = PackageManager.PERMISSION_DENIED
 val PERMISSION_GRANTED = PackageManager.PERMISSION_GRANTED
+
 class MainActivity : AppCompatActivity() {
 
     private val binding: ActivityMainBinding by lazy {
@@ -91,30 +92,11 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun requestPermissions() {
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){permissions->
-            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q){
-                if(!permissions.getOrDefault(ACCESS_FINE_LOCATION, false)){
-                    showDialogWithSettings()
-                }
-            }
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-                if(!permissions.getOrDefault(ACCESS_BACKGROUND_LOCATION, false))
-                    showDialogWithSettings()
-            }
-
-        }.launch(
-            if(Build.VERSION.SDK_INT == Build.VERSION_CODES.Q)
-                arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, ACCESS_BACKGROUND_LOCATION)
-            else
-                arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
-        )
-    }
-
-    private fun showDialogWithSettings(){
+    private fun showDialogWithSettings() {
         AlertDialog.Builder(this)
             .setTitle("Need set max \n location permissions")
-            .setPositiveButton("Set"
+            .setPositiveButton(
+                "Set"
             ) { dialog, which ->
                 val intent = Intent().apply {
                     action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
@@ -125,20 +107,31 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    val activityResultLauncher: ActivityResultLauncher<Array<String>> = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){permissions ->
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q){
-        }
-        if(Build.VERSION.SDK_INT == Build.VERSION_CODES.Q){
-
-        }
-    }
+    private var launcherBackgroundLocation: ActivityResultLauncher<String>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestPermissions()
 //        showDialogWithSettings()
         MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
         MapKitFactory.initialize(this)
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            launcherBackgroundLocation =
+                registerForActivityResult(ActivityResultContracts.RequestPermission()) { access ->
+                    if (!access)
+                        showDialogWithSettings()
+                }
+        }
+
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            if (!permissions.getOrDefault(ACCESS_FINE_LOCATION, false)) {
+                showDialogWithSettings()
+            } else {
+                launcherBackgroundLocation?.launch(ACCESS_BACKGROUND_LOCATION)
+            }
+        }.launch(
+            arrayOf(ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION)
+        )
 
         setContentView(R.layout.activity_main)
 
@@ -146,7 +139,7 @@ class MainActivity : AppCompatActivity() {
         val navHost =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHost.navController
-        
+
         val appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
