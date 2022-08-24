@@ -16,6 +16,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -32,9 +36,12 @@ import com.smogunovandrey.tasksplanning.runtask.RunService
 import com.smogunovandrey.tasksplanning.utils.showDialogWithSettings
 import com.smogunovandrey.tasksplanning.utils.showSnackbar
 import com.yandex.mapkit.MapKitFactory
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 val ACCESS_BACKGROUND_LOCATION = Manifest.permission.ACCESS_BACKGROUND_LOCATION
 val ACCESS_COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION
@@ -42,6 +49,7 @@ val ACCESS_FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION
 val PERMISSION_DENIED = PackageManager.PERMISSION_DENIED
 val PERMISSION_GRANTED = PackageManager.PERMISSION_GRANTED
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private val binding: ActivityMainBinding by lazy {
@@ -95,8 +103,21 @@ class MainActivity : AppCompatActivity() {
 
     private var launcherBackgroundLocation: ActivityResultLauncher<String>? = null
 
+    @Inject lateinit var dataStore: DataStore<Preferences>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("MainActivity", "dataStore=$dataStore")
+        lifecycleScope.launch {
+            val strKey = stringPreferencesKey("strKey")
+            dataStore.data.collect{
+                val strValue = it[strKey] ?: "not value"
+                Log.d("MainActivity", "strValue=$strValue")
+            }
+//            dataStore.edit {
+//                it[strKey] = "12345"
+//            }
+        }
 //        showDialogWithSettings()
         MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
         MapKitFactory.initialize(this)
