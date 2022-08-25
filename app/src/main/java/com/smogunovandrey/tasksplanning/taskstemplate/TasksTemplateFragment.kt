@@ -15,6 +15,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -26,12 +30,14 @@ import com.smogunovandrey.tasksplanning.databinding.FragmentTasksTemplateBinding
 import com.smogunovandrey.tasksplanning.runtask.ManagerActiveTask
 import com.smogunovandrey.tasksplanning.runtask.RunTaskViewModel
 import com.smogunovandrey.tasksplanning.utils.showDialogWithSettings
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class
-TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
+@AndroidEntryPoint
+class TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
 
     private val binding: FragmentTasksTemplateBinding by lazy {
         FragmentTasksTemplateBinding.inflate(layoutInflater)
@@ -128,7 +134,19 @@ TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
         return requireActivity().checkSelfPermission(ACCESS_BACKGROUND_LOCATION) == PERMISSION_GRANTED
     }
 
+
+    @Inject
+    lateinit var dataStore: DataStore<Preferences>
+    //@Inject lateinit var dataStore: DataStore<Preferences>
+
     override fun onRunTaskItemClick(task: Task) {
+        val strKey = stringPreferencesKey("strKKK")
+        lifecycleScope.launch {
+            dataStore.edit {
+                it[strKey] = "new value"
+            }
+        }
+        return
         if(!canWorkBackground()){
             requireActivity().showDialogWithSettings()
             return

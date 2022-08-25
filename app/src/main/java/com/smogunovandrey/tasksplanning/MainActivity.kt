@@ -39,6 +39,7 @@ import com.yandex.mapkit.MapKitFactory
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -105,18 +106,23 @@ class MainActivity : AppCompatActivity() {
 
     @Inject lateinit var dataStore: DataStore<Preferences>
 
+    private val strKey = stringPreferencesKey("strKKK")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("MainActivity", "dataStore=$dataStore")
         lifecycleScope.launch {
-            val strKey = stringPreferencesKey("strKey")
-            dataStore.data.collect{
-                val strValue = it[strKey] ?: dataStore.edit {mutRefernces ->
-                    mutRefernces[strKey] = "123456"
-                    Log.d("MainActivity", "insert preferences")
-                }
-                Log.d("MainActivity", "strValue=$strValue")
+
+            val f = dataStore.data.map {
+                val str = it[strKey]
+                str
             }
+
+
+            f.collect{
+                Log.d("MainActivity", "collect=$it")
+            }
+            Log.d("MainActivity", "after collect")
         }
 //        showDialogWithSettings()
         MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
