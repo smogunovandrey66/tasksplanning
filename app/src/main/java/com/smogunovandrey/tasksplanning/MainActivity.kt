@@ -111,12 +111,12 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val strKey = stringPreferencesKey("strKey")
             dataStore.data.collect{
-                val strValue = it[strKey] ?: "not value"
+                val strValue = it[strKey] ?: dataStore.edit {mutRefernces ->
+                    mutRefernces[strKey] = "123456"
+                    Log.d("MainActivity", "insert preferences")
+                }
                 Log.d("MainActivity", "strValue=$strValue")
             }
-//            dataStore.edit {
-//                it[strKey] = "12345"
-//            }
         }
 //        showDialogWithSettings()
         MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
