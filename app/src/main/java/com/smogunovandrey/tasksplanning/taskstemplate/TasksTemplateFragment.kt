@@ -34,6 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.UUID
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -140,13 +141,14 @@ class TasksTemplateFragment : Fragment(), OnRunTaskItemClick {
     //@Inject lateinit var dataStore: DataStore<Preferences>
 
     override fun onRunTaskItemClick(task: Task) {
-        val strKey = stringPreferencesKey("strKKK")
-        lifecycleScope.launch {
-            dataStore.edit {
-                it[strKey] = "new value"
-            }
-        }
-        return
+        //Test preference jetpack library
+//        val strKey = stringPreferencesKey("strKKK")
+//        lifecycleScope.launch {
+//            dataStore.edit {
+//                it[strKey] = UUID.randomUUID().toString()
+//            }
+//        }
+//        return
         if(!canWorkBackground()){
             requireActivity().showDialogWithSettings()
             return

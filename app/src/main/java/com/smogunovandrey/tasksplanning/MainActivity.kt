@@ -110,20 +110,21 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("MainActivity", "dataStore=$dataStore")
-        lifecycleScope.launch {
-
-            val f = dataStore.data.map {
-                val str = it[strKey]
-                str
-            }
-
-
-            f.collect{
-                Log.d("MainActivity", "collect=$it")
-            }
-            Log.d("MainActivity", "after collect")
-        }
+        //Test preference jetpack library
+//        Log.d("MainActivity", "dataStore=$dataStore")
+//        lifecycleScope.launch {
+//
+//            val f = dataStore.data.map {
+//                val str = it[strKey]
+//                str
+//            }
+//
+//
+//            f.collect{
+//                Log.d("MainActivity", "collect=$it")
+//            }
+//            Log.d("MainActivity", "after collect")
+//        }
 //        showDialogWithSettings()
         MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
         MapKitFactory.initialize(this)
