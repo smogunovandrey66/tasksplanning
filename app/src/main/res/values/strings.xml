@@ -35,4 +35,6 @@
     <string name="coordinates">coordinates:</string>
     <string name="need_change_permission">Need change permissions</string>
     <string name="ok">Ok</string>
+    <string name="settings">Settings</string>
+    <string name="geofence_radius">Geofencd radius</string>
 </resources>

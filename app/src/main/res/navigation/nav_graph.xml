@@ -23,6 +23,9 @@
         <action
             android:id="@+id/action_tasksTemplateFragment_to_runTaskViewFragment"
             app:destination="@id/runTaskViewFragment" />
+        <action
+            android:id="@+id/action_tasksTemplateFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/taskViewFragment"
@@ -87,4 +90,8 @@
         android:id="@+id/mapFragment"
         android:name="com.smogunovandrey.tasksplanning.map.MapFragment"
         android:label="MapFragment" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.smogunovandrey.tasksplanning.settings.SettingsFragment"
+        android:label="SettingsFragment" />
 </navigation>
