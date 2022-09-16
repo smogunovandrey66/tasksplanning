@@ -17,13 +17,13 @@ class SettingsFragment: Fragment() {
         FragmentSettingsBinding.inflate(layoutInflater)
     }
 
-    private val model: SettingsDatastoreViewModel by activityViewModels()
-
+    private lateinit var model: SettingsObservableModel
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        model = SettingsObservableModel()
         binding.viewModel = model
         binding.lifecycleOwner = viewLifecycleOwner
 

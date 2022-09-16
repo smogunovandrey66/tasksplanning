@@ -25,6 +25,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@={viewModel.geofenceRadiusString}"
+
             android:hint="@string/geofence_radius_in_meters"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

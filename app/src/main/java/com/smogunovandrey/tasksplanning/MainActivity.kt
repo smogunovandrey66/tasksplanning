@@ -65,6 +65,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var navController: NavController
 
+    private fun log(msg: String){
+        Log.d("MainActivityDebug", msg)
+    }
+
     /**
      * Other way check and set permissions
      */
@@ -109,8 +113,28 @@ class MainActivity : AppCompatActivity() {
 
     private val strKey = stringPreferencesKey("strKKK")
 
+    override fun onStart() {
+        super.onStart()
+        log("onStart")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        log("onPause")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        log("onDestroy")
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        log("onBackPressed")
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        log("onCreate")
         //Test preference jetpack library
 //        Log.d("MainActivity", "dataStore=$dataStore")
 //        lifecycleScope.launch {
@@ -127,8 +151,8 @@ class MainActivity : AppCompatActivity() {
 //            Log.d("MainActivity", "after collect")
 //        }
 //        showDialogWithSettings()
-        MapKitFactory.setApiKey(BuildConfig.MAPKIT_API_KEY)
-        MapKitFactory.initialize(this)
+
+
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             launcherBackgroundLocation =
